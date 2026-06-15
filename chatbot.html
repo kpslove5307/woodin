@@ -206,7 +206,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
     </div>
     <div class="adm-gh-field">
       <label>파일 경로</label>
-      <input type="text" id="adm-gh-path" placeholder="예: 하드웨어_챗봇.html" value="하드웨어_챗봇.html">
+      <input type="text" id="adm-gh-path" placeholder="예: chatbot.html" value="chatbot.html">
     </div>
     <div class="adm-gh-field">
       <label>Personal Access Token</label>
@@ -222,7 +222,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
 </div>
 
 <!-- 업로드 진행 오버레이 -->
-<div id="adm-upload-overlay" class="show">
+<div id="adm-upload-overlay" class="">
   <div class="adm-spinner"></div>
   <p>GitHub에 업로드 중...</p>
   <small id="adm-upload-msg">HTML 파일 인코딩 중...</small>
@@ -372,7 +372,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
   </div>
 </div>
 
-  <div id="msgs"><div class="mw b"><div style="display: flex; gap: 7px; align-items: flex-end;"><div class="av" style="width: 28px; height: 28px; border-radius: 50%; background: rgb(255, 255, 255); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; align-self: flex-end;"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC8AAAAoCAYAAABuIqMUAAAOS0lEQVR4nNWZ269dV3XGf2PMudbeZ+9zfI5zbAfb2LFjkmA7MbkCgaYUBAGktKCqVYVQpaqoD63oS/+Cqn2p1MdWtOIpEk8FtRCEyiUtCrdAnHLJhSROnIT47vhyjs85+7bWnGP0YS4fO1WThifUIS1t7bXXnmvMcfu+MaZMJyN3ADEcANm8xBUAlwySAMMIiPdRi4gLkDFNZE0IRnAQD+ABMDw0uI5x7+E2RMkIDh7LBbi2ILPuf+Xe25HoYnQrIACETnmKci4gAURAMgrgVhSTzSeBCLRABvFyzyPkCryPoIgLgiMYxVK+aTBHkW61t618WUUABQ+b1r5exAKIgiREEo6BtIDirt1/ASmbKmI4glvEcix7D/k6IzmQujUEp8bdfy31o0tGPBalPRRFMBAjywxc0c5yeETcQVN5vRhO7KIsd57q4RiCYTJDaiPGipwzntuyjikqBm6YGMK1MLu2+bdl+U37UtznSMg0jKh7CUVpW4ccUI+IB5SMk4rLJWDeEkJC8hBLkRChZYPYH7M6Pc2Z879i2w17WB7sJzcBYQ5LRtASQmVNRYRfV/nO7XTJqZksG0i9wS/P/pTzF85w5Ob7WR7uJ7d9PEWChy6BvWxWDKFBmCcEIbsj/cSrl57kX7/zBS6OjhN8mU+8/8/4wB2fpJ0Fau3hboj4r6XwG5V3pVzg4uQwgWrMD5/5Oo9872FGsxV+cdO9fPahv2JrdRuei/VFFCEj7qgGPAXMIJkj9Yz19CpffvQfOXHlKDo/RfM6X3v8iyzvuJFDOz6ETUGJQEbFcDe6LH4TufrbtaxQ6UIBBCOhMXN67SUePfoV0vAsC3vHPH/2MZ449h0IieSQXYvTXBDx4o08j3hEQ6Kq1/j+T7/CiZWfI4uZaQw0gwmj8Arff+obtNJgGnFX1ALijpDf1ANlXwHp3rmpfAkXQVxwF6Jknj72OBcnJ2E4YaKXkPkNfvHi97jSXiDWgop2iygOuAgx9CA7dc84PXqWnx3/DxhOacQxH5IlI/MjXrvwIqfXTuJBMBF8M2y8u+xaiUYwMtXA8d6IWbiI1NPyvCt6tc6rCxUVIzvP8XM/RActbTbatibM9Tm39iQXrzxPHR3NoLQIgnuNxXWSjkAclcwvj/+Ys9NXaOYUp8/AoJplgkYubZzkVxefx6Nh0uI6xTSTpIeZEaUBy5gFNFZYf8yTJx/hi9/7PH//zU9x9MSXkJBQq9Gy85L1KjBqVri4egaXXGqza6nXNLxy6jkU7+53+CAlFpNlJBqj5jJPv3gUqTMmVp4xI0rEPWNyhbMXnscYgYFaVXIOR7WHWU1Dg/bXWUnP82/f/wce/vrf8dQrj/Hq68/w6I++ysTXcIVYXJbJ4oSqZnXlEpPpGqGvGIZLQqRHtsDpcy/R+BQEKgnFtZpx6yES0Cpx+vwxTr1+HL3BEbdCBSTiHnGfEKoRZ849gzBCWUByhTJDQ0u2mixKGLa8fPkn/Mt/foHXLjxDf4sTJFGnBcZpxOr0dfpzu4ni3nEXQ0LN5SvnyNLgmjvDOslaYt3j3OXjrE7OsVzvxpKACOItSh+zDGHMc6d+QqNXCMFLyXRwQtkgDXXVsjE+waRdYU52FTzUiLOBVA0WJ/zohUd45Mf/zDieIOwYM7VMSDUifQiJSVpHqw6kCuMoG1gbr5CYYk5JHsAEJEQurZ/i8sZJtu/YSWojKl42bRWuzshe59jpJ7A4JrqVdPYuEb1G6OM+YzJbZX10mRv60BigCe21rDbH+fYPvswPnv0WvmWVadwg25Q6VKgVLUMQ5voDpqm5ClLgJUiYtiNamxHCHNkcES1xrdDKiJMXnuddO+7GpIcwK9tOUM1Hzqwe4/TqMbTvWFaCFNbpkjFTgtZ4h88rk0vsnm+wPoS5DV648AT//sN/4vjZo1RLfcYyAomEuADJcYTkLYPBInNzi9AGIh7ArSufzmQ2xTAqVVILIUaSO64Z15bXzj9FPvwZXKRwnI7IKS0vn3qKtXSeaiBIrlGjy6cGYuFAIc6xMZ6wun4B3TlmGi7z+LOP8K2jX2HDX6JenjJNM4JG3HvYzHEHjYFGZmyb38NAtiEWiOKRwgAbHCN5wjocEImYCwQh54YYlNcvv8RGM2GoSwXUvE9QmNg6r555Dq8nJHqEPCBioC1ZW0Qj7WxGXRvTPGHqK5ybPsPXHnuYZ05+l3ZuRA4NLhWigCu1Ce6KqOI5M0uZvTsP0bcl2sRVSngNglUVBLJDDBU5t4goqoFQ17y+eoLLa2dYWt5JbgryaeWsjM9z5tyviLVgCCIBNzB3XA1PEwZzPaaTCb1qkZfPHuPoU49x6uLT6NIaqZoCQ1LbJ2qG1BCk+NQl07aJLf1l9u54N+KKZu+IuDQF7jvkEgJOC6JEzwzbiKQ+bVSuyAovnv06QVbQZgnxQKoucObK02xsrNP3ecgtrY6ZVZC0j1KhZuQrFdu4nc89+NfctPweTq38grDUYkR6aUhsBfWMeEarhiYERtYja0NIU/b138OehSPklKBu0WvQLDhQV32CRgTHrPwWOgKWMYjCL1/+GWNbQ4KWMkjmuVNPMpGNQpQ1gCpoQCXSTEfUtsi9t36KP/+Dv+Hemz7B0mAPVRVwUql3JqgUAMQUQ8lkQk9wTwSvObDjThZ7O7DcgmSiS+lexEsb1q8HYFc7I9AIKTcloV2IVeTE+VO8fPYFDu7czXgDzBIvnDtG25/g1QYaDMlKuxbRvJXbdt/Db9/9ae7e+UncAtmGDOutBK/I7qCOS7nwUlbJjqoBa4gZMW/l4IEPYB5AMhSa1iVnRwMGvXkqaoxEyokQDFQK1IvgqjSs8djPvsreh25jfn4nL6y8yuWNM/TmwL0ljZ0wg1uW7+P+g3/E3e/6CPNhG83MkAx1v2Khv0StgcatI2ClEUIc8QL8GkYYU2ym7Nl2hL3LR2hm3uXCJj0o+xAXhnNbUCrMM7gXfi417l177JlqS8uzpx/l2/91A5++73O8/NoTrF8+xfygppZ9HN51F3cd+Di37/8IW+M+fBLJGaroiDnSClsGA1TA3EAqxCPObDOE1SO4EXCsHXJo3wMs9HaQxk5Xg4lIAQBxkCwszi8TpEf2hqCKq+AeutCSggW2QrUoPPbUl1i9cIkblt7JA7c9xN53HOLWvfdz4/Agw7gME9BJQ5A1TIXkPVSKqaqg9Ooe3ipChVnxqkgGMoKiJuQsLPb2cfv+DxFSxGg3a2N0MdQhOHiGpeEyc3FAY+sQuv5FFDUjeCjfo5BkSuwFXj31Ap/68F+wc+4gCaVtFJKTZ4lKjKBNmTho4f2lMERCrJifX8IvnQbv2kmkkDmZgVcEiczGPQ7d9mF2Lx0hbUyRUDhw14wUT4kLnmGuGrAw3ELbJFSluEgyihOzEnIPqJEoTNqG/fvvYKl/M+NRRbshRHOitGjcwOKYNigztpAYdsS7JltNjAsMhltJ2RAxNLSIFM+KThBpICtz1XbuOfxJvOkTNaG0cE153/yCQR2GLG/djpuBKGYB8YR2EzP3QG7LAEmtzy177yNKnxBWiHEMXtDUpSJT00pNq5FEhXmFE3ETAnMM57YjFhAy7rPSN7iAtqhmZlPj9lt+i73bj2BNl9ZyrVVU00zWTIpOdhiym12LB4jeYiKIL1FnwTGmVcusniKVE5rI9moXh3bdh856iPSLYqIFH7oBlnom0BAwCupPyTolAtv77ya2fdQzRgSr8VSIYMpT5nwnDxz8YwbtNmoxSLGU0a4Z1zLs6eaRgFDzjhsO0IsLmCfKBHMO8z4mgoUWwfBpj1v33MPyYDtNk8EryqjwjXJ1vCeb3X/uJmvC8uIeenEOvDBP1xmxVjz38Mk8d9/6YW7ddieeM+pSAFGuTfQ05B7qgkpC1WlbY9/uO6nYjlhCwpjkfbIPupSaog4+XeKOAx9FRAlVuzl1fFPxqx2jokSyR7Zt3UWshqWp0YzpCNOMTRZY7h3mY/f8IZ6dSlLJvUpJdl3YqEXUFfUWlUTKsLV3gJtuvAtvHJUxWTOuDtoQdILPMjffeB/7d32wm0POrrPsW4u4gyg5KctL72TH0l7SrFQOp0WlRpodfPTeP2Hn8DBV6hEs0dqEHED0Osvjslm/kbaUTRa57ab70emQHiBhBDpGbEpwCM0c9x3+OIvVPjz1um7pbYo46kAS5nUbN+86Qh4N6NkiVR4yuaTce/DjvO/gQzDbQpX7iOcyQsypq0hXlRfDUVy0xLInPEfuuPmDbK8P4BsVQWaQp/SoYb3HzTvu5s4Dv00zhiC9Lon+r/nu1Xl4RsgEE4INee+hj7Fr/jDNxXn0yjbed8sn+N0PfpaQS3Pu3RzdcVQFv85Q0UIDHlHvoTIjqjGdNdw42McHDv8e33ziJNQjhlrTrgsL7OTB9/8pW+KNWALLoKGj028h3gWGSEa8JdCjncI7txzmMw9+np88+zi7t+/ivXd8iHnZhc9KIJqAiRaA8zcaSNbbFde8gOaA6AZIQ5t6SF3TcIKHv/G3/PzsYwRRluJefv93/pK7bnkQTQFrG/pxgdReG3u/mZj3cE0EXSHkCklLgNDqGJnbIEuizwJ55sU3SdFQF6KGd8kubzCSrKWLLmmRYBGVERKm5LaPSY9QTVhtjvHka9+lmTXcvu8Bdi+9jzzpUesUlREqQyxXHS9/C+WpcTIhXCZYRJqtuClSGa1OMCC0NTURrzIzmWFdOyge0O5U5Q3Kj6cj3zwR6VAUAiKBZA0hGrFSFCWZ0zZSprue0OAlbDS8IRb/97DpDoAkFSt6xdXzAMRKIroiXuYYBfuvof9mUbk+bCaTyZu89eq5Utcf4IhIdwBwHaX4DcpbHL3J5ocI/+Ow6zevOFxllf9P5b8Be++WOHydRyAAAAAASUVORK5CYII=" style="width:22px;height:auto"></div><div style="flex: 1 1 0%; min-width: 0px;"><div class="bub b">안녕하세요! 👋 <b>우딘 하드웨어 챗봇</b>입니다.<br>필요한 제품명을 검색하면 이미지와 도면 등 제품 정보가 나오며, 제품명 · 숫자 · 키워드를 입력하면 제품을 찾을 수 있습니다.</div><div class="ts">오후 08:23</div></div></div></div></div>
+  <div id="msgs"><div class="mw b"><div style="display: flex; gap: 7px; align-items: flex-end;"><div class="av" style="width: 28px; height: 28px; border-radius: 50%; background: rgb(255, 255, 255); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; align-self: flex-end;"><img src="data:image/png;base64,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" style="width:22px;height:auto"></div><div style="flex: 1 1 0%; min-width: 0px;"><div class="bub b">안녕하세요! 👋 <b>우딘 하드웨어 챗봇</b>입니다.<br>필요한 제품명을 검색하면 이미지와 도면 등 제품 정보가 나오며, 제품명 · 숫자 · 키워드를 입력하면 제품을 찾을 수 있습니다.</div><div class="ts">오후 08:13</div></div></div></div><div class="mw b"><div style="display: flex; gap: 7px; align-items: flex-end;"><div class="av" style="width: 28px; height: 28px; border-radius: 50%; background: rgb(255, 255, 255); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; align-self: flex-end;"><img src="data:image/png;base64,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" style="width:22px;height:auto"></div><div style="flex: 1 1 0%; min-width: 0px;"><div class="bub b">안녕하세요! 👋 <b>우딘 하드웨어 챗봇</b>입니다.<br>필요한 제품명을 검색하면 이미지와 도면 등 제품 정보가 나오며, 제품명 · 숫자 · 키워드를 입력하면 제품을 찾을 수 있습니다.</div><div class="ts">오후 08:26</div></div></div></div></div>
   <div id="ir" style="position:relative">
     <div id="ac"></div>
     <input id="ii" type="text" placeholder="🔍 제품명을 입력하세요 (예: 대칭, 40, 커브...)">
@@ -388,7 +388,16 @@ function closeLB(){lb.style.display='none';lbi.src='';}
 document.getElementById('lbx').addEventListener('click',function(e){e.stopPropagation();closeLB();});
 lb.addEventListener('click',function(e){if(e.target===lb)closeLB();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLB();});
-function gi(f){return I[f]||'';}
+function gi(f){
+  if(!f)return '';
+  // 새로 업로드한 이미지(base64)는 바로 반환
+  if(I[f]&&I[f]!=='__IMG_PLACEHOLDER__')return I[f];
+  // GitHub Raw URL (모든 사용자가 볼 수 있음 - 저장소 정보 하드코딩)
+  var OWNER='kpslove5307', REPO='woodin', BRANCH='main';
+  var cfg=admGhLoadConfig?admGhLoadConfig():null;
+  var folder=cfg&&cfg.path?cfg.path.replace(/[^/]*$/,''):'';
+  return 'https://raw.githubusercontent.com/'+OWNER+'/'+REPO+'/'+BRANCH+'/'+folder+'images/'+encodeURIComponent(f);
+}
 
 /* ══ 제품 DB ══ */
 var DB = {
@@ -851,7 +860,7 @@ function admGhOpenModal(){
   if(cfg){
     document.getElementById('adm-gh-owner').value=cfg.owner||'';
     document.getElementById('adm-gh-repo').value=cfg.repo||'';
-    document.getElementById('adm-gh-path').value=cfg.path||'하드웨어_챗봇.html';
+    document.getElementById('adm-gh-path').value=cfg.path||'chatbot.html';
     document.getElementById('adm-gh-token').value=cfg.token||'';
   }
   document.getElementById('adm-gh-modal').classList.add('show');
@@ -877,9 +886,17 @@ function admGhUpdateStatus(){
 
 /* 현재 HTML 전체를 문자열로 직렬화 */
 function admGetCurrentHTML(){
+  var hideIds=['adm-upload-overlay','adm-panel','adm-login-overlay','adm-gh-modal','lb'];
+  var removed=[];
+  hideIds.forEach(function(id){
+    var el=document.getElementById(id);
+    if(el&&el.classList.contains('show')){el.classList.remove('show');removed.push(el);}
+  });
   var dt=document.doctype;
   var dtStr=dt?'<!DOCTYPE '+dt.name+'>':'';
-  return dtStr+document.documentElement.outerHTML;
+  var html=dtStr+document.documentElement.outerHTML;
+  removed.forEach(function(el){el.classList.add('show');});
+  return html;
 }
 
 /* GitHub API 단일 파일 PUT 헬퍼 */
@@ -901,7 +918,7 @@ async function ghPutFile(cfg, filePath, content, commitMsg){
   return putRes;
 }
 
-/* GitHub API로 HTML + woodin_images.json 동시 업로드 */
+/* GitHub API로 HTML + 새 이미지 개별 파일 업로드 */
 async function admPushToGitHub(onSuccess){
   var cfg=admGhLoadConfig();
   if(!cfg||!cfg.token){
@@ -913,22 +930,36 @@ async function admPushToGitHub(onSuccess){
   overlay.classList.add('show');
   try{
     var now=new Date().toLocaleString('ko-KR');
+    var folder=cfg.path.replace(/[^/]*$/,'');
+    var imgFolder=folder+'images/';
 
-    // ── 1) woodin_images.json 업로드 ──────────────────────────────
-    msg.textContent='이미지 JSON 인코딩 중...';
-    var imgJson=JSON.stringify(I, null, 0);
-    var imgB64=btoa(unescape(encodeURIComponent(imgJson)));
-    var imgPath=cfg.path.replace(/[^/]*$/, '')+'woodin_images.json'; // HTML과 같은 폴더
-    msg.textContent='이미지 JSON 업로드 중 ('+Object.keys(I).length+'개)...';
-    await ghPutFile(cfg, imgPath, imgB64, '이미지 업데이트 ('+now+')');
+    // ── 1) base64 이미지를 개별 파일로 GitHub 업로드 ──────────────
+    var newImgs=Object.keys(I).filter(function(k){
+      return I[k]&&I[k]!=='__IMG_PLACEHOLDER__'&&I[k].startsWith('data:');
+    });
+    if(newImgs.length>0){
+      msg.textContent='이미지 업로드 중 (0/'+newImgs.length+')...';
+      for(var i=0;i<newImgs.length;i++){
+        var fname=newImgs[i];
+        msg.textContent='이미지 업로드 중 ('+(i+1)+'/'+newImgs.length+'): '+fname;
+        var b64data=I[fname].split(',')[1];
+        if(!b64data)continue;
+        await ghPutFile(cfg, imgFolder+fname, b64data, '이미지 추가: '+fname+' ('+now+')');
+      }
+    }
 
-    // ── 2) HTML 업로드 (I 객체는 __IMG_PLACEHOLDER__ 상태로 직렬화) ─
+    // ── 2) HTML 직렬화: I를 임시로 placeholder로 바꿔서 저장 ──────
     msg.textContent='HTML 파일 인코딩 중...';
-    // 현재 I 값을 임시로 플레이스홀더로 바꿔서 HTML 직렬화
     var savedI={};
-    for(var k in I){savedI[k]=I[k]; I[k]='__IMG_PLACEHOLDER__';}
+    for(var k in I){
+      if(I[k]&&I[k]!=='__IMG_PLACEHOLDER__'&&I[k].startsWith('data:')){
+        savedI[k]=I[k];
+        I[k]='__IMG_PLACEHOLDER__';
+      }
+    }
     var html=admGetCurrentHTML();
-    for(var k in savedI){I[k]=savedI[k];} // 복원
+    for(var k in savedI){I[k]=savedI[k];} // I 복원
+
     var htmlB64=btoa(unescape(encodeURIComponent(html)));
     msg.textContent='HTML 업로드 중...';
     await ghPutFile(cfg, cfg.path, htmlB64, '챗봇 업데이트 ('+now+')');
@@ -936,7 +967,8 @@ async function admPushToGitHub(onSuccess){
     overlay.classList.remove('show');
     var pageUrl='https://'+cfg.owner+'.github.io/'+cfg.repo+'/'+cfg.path;
     if(onSuccess)onSuccess();
-    alert('🚀 GitHub 업로드 성공!\n\n✅ 하드웨어_챗봇_경량.html\n✅ woodin_images.json (이미지 '+Object.keys(I).length+'개)\n\nGitHub Pages URL:\n'+pageUrl+'\n\n※ Pages 반영까지 1~2분 소요됩니다.');
+    var imgMsg=newImgs.length>0?'\n✅ 새 이미지 '+newImgs.length+'개 (images/ 폴더)':'\n(새 이미지 없음)';
+    alert('🚀 GitHub 업로드 성공!\n\n✅ chatbot.html'+imgMsg+'\n\nGitHub Pages URL:\n'+pageUrl+'\n\n※ Pages 반영까지 1~2분 소요됩니다.');
   } catch(e){
     overlay.classList.remove('show');
     alert('❌ 업로드 오류\n'+e.message);
@@ -947,10 +979,7 @@ async function admPushToGitHub(onSuccess){
 function admSaveAndPush(){
   var pname=document.getElementById('adm-product-sel').value;
   if(!pname){alert('제품을 선택하세요.');return;}
-  // 먼저 로컬 저장
-  admSaveLocal();
-  admClosePanel();
-  // GitHub 업로드
+  if(!admSaveLocal()){alert('저장 실패.');return;}  // DB에 먼저 저장
   admPushToGitHub(null);
 }
 
@@ -962,7 +991,6 @@ function admAddProductAndPush(){
   var cat=document.getElementById('adm-new-cat').value;
   if(!cat||cat==='__new__'){alert('카테고리를 선택하세요.');return;}
   admAddProductLocal();
-  admClosePanel();
   admPushToGitHub(null);
 }
 
@@ -1067,8 +1095,9 @@ function admProcessFiles(files,type){
   Array.from(files).forEach(function(f){
     if(!f.type.startsWith('image/'))return;
     var reader=new FileReader();
+    var fname=f.name; // 원본 파일명 보존
     reader.onload=function(e){
-      admPending[type].push({src:e.target.result,label:f.name.replace(/\.[^.]+$/,'')});
+      admPending[type].push({src:e.target.result,label:fname.replace(/\.[^.]+$/,''),origF:fname});
       admRenderGrid(type);
     };
     reader.readAsDataURL(f);
@@ -1194,8 +1223,7 @@ function admSave(){
   var pname=document.getElementById('adm-product-sel').value;
   if(!pname){alert('제품을 선택하세요.');return;}
   if(!admSaveLocal()){alert('제품을 찾을 수 없습니다.');return;}
-  alert('✅ 저장되었습니다!\n영구 저장은 HTML 파일로 내보내기 해주세요.');
-  admClosePanel();
+  alert('✅ 저장되었습니다!\n영구 저장은 GitHub 업로드 버튼을 눌러주세요.');
 }
 
 /* 새 제품 추가 */
@@ -1206,15 +1234,15 @@ function admAddProductLocal(){
   if(!cat||cat==='__new__')return false;
   var info=admGetInfoRows('adm-new-info-rows');
   var images=admPending.newReal.map(function(item,idx){
-    var f=name+'_real_'+idx+'.jpg';var l=item.label||f;
+    var f=item.origF||(name+'_real_'+idx+'.jpg');var l=item.label||f;
     if(item.src)I[f]=item.src;return{f:f,l:l};
   });
   var drawings=admPending.newDraw.map(function(item,idx){
-    var f=name+'_draw_'+idx+'.jpg';var l=item.label||f;
+    var f=item.origF||(name+'_draw_'+idx+'.jpg');var l=item.label||f;
     if(item.src)I[f]=item.src;return{f:f,l:l};
   });
   var videos=admPending.newDesc.map(function(item,idx){
-    var f=name+'_desc_'+idx+'.jpg';var l=item.label||f;
+    var f=item.origF||(name+'_desc_'+idx+'.jpg');var l=item.label||f;
     if(item.src)I[f]=item.src;return{f:f,l:l};
   });
   DB[name]={cat:cat,info:info,images:images,drawings:drawings,videos:videos};
@@ -1233,7 +1261,6 @@ function admAddProduct(){
   if(!cat||cat==='__new__'){alert('카테고리를 선택하세요.');return;}
   admAddProductLocal();
   alert('✅ "'+name+'" 제품이 추가되었습니다!\n챗봇에서 바로 검색할 수 있습니다.');
-  admClosePanel();
 }
 
 /* 제품 삭제 */
@@ -1243,7 +1270,7 @@ function admDeleteProduct(){
   if(!confirm('"'+pname+'" 제품을 삭제하시겠습니까?\n이 작업은 현재 세션에만 적용됩니다.'))return;
   delete DB[pname];
   alert('"'+pname+'" 제품이 삭제되었습니다.');
-  admClosePanel();
+  admOpenPanel(); // 제품 목록 새로고침
 }
 
 function addBot(html,chips,extra){
@@ -1305,38 +1332,25 @@ addBot('안녕하세요! 👋 <b>우딘 하드웨어 챗봇</b>입니다.<br>필
 </script>
 
 <script>
-// 이미지 동적 로딩 (I 객체에 채움)
+// I 객체는 base64 캐시용. GitHub Raw URL은 gi()에서 동적으로 생성하므로 별도 로딩 불필요.
+// 단, 로컬에서 열 경우를 위해 woodin_images.json 시도
 (function() {
   function loadImages() {
-    // 현재 HTML과 같은 경로의 woodin_images.json 로드
     var base = location.href.replace(/[^/]*$/, '');
-    var url = base + 'woodin_images.json';
+    // GitHub Pages에서는 gi()가 Raw URL 반환하므로 JSON 로딩 불필요
+    if(location.hostname.endsWith('github.io'))return;
+    // 로컬에서 열 때만 woodin_images.json 시도
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
+    xhr.open('GET', base + 'woodin_images.json', true);
     xhr.onload = function() {
       if (xhr.status === 200) {
         try {
           var imgs = JSON.parse(xhr.responseText);
-          // I 객체에 이미지 데이터 채우기
           if (typeof I !== 'undefined') {
             for (var k in imgs) { I[k] = imgs[k]; }
           }
-          // DB 내 플레이스홀더도 교체
-          function replaceInObj(obj) {
-            for (var k in obj) {
-              if (typeof obj[k] === 'string' && obj[k] === '__IMG_PLACEHOLDER__') {
-                obj[k] = imgs[k] || '';
-              } else if (typeof obj[k] === 'object' && obj[k] !== null) {
-                replaceInObj(obj[k]);
-              }
-            }
-          }
-          if (typeof DB !== 'undefined') replaceInObj(DB);
-        } catch(e) { console.error('이미지 로딩 오류:', e); }
+        } catch(e) {}
       }
-    };
-    xhr.onerror = function() {
-      console.warn('woodin_images.json 로딩 실패 - 같은 폴더에 woodin_images.json이 있어야 합니다.');
     };
     xhr.send();
   }

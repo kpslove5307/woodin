@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>우딘 하드웨어 챗봇</title>
+<style>
+:root{--p:#1a4fa0;--pd:#0d3578;--pl:#e8f0fe;--bg:#eef1f6;--w:#fff;--tx:#1a1f2e;--s:#5a6478;--b:#dde3ed}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif}
+body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:16px}
+#app{width:100%;max-width:720px;background:var(--w);border-radius:22px;box-shadow:0 8px 40px rgba(26,79,160,.15);display:flex;flex-direction:column;height:98vh;overflow:hidden}
+#hdr{background:linear-gradient(135deg,var(--p),var(--pd));color:#fff;padding:13px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+#hdr-ic{width:40px;height:40px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+#hdr h1{font-size:14px;font-weight:700}
+#hdr p{font-size:10.5px;opacity:.75;margin-top:2px}
+#hdr-st{margin-left:auto;display:flex;align-items:center;gap:4px;font-size:10.5px;opacity:.8}
+.dlive{width:6px;height:6px;background:#4ade80;border-radius:50%;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+/* 검색 */
+#sw{padding:9px 12px 0;flex-shrink:0;position:relative}
+#si{width:100%;border:1.5px solid var(--b);border-radius:12px;padding:9px 38px 9px 13px;font-size:13.5px;outline:none;font-family:inherit;background:#f8f9fc;transition:all .2s}
+#si:focus{border-color:var(--p);background:#fff}
+#si::placeholder{color:#a0aec0}
+#sic{position:absolute;right:22px;top:50%;transform:translateY(-20%);font-size:15px;color:#a0aec0;pointer-events:none}
+
+#ac.show{display:block}
+.aci{padding:9px 13px;cursor:pointer;font-size:13px;color:var(--tx);border-bottom:1px solid #f0f3f8;display:flex;align-items:center;gap:9px;transition:background .12s}
+.aci:last-child{border-bottom:none}
+.aci:hover,.aci.fc{background:var(--pl)}
+#ac{position:absolute;bottom:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid var(--p);border-radius:10px;box-shadow:0 -6px 24px rgba(26,79,160,.2);z-index:9999;max-height:300px;overflow-y:auto;display:none}
+#ac.show{display:block}
+.acth{width:34px;height:34px;object-fit:cover;border-radius:6px;flex-shrink:0;background:#f0f3f8}
+.acth-ph{width:34px;height:34px;border-radius:6px;background:var(--pl);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.acn{font-weight:700;color:var(--p);font-size:13px}
+.acs{font-size:11px;color:var(--s);margin-top:1px}
+/* 메시지 */
+#msgs{flex:1;overflow-y:auto;padding:11px 12px;display:flex;flex-direction:column;gap:9px;background:var(--bg)}
+#msgs::-webkit-scrollbar{width:3px}
+#msgs::-webkit-scrollbar-thumb{background:#c5cfe0;border-radius:3px}
+.mw{display:flex;flex-direction:column;gap:3px;animation:fup .2s ease}
+.mw.u{align-items:flex-end}.mw.b{align-items:flex-start}
+@keyframes fup{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.bub{max-width:95%;padding:9px 13px;border-radius:17px;font-size:13px;line-height:1.7;word-break:keep-all}
+.bub.b{background:var(--w);color:var(--tx);border-bottom-left-radius:4px;box-shadow:0 1px 8px rgba(26,79,160,.08)}
+.bub.u{background:var(--p);color:#fff;border-bottom-right-radius:4px}
+.av{width:28px;height:28px;border-radius:50%;background:var(--p);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;align-self:flex-end}
+.ts{font-size:10px;color:#a0aec0;margin-top:2px}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.chip{background:#fff;border:1.5px solid var(--p);border-radius:18px;padding:4px 11px;font-size:11.5px;cursor:pointer;color:var(--p);font-weight:600;transition:all .15s;white-space:nowrap;font-family:inherit}
+.chip:hover{background:var(--p);color:#fff}
+/* 제품카드 */
+.pcard{background:var(--w);border-radius:13px;box-shadow:0 3px 14px rgba(26,79,160,.11);overflow:hidden;max-width:520px;margin-top:5px;border:1px solid var(--b)}
+.tbr{display:flex;background:#f4f7fc;border-bottom:1px solid var(--b)}
+.tab{flex:1;padding:8px 3px;text-align:center;font-size:11px;font-weight:700;color:var(--s);cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;font-family:inherit;transition:all .15s}
+.tab.on{color:var(--p);border-bottom-color:var(--p);background:#fff}
+.tp{display:none}.tp.on{display:block}
+/* 슬라이더 */
+.slw{position:relative;background:#f0f3f8;user-select:none}
+.slo{overflow:hidden}
+.slt{display:flex;transition:transform .32s cubic-bezier(.4,0,.2,1)}
+.sli{min-width:100%;position:relative;cursor:zoom-in}
+.sli img{width:100%;height:320px;object-fit:contain;display:block;pointer-events:none;background:#f0f3f8}
+.slil{position:absolute;top:7px;left:7px;background:rgba(13,53,120,.88);color:#fff;font-size:9.5px;padding:2px 7px;border-radius:5px;font-weight:700;pointer-events:none}
+.slb{position:absolute;top:50%;transform:translateY(-50%);width:30px;height:30px;background:rgba(255,255,255,.92);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 7px rgba(0,0,0,.14);z-index:5;color:var(--p);font-family:inherit}
+.slb.prev{left:6px}.slb.next{right:6px}.slb.hide{display:none}
+.slds{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);display:flex;gap:4px;z-index:5}
+.sld{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5);cursor:pointer;transition:all .2s}
+.sld.on{background:#fff;transform:scale(1.3)}
+.slc{position:absolute;top:6px;right:7px;background:rgba(0,0,0,.4);color:#fff;font-size:10px;padding:2px 6px;border-radius:8px;pointer-events:none}
+.etp{padding:60px 22px;text-align:center;color:#b0bec5;font-size:12.5px;min-height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.etp .ei{font-size:30px;display:block;margin-bottom:6px}
+.vw{padding:16px;background:#f8f9fc;display:flex;flex-direction:column;gap:10px;min-height:320px}
+.vl{color:var(--p);font-size:13px;font-weight:700;margin-bottom:4px}
+.vi video{width:100%;display:block;max-height:280px;border-radius:7px}
+.pb{padding:12px}
+.pt{font-size:13.5px;font-weight:700;color:var(--tx);margin-bottom:8px;padding-bottom:7px;border-bottom:2px solid var(--pl);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.bc{font-size:10px;background:var(--pl);color:var(--p);padding:2px 7px;border-radius:7px;font-weight:700}
+.it{width:100%;border-collapse:collapse;font-size:12px}
+.it tr{border-bottom:1px solid #f0f3f8}
+.it tr:last-child{border-bottom:none}
+.it td{padding:6px 4px;vertical-align:top;line-height:1.55}
+.it .lbl{font-weight:700;color:var(--p);white-space:nowrap;width:78px;min-width:78px}
+#ir{padding:9px 11px;border-top:1px solid var(--b);display:flex;gap:7px;background:var(--w);flex-shrink:0;position:relative}
+#ii{flex:1;border:1.5px solid var(--b);border-radius:22px;padding:8px 15px;font-size:13px;outline:none;font-family:inherit;color:var(--tx);background:var(--bg);transition:all .2s}
+#ii:focus{border-color:var(--p);background:#fff}
+#ii::placeholder{color:#a0aec0}
+#sb{background:var(--p);color:#fff;border:none;border-radius:50%;width:40px;height:40px;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:inherit}
+#sb:hover{background:var(--pd)}
+#lb{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,.93);z-index:999999;align-items:center;justify-content:center;flex-direction:column}
+#lb.show{display:flex}
+#lbi{max-width:95vw;max-height:88vh;border-radius:10px;object-fit:contain;display:block}
+#lbx{position:fixed;top:12px;right:16px;color:#fff;font-size:40px;cursor:pointer;line-height:1;font-weight:200;z-index:1000000}
+#lbc{color:rgba(255,255,255,.55);font-size:11.5px;margin-top:7px}
+/* ===== 관리자 모드 ===== */
+#adm-btn{margin-left:10px;padding:5px 10px;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.4);border-radius:6px;cursor:pointer;font-size:11px;white-space:nowrap;flex-shrink:0}
+#adm-btn:hover{background:rgba(255,255,255,0.28)}
+#adm-login-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9000;align-items:center;justify-content:center}
+#adm-login-overlay.show{display:flex}
+#adm-login-box{background:#fff;border-radius:12px;padding:32px 28px;width:300px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+#adm-login-box h3{margin:0 0 18px;font-size:17px;color:#333;text-align:center}
+#adm-login-box input{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ccc;border-radius:7px;font-size:14px;margin-bottom:12px}
+#adm-login-box .adm-btns{display:flex;gap:8px}
+#adm-login-box .adm-btns button{flex:1;padding:10px;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600}
+#adm-ok{background:var(--p);color:#fff}
+#adm-cancel{background:#eee;color:#555}
+#adm-err{color:#e53935;font-size:12px;text-align:center;margin-bottom:8px;display:none}
+/* 패널 */
+#adm-panel{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto}
+#adm-panel.show{display:flex}
+#adm-inner{background:#fff;border-radius:14px;width:100%;max-width:660px;padding:24px 22px 20px;box-shadow:0 8px 32px rgba(0,0,0,.35);margin:auto}
+#adm-inner h2{margin:0 0 14px;font-size:17px;color:#222;display:flex;align-items:center;gap:8px}
+#adm-sel-label{display:block;font-size:12px;color:#666;margin-bottom:5px;font-weight:600}
+#adm-product-sel{width:100%;padding:9px 12px;border:1px solid #ccc;border-radius:7px;font-size:14px;margin-bottom:4px}
+/* 섹션 카드 */
+.adm-sec{border:1px solid #e4e4e4;border-radius:10px;padding:12px 14px 10px;margin-top:14px;background:#fafafa}
+.adm-sec-hd{font-size:12px;font-weight:700;color:#444;margin:0 0 10px;display:flex;align-items:center;gap:5px}
+/* 이미지 그리드 */
+.adm-grid{display:flex;flex-wrap:wrap;gap:8px;min-height:36px;margin-bottom:10px}
+.adm-card{position:relative;width:90px;border:1px solid #ddd;border-radius:8px;overflow:hidden;background:#fff;cursor:pointer}
+.adm-card:hover .adm-del-ov{opacity:1}
+.adm-card img{width:90px;height:66px;object-fit:cover;display:block}
+.adm-card-lbl{font-size:10px;color:#555;text-align:center;padding:2px 4px;background:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.adm-del-ov{position:absolute;inset:0;background:rgba(200,30,30,.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s}
+.adm-del-ov span{color:#fff;font-size:26px;font-weight:300;pointer-events:none}
+.adm-empty{font-size:12px;color:#bbb;padding:4px 0}
+/* 드롭존 */
+.adm-drop{border:2px dashed #ccc;border-radius:8px;padding:13px;text-align:center;color:#aaa;font-size:12px;cursor:pointer;transition:border-color .2s,color .2s}
+.adm-drop:hover,.adm-drop.drag-over{border-color:var(--p);color:var(--p)}
+.adm-drop input[type=file]{display:none}
+/* 하단 */
+.adm-foot{display:flex;gap:8px;margin-top:16px}
+.adm-save{background:var(--p);color:#fff;border:none;border-radius:8px;padding:10px 0;flex:1;cursor:pointer;font-size:14px;font-weight:700}
+.adm-close-btn{background:#eee;color:#555;border:none;border-radius:8px;padding:10px 18px;cursor:pointer;font-size:14px}
+/* 관리자 탭 */
+.adm-tabs{display:flex;gap:0;margin-bottom:16px;border:1px solid #ddd;border-radius:8px;overflow:hidden}
+.adm-tab{flex:1;padding:9px 0;border:none;background:#f5f5f5;color:#888;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,color .15s}
+.adm-tab.on{background:var(--p);color:#fff}
+/* 신규 제품 폼 */
+.adm-new-form{display:none}
+.adm-new-form.on{display:block}
+.adm-edit-view{display:none}
+.adm-edit-view.on{display:block}
+.adm-field{margin-bottom:12px}
+.adm-field label{display:block;font-size:12px;color:#666;font-weight:600;margin-bottom:4px}
+.adm-field input,.adm-field select{width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #ccc;border-radius:7px;font-size:13px}
+.adm-field input:focus,.adm-field select:focus{border-color:var(--p);outline:none}
+.adm-info-rows{border:1px solid #e4e4e4;border-radius:8px;padding:10px;background:#fafafa;margin-bottom:8px}
+.adm-info-row{display:flex;gap:6px;margin-bottom:6px;align-items:center}
+.adm-info-row input{flex:1;padding:7px 10px;border:1px solid #ddd;border-radius:6px;font-size:12px}
+.adm-info-row button{border:none;background:#fdd;color:#c33;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:13px;flex-shrink:0}
+.adm-add-row{border:none;background:#e8f4ff;color:var(--p);border-radius:6px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:600;width:100%;margin-top:2px}
+.adm-del-product-btn{background:#fee;color:#c33;border:1px solid #f8c;border-radius:7px;padding:8px 14px;cursor:pointer;font-size:12px;font-weight:600}
+.adm-del-product-btn:hover{background:#fcc}
+/* GitHub 설정 */
+#adm-gh-bar{background:#f0f7ff;border:1px solid #c8e0ff;border-radius:9px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#adm-gh-bar span{font-size:12px;color:#555;white-space:nowrap}
+#adm-gh-status{font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap}
+#adm-gh-status.ok{background:#d4edda;color:#155724}
+#adm-gh-status.no{background:#fff3cd;color:#856404}
+#adm-gh-setup-btn{background:var(--p);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
+/* GitHub 설정 모달 */
+#adm-gh-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9100;align-items:center;justify-content:center}
+#adm-gh-modal.show{display:flex}
+#adm-gh-box{background:#fff;border-radius:12px;padding:28px 26px;width:100%;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+#adm-gh-box h3{margin:0 0 6px;font-size:16px;color:#222}
+#adm-gh-box p{margin:0 0 16px;font-size:12px;color:#777;line-height:1.5}
+.adm-gh-field{margin-bottom:12px}
+.adm-gh-field label{display:block;font-size:12px;color:#555;font-weight:600;margin-bottom:4px}
+.adm-gh-field input{width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #ccc;border-radius:7px;font-size:13px;font-family:monospace}
+.adm-gh-field input:focus{border-color:var(--p);outline:none}
+.adm-gh-hint{font-size:11px;color:#999;margin-top:3px}
+.adm-gh-btns{display:flex;gap:8px;margin-top:4px}
+.adm-gh-btns button{flex:1;padding:9px;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600}
+#adm-gh-save-btn{background:var(--p);color:#fff}
+#adm-gh-clear-btn{background:#fee;color:#c33}
+#adm-gh-cancel-btn{background:#eee;color:#555}
+/* 업로드 진행 오버레이 */
+#adm-upload-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.9);z-index:9200;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+#adm-upload-overlay.show{display:flex}
+#adm-upload-overlay p{font-size:16px;font-weight:600;color:#333}
+#adm-upload-overlay small{font-size:12px;color:#888}
+.adm-spinner{width:44px;height:44px;border:4px solid #e0e0e0;border-top-color:var(--p);border-radius:50%;animation:adm-spin .8s linear infinite}
+@keyframes adm-spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div id="lb"><span id="lbx">&#215;</span><img id="lbi" src="" alt=""><div id="lbc"></div></div>
+<div id="app">
+  <div id="hdr">
+    <div id="hdr-ic" style="background:transparent;border:none;padding:0"><img src="data:image/png;base64,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" style="height:38px;width:auto;display:block" alt="우딘 로고"></div>
+    <div><h1>우딘 하드웨어 챗봇</h1><p>제품명 검색 → 이미지 · 도면 · 상세설명</p></div>
+    <div id="hdr-st"><div class="dlive"></div>온라인</div>
+    <button id="adm-btn" onclick="admOpenLogin()">⚙ 관리자</button>
+  </div>
+
+<!-- GitHub 설정 모달 -->
+<div id="adm-gh-modal">
+  <div id="adm-gh-box">
+    <h3>⚙️ GitHub 연동 설정</h3>
+    <p>저장 버튼을 누르면 GitHub 파일이 자동으로 업데이트됩니다.<br>아래 정보를 입력해 주세요.</p>
+    <div class="adm-gh-field">
+      <label>GitHub 사용자명</label>
+      <input type="text" id="adm-gh-owner" placeholder="예: woodin-company">
+    </div>
+    <div class="adm-gh-field">
+      <label>저장소(Repository) 이름</label>
+      <input type="text" id="adm-gh-repo" placeholder="예: hardware-chatbot">
+    </div>
+    <div class="adm-gh-field">
+      <label>파일 경로</label>
+      <input type="text" id="adm-gh-path" placeholder="예: chatbot.html" value="chatbot.html">
+    </div>
+    <div class="adm-gh-field">
+      <label>Personal Access Token</label>
+      <input type="password" id="adm-gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+      <p class="adm-gh-hint">GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens<br>권한: Contents (Read and Write)</p>
+    </div>
+    <div class="adm-gh-btns">
+      <button id="adm-gh-save-btn" onclick="admGhSaveConfig()">저장</button>
+      <button id="adm-gh-clear-btn" onclick="admGhClearConfig()">초기화</button>
+      <button id="adm-gh-cancel-btn" onclick="admGhCloseModal()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 업로드 진행 오버레이 -->
+<div id="adm-upload-overlay">
+  <div class="adm-spinner"></div>
+  <p>GitHub에 업로드 중...</p>
+  <small id="adm-upload-msg">파일을 준비하고 있습니다</small>
+</div>
+
+
+<div id="adm-login-overlay">
+  <div id="adm-login-box">
+    <h3>🔒 관리자 로그인</h3>
+    <div id="adm-err">비밀번호가 올바르지 않습니다.</div>
+    <input type="password" id="adm-pw-input" placeholder="비밀번호 입력" onkeydown="if(event.key==='Enter')admCheckPw()">
+    <div class="adm-btns">
+      <button id="adm-ok" onclick="admCheckPw()">확인</button>
+      <button id="adm-cancel" onclick="admCloseLogin()">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- 관리자 패널 -->
+<div id="adm-panel">
+  <div id="adm-inner">
+    <h2>🛠 관리자 패널</h2>
+
+    <!-- GitHub 연동 상태 바 -->
+    <div id="adm-gh-bar">
+      <span>🔗 GitHub 연동:</span>
+      <span id="adm-gh-status" class="no">미설정</span>
+      <button id="adm-gh-setup-btn" onclick="admGhOpenModal()">설정</button>
+    </div>
+
+    <!-- 탭 -->
+    <div class="adm-tabs">
+      <button class="adm-tab on" id="adm-tab-edit" onclick="admSwitchTab('edit')">✏️ 제품 편집</button>
+      <button class="adm-tab" id="adm-tab-new" onclick="admSwitchTab('new')">➕ 새 제품 추가</button>
+    </div>
+
+    <!-- 탭1: 기존 제품 편집 -->
+    <div class="adm-edit-view on" id="adm-edit-view">
+      <label id="adm-sel-label" for="adm-product-sel">제품 선택</label>
+      <select id="adm-product-sel" onchange="admLoadProduct()"><option value="">-- 제품을 선택하세요 --</option></select>
+
+      <!-- 기본정보 편집 -->
+      <div class="adm-sec" id="adm-meta-sec" style="display:none">
+        <p class="adm-sec-hd">📝 기본 정보</p>
+        <div class="adm-field">
+          <label>카테고리</label>
+          <select id="adm-edit-cat"></select>
+        </div>
+        <div class="adm-field">
+          <label>규격/상세 정보 <span style="font-weight:400;color:#aaa">(행 추가 가능)</span></label>
+          <div class="adm-info-rows" id="adm-edit-info-rows"></div>
+          <button class="adm-add-row" onclick="admAddInfoRow('adm-edit-info-rows')">＋ 행 추가</button>
+        </div>
+      </div>
+
+      <!-- 실물 이미지 -->
+      <div class="adm-sec">
+        <p class="adm-sec-hd">📷 실물 이미지</p>
+        <div class="adm-grid" id="adm-real-grid"></div>
+        <div class="adm-drop" id="adm-real-drop" onclick="document.getElementById('adm-real-file').click()">
+          <input type="file" id="adm-real-file" accept="image/*" multiple onchange="admHandleFiles(this,'real')">
+          ＋ 클릭 또는 드래그하여 실물 이미지 추가
+        </div>
+      </div>
+
+      <!-- 도면 이미지 -->
+      <div class="adm-sec">
+        <p class="adm-sec-hd">📐 도면 이미지</p>
+        <div class="adm-grid" id="adm-draw-grid"></div>
+        <div class="adm-drop" id="adm-draw-drop" onclick="document.getElementById('adm-draw-file').click()">
+          <input type="file" id="adm-draw-file" accept="image/*" multiple onchange="admHandleFiles(this,'draw')">
+          ＋ 클릭 또는 드래그하여 도면 이미지 추가
+        </div>
+      </div>
+
+      <!-- 상세설명 이미지 -->
+      <div class="adm-sec">
+        <p class="adm-sec-hd">📋 상세설명 이미지</p>
+        <div class="adm-grid" id="adm-desc-grid"></div>
+        <div class="adm-drop" id="adm-desc-drop" onclick="document.getElementById('adm-desc-file').click()">
+          <input type="file" id="adm-desc-file" accept="image/*" multiple onchange="admHandleFiles(this,'desc')">
+          ＋ 클릭 또는 드래그하여 상세설명 이미지 추가
+        </div>
+      </div>
+
+      <div class="adm-foot">
+        <button class="adm-save" onclick="admSave()">💾 저장</button>
+        <button class="adm-save" style="background:#28a745" onclick="admSaveAndPush()">🚀 저장 + GitHub 업로드</button>
+        <button class="adm-del-product-btn" id="adm-del-btn" style="display:none" onclick="admDeleteProduct()">🗑 제품 삭제</button>
+        <button class="adm-close-btn" onclick="admClosePanel()">닫기</button>
+      </div>
+    </div>
+
+    <!-- 탭2: 새 제품 추가 -->
+    <div class="adm-new-form" id="adm-new-view">
+      <div class="adm-field">
+        <label>제품명 <span style="color:#e33">*</span></label>
+        <input type="text" id="adm-new-name" placeholder="예: 45대칭몰딩">
+      </div>
+      <div class="adm-field">
+        <label>카테고리 <span style="color:#e33">*</span></label>
+        <select id="adm-new-cat"></select>
+      </div>
+      <div class="adm-field">
+        <label>규격/상세 정보 <span style="font-weight:400;color:#aaa">(선택)</span></label>
+        <div class="adm-info-rows" id="adm-new-info-rows"></div>
+        <button class="adm-add-row" onclick="admAddInfoRow('adm-new-info-rows')">＋ 행 추가</button>
+      </div>
+
+      <!-- 실물 이미지 -->
+      <div class="adm-sec">
+        <p class="adm-sec-hd">📷 실물 이미지 <span style="font-weight:400;color:#aaa">(선택)</span></p>
+        <div class="adm-grid" id="adm-new-real-grid"></div>
+        <div class="adm-drop" id="adm-new-real-drop" onclick="document.getElementById('adm-new-real-file').click()">
+          <input type="file" id="adm-new-real-file" accept="image/*" multiple onchange="admHandleFiles(this,'newReal')">
+          ＋ 클릭 또는 드래그
+        </div>
+      </div>
+
+      <!-- 도면 이미지 -->
+      <div class="adm-sec">
+        <p class="adm-sec-hd">📐 도면 이미지 <span style="font-weight:400;color:#aaa">(선택)</span></p>
+        <div class="adm-grid" id="adm-new-draw-grid"></div>
+        <div class="adm-drop" id="adm-new-draw-drop" onclick="document.getElementById('adm-new-draw-file').click()">
+          <input type="file" id="adm-new-draw-file" accept="image/*" multiple onchange="admHandleFiles(this,'newDraw')">
+          ＋ 클릭 또는 드래그
+        </div>
+      </div>
+
+      <!-- 상세설명 이미지 -->
+      <div class="adm-sec">
+        <p class="adm-sec-hd">📋 상세설명 이미지 <span style="font-weight:400;color:#aaa">(선택)</span></p>
+        <div class="adm-grid" id="adm-new-desc-grid"></div>
+        <div class="adm-drop" id="adm-new-desc-drop" onclick="document.getElementById('adm-new-desc-file').click()">
+          <input type="file" id="adm-new-desc-file" accept="image/*" multiple onchange="admHandleFiles(this,'newDesc')">
+          ＋ 클릭 또는 드래그
+        </div>
+      </div>
+
+      <div class="adm-foot">
+        <button class="adm-save" onclick="admAddProduct()">➕ 제품 추가</button>
+        <button class="adm-save" style="background:#28a745" onclick="admAddProductAndPush()">➕🚀 추가 + GitHub 업로드</button>
+        <button class="adm-close-btn" onclick="admClosePanel()">닫기</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+  <div id="msgs"></div>
+  <div id="ir" style="position:relative">
+    <div id="ac"></div>
+    <input id="ii" type="text" placeholder="🔍 제품명을 입력하세요 (예: 대칭, 40, 커브...)">
+    <button id="sb">&#10148;</button>
+  </div>
+</div>
+<script>
+var I={"100걸레받이.jpg":"__IMG_PLACEHOLDER__","100걸레받이_도면.jpg":"__IMG_PLACEHOLDER__","15대칭.jpg":"__IMG_PLACEHOLDER__","15대칭_도면.jpg":"__IMG_PLACEHOLDER__","20비대칭.jpg":"__IMG_PLACEHOLDER__","20비대칭_도면.jpg":"__IMG_PLACEHOLDER__","22대칭.jpg":"__IMG_PLACEHOLDER__","22대칭_도면.jpg":"__IMG_PLACEHOLDER__","2계단25_도면.jpg":"__IMG_PLACEHOLDER__","2계단35_도면.jpg":"__IMG_PLACEHOLDER__","30비대칭.jpg":"__IMG_PLACEHOLDER__","30비대칭_도면.jpg":"__IMG_PLACEHOLDER__","31마감재.jpg":"__IMG_PLACEHOLDER__","31마감재_도면.jpg":"__IMG_PLACEHOLDER__","40대칭.jpg":"__IMG_PLACEHOLDER__","40대칭_도면.jpg":"__IMG_PLACEHOLDER__","40비대칭.jpg":"__IMG_PLACEHOLDER__","40비대칭_도면.jpg":"__IMG_PLACEHOLDER__","40비대칭_도면2.jpg":"__IMG_PLACEHOLDER__","40평.jpg":"__IMG_PLACEHOLDER__","40평_도면.jpg":"__IMG_PLACEHOLDER__","42마감재.jpg":"__IMG_PLACEHOLDER__","42마감재_도면.jpg":"__IMG_PLACEHOLDER__","50대칭_도면.jpg":"__IMG_PLACEHOLDER__","50마감재.jpg":"__IMG_PLACEHOLDER__","50마감재_도면.jpg":"__IMG_PLACEHOLDER__","50비대칭.jpg":"__IMG_PLACEHOLDER__","55걸레받이.jpg":"__IMG_PLACEHOLDER__","55걸레받이_도면.jpg":"__IMG_PLACEHOLDER__","60비대칭.jpg":"__IMG_PLACEHOLDER__","60평.jpg":"__IMG_PLACEHOLDER__","60평_도면.jpg":"__IMG_PLACEHOLDER__","66허리.jpg":"__IMG_PLACEHOLDER__","66허리_도면.jpg":"__IMG_PLACEHOLDER__","70걸레받이.jpg":"__IMG_PLACEHOLDER__","70걸레받이_도면.jpg":"__IMG_PLACEHOLDER__","80걸레받이.jpg":"__IMG_PLACEHOLDER__","80걸레받이_도면.jpg":"__IMG_PLACEHOLDER__","80평.jpg":"__IMG_PLACEHOLDER__","80평_도면.jpg":"__IMG_PLACEHOLDER__","90천장.jpg":"__IMG_PLACEHOLDER__","90천장_도면.jpg":"__IMG_PLACEHOLDER__","PVC마이너스_12T.jpg":"__IMG_PLACEHOLDER__","PVC마이너스_9T.jpg":"__IMG_PLACEHOLDER__","사각포인트_골드.jpg":"__IMG_PLACEHOLDER__","사각포인트_브론즈.jpg":"__IMG_PLACEHOLDER__","사각포인트_실버.jpg":"__IMG_PLACEHOLDER__","아웃커브.jpg":"__IMG_PLACEHOLDER__","인커브.jpg":"__IMG_PLACEHOLDER__","포인트템바보드.jpg":"__IMG_PLACEHOLDER__","포인트템바보드_도면.jpg":"__IMG_PLACEHOLDER__","하부인조대리석.jpg":"__IMG_PLACEHOLDER__"};
+
+var lb=document.getElementById('lb'),lbi=document.getElementById('lbi'),lbc=document.getElementById('lbc');
+function openLB(s,c){lbi.src=s;lbc.textContent=c||'';lb.style.display='flex';}
+function closeLB(){lb.style.display='none';lbi.src='';}
+document.getElementById('lbx').addEventListener('click',function(e){e.stopPropagation();closeLB();});
+lb.addEventListener('click',function(e){if(e.target===lb)closeLB();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLB();});
+function gi(f){
+  if(!f)return '';
+  // 새로 업로드한 이미지(base64)는 바로 반환
+  if(I[f]&&I[f]!=='__IMG_PLACEHOLDER__')return I[f];
+  // GitHub Raw URL (모든 사용자가 볼 수 있음 - 저장소 정보 하드코딩)
+  var OWNER='kpslove5307', REPO='woodin', BRANCH='main';
+  var cfg=admGhLoadConfig?admGhLoadConfig():null;
+  var folder=cfg&&cfg.path?cfg.path.replace(/[^/]*$/,''):'';
+  return 'https://raw.githubusercontent.com/'+OWNER+'/'+REPO+'/'+BRANCH+'/'+folder+'images/'+encodeURIComponent(f);
+}
+
+/* ══ 제품 DB ══ */
+var DB = {
+  "90천장":{cat:"천장몰딩",info:[["규격","50×76mm"],["길이","2.4M"],["용도","천장·벽면 경계 마감"]],
+    images:[{f:"90천장.jpg",l:"실물"}],drawings:[{f:"90천장_도면.jpg",l:"도면"}],videos:[]},
+  "15대칭":{cat:"대칭몰딩",info:[["규격","9×15mm"],["길이","2.4M"]],
+    images:[{f:"15대칭.jpg",l:"실물"}],drawings:[{f:"15대칭_도면.jpg",l:"도면"}],videos:[]},
+  "22대칭":{cat:"대칭몰딩",info:[["규격","10×22mm"],["길이","2.4M"]],
+    images:[{f:"22대칭.jpg",l:"실물"}],drawings:[{f:"22대칭_도면.jpg",l:"도면"}],videos:[]},
+  "40대칭":{cat:"대칭몰딩",info:[["규격","18×40mm"],["길이","2.4M"]],
+    images:[{f:"40대칭.jpg",l:"실물"}],drawings:[{f:"40대칭_도면.jpg",l:"도면"}],videos:[]},
+  "50대칭":{cat:"대칭몰딩",info:[["규격","22×50mm"],["길이","2.4M"]],
+    images:[],drawings:[{f:"50대칭_도면.jpg",l:"도면"}],videos:[]},
+  "20비대칭":{cat:"비대칭몰딩",info:[["규격","11×20mm"],["길이","2.4M"]],
+    images:[{f:"20비대칭.jpg",l:"실물"}],drawings:[{f:"20비대칭_도면.jpg",l:"도면"}],videos:[]},
+  "30비대칭":{cat:"비대칭몰딩",info:[["규격","15×30mm"],["길이","2.4M"]],
+    images:[{f:"30비대칭.jpg",l:"실물"}],drawings:[{f:"30비대칭_도면.jpg",l:"도면"}],videos:[]},
+  "40비대칭":{cat:"비대칭몰딩",info:[["규격","19×40mm"],["길이","2.4M"]],
+    images:[{f:"40비대칭.jpg",l:"실물"}],drawings:[{f:"40비대칭_도면.jpg",l:"도면1"},{f:"40비대칭_도면2.jpg",l:"도면2"}],videos:[]},
+  "50비대칭":{cat:"비대칭몰딩",info:[["규격","28×60mm"],["길이","2.4M"]],
+    images:[{f:"50비대칭.jpg",l:"실물"}],drawings:[],videos:[]},
+  "60비대칭":{cat:"비대칭몰딩",info:[["규격","22×40mm"],["길이","2.4M"]],
+    images:[{f:"60비대칭.jpg",l:"실물"}],drawings:[],videos:[]},
+  "66허리":{cat:"허리몰딩",info:[["규격","17×66mm"],["길이","2.4M"]],
+    images:[{f:"66허리.jpg",l:"실물"}],drawings:[{f:"66허리_도면.jpg",l:"도면"}],videos:[]},
+  "80평":{cat:"평몰딩",info:[["규격","9×80mm"],["길이","2.4M"]],
+    images:[{f:"80평.jpg",l:"실물"}],drawings:[{f:"80평_도면.jpg",l:"도면"}],videos:[]},
+  "60평":{cat:"평몰딩",info:[["규격","9×60mm"],["길이","2.4M"]],
+    images:[{f:"60평.jpg",l:"실물"}],drawings:[{f:"60평_도면.jpg",l:"도면"}],videos:[]},
+  "40평":{cat:"평몰딩",info:[["규격","9×40mm"],["길이","2.4M"]],
+    images:[{f:"40평.jpg",l:"실물"}],drawings:[{f:"40평_도면.jpg",l:"도면"}],videos:[]},
+  "100걸레받이":{cat:"걸레받이",info:[["규격","13×100mm"],["길이","2.4M"]],
+    images:[{f:"100걸레받이.jpg",l:"실물"}],drawings:[{f:"100걸레받이_도면.jpg",l:"도면"}],videos:[]},
+  "80걸레받이":{cat:"걸레받이",info:[["규격","9×80mm"],["길이","2.4M"]],
+    images:[{f:"80걸레받이.jpg",l:"실물"}],drawings:[{f:"80걸레받이_도면.jpg",l:"도면"}],videos:[]},
+  "70걸레받이":{cat:"걸레받이",info:[["규격","14×70mm"],["길이","2.4M"]],
+    images:[{f:"70걸레받이.jpg",l:"실물"}],drawings:[{f:"70걸레받이_도면.jpg",l:"도면"}],videos:[]},
+  "55걸레받이":{cat:"걸레받이",info:[["규격","15×55mm"],["길이","2.4M"]],
+    images:[{f:"55걸레받이.jpg",l:"실물"}],drawings:[{f:"55걸레받이_도면.jpg",l:"도면"}],videos:[]},
+  "50마감재":{cat:"마감재",info:[["규격","17×50mm"],["길이","2.4M"]],
+    images:[{f:"50마감재.jpg",l:"실물"}],drawings:[{f:"50마감재_도면.jpg",l:"도면"}],videos:[]},
+  "42마감재":{cat:"마감재",info:[["규격","12×42mm"],["길이","2.4M"]],
+    images:[{f:"42마감재.jpg",l:"실물"}],drawings:[{f:"42마감재_도면.jpg",l:"도면"}],videos:[]},
+  "31마감재":{cat:"마감재",info:[["규격","12×31mm"],["길이","2.4M"]],
+    images:[{f:"31마감재.jpg",l:"실물"}],drawings:[{f:"31마감재_도면.jpg",l:"도면"}],videos:[]},
+  "포인트템바보드":{cat:"포인트몰딩",info:[["규격","12×120mm"],["길이","2.4M"]],
+    images:[{f:"포인트템바보드.jpg",l:"실물"}],drawings:[{f:"포인트템바보드_도면.jpg",l:"도면"}],videos:[]},
+  "사각포인트몰딩":{cat:"포인트몰딩",info:[["규격","15×15mm"],["판매단위","개당 판매"],["색상","골드 / 실버 / 브론즈"]],
+    images:[{f:"사각포인트_골드.jpg",l:"골드"},{f:"사각포인트_실버.jpg",l:"실버"},{f:"사각포인트_브론즈.jpg",l:"브론즈"}],
+    drawings:[],videos:[]},
+  "PVC마이너스몰딩 9T":{cat:"PVC몰딩",info:[["모델","SS-1601"],["두께","9.8T"],["규격","10×31.5mm"],["용도","마이너스몰딩"]],
+    images:[{f:"PVC마이너스_9T.jpg",l:"9T 실물"}],drawings:[],videos:[]},
+  "PVC마이너스몰딩 12T":{cat:"PVC몰딩",info:[["모델","SS-1602 (도배용)"],["두께","12.8T"],["규격","10×31.5mm"],["용도","마이너스몰딩 도배용"]],
+    images:[{f:"PVC마이너스_12T.jpg",l:"12T 실물"}],drawings:[],videos:[]},
+  "인커브":{cat:"인조대리석",info:[["형태","인커브 (오목형)"],["소재","알루미늄"],["용도","욕실 등 코너 마감"],["주의","업체에 규격·색상 전달 후 출고일·단가 확인"]],
+    images:[{f:"인커브.jpg",l:"인커브 실물"}],drawings:[],videos:[]},
+  "아웃커브":{cat:"인조대리석",info:[["형태","아웃커브 (볼록형)"],["소재","알루미늄"],["용도","욕실 등 코너 마감"],["주의","업체에 규격·색상 전달 후 출고일·단가 확인"]],
+    images:[{f:"아웃커브.jpg",l:"아웃커브 실물"}],drawings:[],videos:[]},
+  "하부인조대리석":{cat:"인조대리석",info:[
+    ["형태","ㄱ자형 (기역자) / 턱있는형·턱없는형"],
+    ["규격","턱있는형: 55×80mm / 턱없는형: 45×80mm"],
+    ["두께","7mm"],
+    ["색상","라네스·스노우컬치·사하라·골드더스트·시오트쿼츠·비치샌드·페블골드·샌디드그레이·미노스·그레이샌드·베네치안샌드·다크카페라떼·샌디드토프"],
+    ["주의","업체에 폭·길이·색상 전달 후 출고일·단가 확인"]],
+    images:[{f:"하부인조대리석.jpg",l:"도면 및 색상"}],drawings:[],videos:[]},
+  "2계단 25":{cat:"계단몰딩",info:[["규격","25×15mm"],["용도","계단 단 마감"]],
+    images:[],drawings:[{f:"2계단25_도면.jpg",l:"도면"}],videos:[]},
+  "2계단 35":{cat:"계단몰딩",info:[["규격","35×13mm"],["용도","계단 단 마감"]],
+    images:[],drawings:[{f:"2계단35_도면.jpg",l:"도면"}],videos:[]},
+  "세이프힌지SET(하드웨어별도)":{cat:"하드웨어",info:[],images:[],drawings:[],videos:[]},
+  "세이프힌지SET(하드웨어별도)":{cat:"하드웨어",info:[],images:[],drawings:[],videos:[]},
+  "글라스슬라이딩 세트/3m":{cat:"하드웨어",info:[],images:[],drawings:[],videos:[]},
+  "슬라이딩락_버튼타입(신형-블랙)":{cat:"하드웨어",info:[["규격","38 * 180"]],images:[],drawings:[],videos:[]},
+  "글라스슬라이딩 세트/3m":{cat:"하드웨어",info:[],images:[],drawings:[],videos:[]},
+  "롱핸들(블랙)":{cat:"하드웨어",info:[["규격","1200*19"]],images:[],drawings:[],videos:[]},
+  "롱핸들(화이트)":{cat:"하드웨어",info:[["규격","1200*19"]],images:[],drawings:[],videos:[]},
+  "롱핸들(실버)":{cat:"하드웨어",info:[["규격","1200*19"]],images:[],drawings:[],videos:[]},
+  "노출형행거댐퍼(60kg)":{cat:"하드웨어",info:[["규격","280mm"]],images:[],drawings:[],videos:[]},
+  "볼레치":{cat:"하드웨어",info:[],images:[],drawings:[],videos:[]},
+  "슬라이딩락_버튼타입(신형-골드)":{cat:"하드웨어",info:[["규격","38 * 180"]],images:[],drawings:[],videos:[]},
+  "아크릴 손잡이":{cat:"하드웨어",info:[["규격","105*75"]],images:[],drawings:[],videos:[]},
+  "사각핸들(투톤 실버)":{cat:"하드웨어",info:[["규격","370mm"]],images:[],drawings:[],videos:[]},
+  "도어스토퍼(바닥고정형-골드)":{cat:"하드웨어",info:[["규격","25*36"]],images:[],drawings:[],videos:[]},
+  "사각핸들(투톤 골드)":{cat:"하드웨어",info:[["규격","370mm"]],images:[],drawings:[],videos:[]},
+  "사각핸들(투톤 흑진주)":{cat:"하드웨어",info:[["규격","370mm"]],images:[],drawings:[],videos:[]},
+  "댐퍼용행거철물(1방)60KG":{cat:"하드웨어",info:[["규격","32*38"]],images:[],drawings:[],videos:[]},
+  "오목이(SH09-실버)":{cat:"하드웨어",info:[["규격","129*27"]],images:[],drawings:[],videos:[]},
+  "노출형행거세트(3m-백색)":{cat:"하드웨어",info:[["규격","3m"]],images:[],drawings:[],videos:[]},
+  "안전체(손끼임방지)":{cat:"하드웨어",info:[["규격","2150"]],images:[],drawings:[],videos:[]},
+  "슬라이딩락_고급형(키타입/35T용)":{cat:"하드웨어",info:[["규격","45*193"]],images:[],drawings:[],videos:[]},
+  "NEW AL 라운드 인커브":{cat:"하드웨어",info:[["규격","54*2400*54"]],images:[],drawings:[],videos:[]},
+  "노출형행거세트(3m-검정)":{cat:"하드웨어",info:[["규격","3m"]],images:[],drawings:[],videos:[]},
+  "풀핸들(모던)":{cat:"하드웨어",info:[["규격","52*240"]],images:[],drawings:[],videos:[]},
+  "노출형행거세트(2m-백색)":{cat:"하드웨어",info:[["규격","2m"]],images:[],drawings:[],videos:[]},
+  "오도시 마감캡(14*25)":{cat:"하드웨어",info:[],images:[],drawings:[],videos:[]},
+  "벽체고정용레일세트(검정)":{cat:"하드웨어",info:[["규격","2m"]],images:[],drawings:[],videos:[]},
+  "도어스토퍼(바닥고정형-앤틱브론즈)":{cat:"하드웨어",info:[["규격","25*36"]],images:[],drawings:[],videos:[]},
+  "스프링경첩(갑)":{cat:"하드웨어",info:[["규격","25.4*25.4"]],images:[],drawings:[],videos:[]},
+  "슬라이딩 모티스(미닫이용)":{cat:"하드웨어",info:[["규격","100*150"]],images:[],drawings:[],videos:[]},
+  "히든경첩(실버)":{cat:"하드웨어",info:[["규격","1*1"]],images:[],drawings:[],videos:[]},
+  "세이프힌지(벽체형)":{cat:"하드웨어",info:[["규격","30*57*3"]],images:[],drawings:[],videos:[]},
+  "슬라이딩락_버튼타입(신형-실버)":{cat:"하드웨어",info:[["규격","38 * 180"]],images:[],drawings:[],videos:[]},
+  "슬라이딩락_고급형(키타입/40T이상)":{cat:"하드웨어",info:[["규격","45*193"]],images:[],drawings:[],videos:[]},
+  "범퍼(화이트)":{cat:"하드웨어",info:[["규격","40*40"]],images:[],drawings:[],videos:[]},
+  "나비경첩(황동-갑)":{cat:"하드웨어",info:[["규격","110*58"]],images:[],drawings:[],videos:[]},
+  "노출형행거세트(2m-검정)":{cat:"하드웨어",info:[["규격","2m"]],images:[],drawings:[],videos:[]},
+  "부착형 도어캐치":{cat:"하드웨어",info:[],images:[],drawings:[],videos:[]},
+  "NEW 목문스윙힌지":{cat:"하드웨어",info:[],images:[],drawings:[],videos:[]},
+  "행거하부가이드(공용-10파이)":{cat:"하드웨어",info:[["규격","40*17.5"]],images:[],drawings:[],videos:[]},
+  "슬라이딩락_고급형(레버타입)":{cat:"하드웨어",info:[["규격","45*193"]],images:[],drawings:[],videos:[]},
+  "세이프힌지SET(하드웨어별도)":{cat:"하드웨어",info:[],images:[],drawings:[],videos:[]},
+  "노출형행거댐퍼(40kg)":{cat:"하드웨어",info:[["규격","280mm"]],images:[],drawings:[],videos:[]},
+  "F/L유리도어힌지":{cat:"하드웨어",info:[["규격","1*1"]],images:[],drawings:[],videos:[]},
+  "에어타이트A(832-수입)":{cat:"하드웨어",info:[["규격","832*25*10"]],images:[],drawings:[],videos:[]},
+  "행거철물(32*38)":{cat:"하드웨어",info:[["규격","32*38"]],images:[],drawings:[],videos:[]},
+  "SH05(엣찌풀-매립손잡이)":{cat:"하드웨어",info:[["규격","100*26"]],images:[],drawings:[],videos:[]},
+  "NEW AL 라운드 아웃커브":{cat:"하드웨어",info:[["규격","42*2400*42"]],images:[],drawings:[],videos:[]},
+  "캡핸들(화이트)":{cat:"하드웨어",info:[["규격","35*194"]],images:[],drawings:[],videos:[]},
+  "자석캐처(소)":{cat:"하드웨어",info:[["규격","52*15"]],images:[],drawings:[],videos:[]},
+  "오목이(SHWD-무광골드)":{cat:"하드웨어",info:[["규격","145*37.5"]],images:[],drawings:[],videos:[]},
+  "에어타이트A(1000-수입)":{cat:"하드웨어",info:[["규격","1000*25*10"]],images:[],drawings:[],videos:[]},
+  "NEW 목문스윙힌지(쪽문용)":{cat:"하드웨어",info:[],images:[],drawings:[],videos:[]},
+  "자석캐처(대)":{cat:"하드웨어",info:[["규격","86*22"]],images:[],drawings:[],videos:[]},
+  "30kg댐퍼용행거철물(2방)":{cat:"하드웨어",info:[["규격","32*38"]],images:[],drawings:[],videos:[]},
+  "댐퍼용행거철물(2방)60KG":{cat:"하드웨어",info:[["규격","32*38"]],images:[],drawings:[],videos:[]},
+  "범퍼(브라운)":{cat:"하드웨어",info:[["규격","40*40"]],images:[],drawings:[],videos:[]},
+  "강화이지경첩(실버-갑)":{cat:"하드웨어",info:[],images:[],drawings:[],videos:[]},
+  "행거레일(32*38/3m)":{cat:"하드웨어",info:[["규격","38*32*3000"]],images:[],drawings:[],videos:[]},
+  "조절식스트라이크(국산)":{cat:"하드웨어",info:[["규격","70*28*0.3"]],images:[],drawings:[],videos:[]},
+  "이지경첩(화이트-갑)":{cat:"하드웨어",info:[["규격","110*58"]],images:[],drawings:[],videos:[]},
+  "캡핸들(블랙)":{cat:"하드웨어",info:[["규격","35*194"]],images:[],drawings:[],videos:[]},
+  "히든도어클로저(650~)":{cat:"하드웨어",info:[["규격","230*85*23"]],images:[],drawings:[],videos:[]},
+  "제네로스윙 전용 손잡이 블랙":{cat:"하드웨어",info:[["규격","190*22*15"]],images:[],drawings:[],videos:[]},
+  "오목이(SH09-브론즈)":{cat:"하드웨어",info:[["규격","129*27"]],images:[],drawings:[],videos:[]},
+  "이지경첩(유광골드-갑)":{cat:"하드웨어",info:[["규격","110*58"]],images:[],drawings:[],videos:[]},
+  "차음스트라이크":{cat:"하드웨어",info:[["규격","28*70"]],images:[],drawings:[],videos:[]},
+  "이지경첩(블랙-갑)":{cat:"하드웨어",info:[["규격","110*58"]],images:[],drawings:[],videos:[]},
+  "이지경첩(SUS-갑)":{cat:"하드웨어",info:[["규격","110*58"]],images:[],drawings:[],videos:[]},
+  "(신)행거양방레일(34*33/3m)":{cat:"하드웨어",info:[["규격","3000*34*33"]],images:[],drawings:[],videos:[]},
+  "행거레일커버(34*33/3m)":{cat:"하드웨어",info:[["규격","3000*82*21"]],images:[],drawings:[],videos:[]},
+  "제네로스윙 전용 손잡이 실버":{cat:"하드웨어",info:[["규격","190*22*15"]],images:[],drawings:[],videos:[]},
+  "오도시(매입형-96*18)":{cat:"하드웨어",info:[["규격","96*18"]],images:[],drawings:[],videos:[]},
+  "나비경첩(실버-갑)":{cat:"하드웨어",info:[["규격","110*58"]],images:[],drawings:[],videos:[]},
+  "L가이드":{cat:"하드웨어",info:[["규격","30*66*39"]],images:[],drawings:[],videos:[]},
+  "(신)행거양방레일(34*33/2m)":{cat:"하드웨어",info:[["규격","2000*34*33"]],images:[],drawings:[],videos:[]},
+  "행거레일(32*38/2m)":{cat:"하드웨어",info:[["규격","38*32*2000"]],images:[],drawings:[],videos:[]},
+  "오목이(SHWD-블랙/헤어라인)":{cat:"하드웨어",info:[["규격","145*37.5"]],images:[],drawings:[],videos:[]},
+  "인스퀘어(흑니켈)":{cat:"하드웨어",info:[["규격","35"]],images:[],drawings:[],videos:[]},
+  "차음경첩":{cat:"하드웨어",info:[["규격","110*58"]],images:[],drawings:[],videos:[]},
+  "강화이지경첩(블랙-갑)":{cat:"하드웨어",info:[],images:[],drawings:[],videos:[]},
+  "도어스토퍼(스프링내장형-실버)":{cat:"하드웨어",info:[["규격","120*10"]],images:[],drawings:[],videos:[]},
+  "이지경첩(도금-갑)":{cat:"하드웨어",info:[["규격","110*58"]],images:[],drawings:[],videos:[]},
+  "도어스토퍼(실버)":{cat:"하드웨어",info:[["규격","110*10"]],images:[],drawings:[],videos:[]},
+  "강화이지경첩(화이트-갑)":{cat:"하드웨어",info:[],images:[],drawings:[],videos:[]},
+  "도어스토퍼(스프링내장형-블랙)":{cat:"하드웨어",info:[["규격","120*10"]],images:[],drawings:[],videos:[]},
+  "도어스토퍼(골드)":{cat:"하드웨어",info:[["규격","110*10"]],images:[],drawings:[],videos:[]},
+  "오목이(SHN04-실버)":{cat:"하드웨어",info:[["규격","144.5*37.5"]],images:[],drawings:[],videos:[]},
+  "오목이(SHN-23)화이트":{cat:"하드웨어",info:[["규격","30*160*12.8"]],images:[],drawings:[],videos:[]},
+  "히든경첩_미니(블랙)":{cat:"하드웨어",info:[["규격","110*24"]],images:[],drawings:[],videos:[]},
+  "오목이(SHN04-블랙)":{cat:"하드웨어",info:[["규격","144.5*37.5"]],images:[],drawings:[],videos:[]},
+  "오목이(SHN-23)엔틱그레이":{cat:"하드웨어",info:[["규격","30*160*12.8"]],images:[],drawings:[],videos:[]},
+  "오목이(SHN21-화이트)":{cat:"하드웨어",info:[["규격","146*38"]],images:[],drawings:[],videos:[]},
+  "오목이(SHN04-브론즈)":{cat:"하드웨어",info:[["규격","144.5*37.5"]],images:[],drawings:[],videos:[]},
+  "히든경첩_미니(화이트)":{cat:"하드웨어",info:[["규격","110*24"]],images:[],drawings:[],videos:[]},
+  "오목이(SHN21-그레이)":{cat:"하드웨어",info:[["규격","146*38"]],images:[],drawings:[],videos:[]},
+  "PVC 아웃코너-백골":{cat:"PVC몰딩",info:[["규격","38*2440*16"]],images:[],drawings:[],videos:[]},
+  "PVC 인코너-백골":{cat:"PVC몰딩",info:[["규격","27*2440*27"]],images:[],drawings:[],videos:[]},
+  "PVC평몰딩 30평-백골":{cat:"PVC몰딩",info:[["규격","30*2440*9"]],images:[],drawings:[],videos:[]},
+  "pvc마이너스몰딩(12T),(SS-1602),T자":{cat:"PVC몰딩",info:[["규격","12.5*1P,2.44M"],["컬러","백골(시트X)"]],images:[],drawings:[],videos:[]},
+  "PVC평몰딩 40평-백골":{cat:"PVC몰딩",info:[["규격","40*2440*9"]],images:[],drawings:[],videos:[]},
+  "PVC걸레받이-백골":{cat:"PVC몰딩",info:[["규격","80*2440*9"]],images:[],drawings:[],videos:[]},
+  "PVC평몰딩 100평-백골":{cat:"PVC몰딩",info:[["규격","100*2440*9"]],images:[],drawings:[],videos:[]},
+  "PVC평몰딩 60평-백골":{cat:"PVC몰딩",info:[["규격","60*2440*9"]],images:[],drawings:[],videos:[]},
+  "PVC평몰딩 80평-백골":{cat:"PVC몰딩",info:[["규격","80*2440*9"]],images:[],drawings:[],videos:[]},
+  "PVC평몰딩 25평-백골":{cat:"PVC몰딩",info:[["규격","25*2440*9"]],images:[],drawings:[],videos:[]},
+  "pvc마이너스몰딩(9T),(SS-1601),T자":{cat:"PVC몰딩",info:[["규격","9.5*1P,2.44M"],["컬러","백골(시트X)"]],images:[],drawings:[],videos:[]},
+  "PVC백색 30 2계단-백골":{cat:"PVC몰딩",info:[["규격","30*2440*12"]],images:[],drawings:[],videos:[]},
+  "PVC 히든걸레받이-백골":{cat:"PVC몰딩",info:[["규격","55*2440*12"]],images:[],drawings:[],videos:[]},
+  "PVC백색 25 2계단-백골":{cat:"PVC몰딩",info:[["규격","25*2440*15"]],images:[],drawings:[],videos:[]},
+  "실린더-엣지라인(하프)":{cat:"실린더/잠금장치",info:[["규격","50*30"]],images:[],drawings:[],videos:[]},
+  "모티스락-루이*":{cat:"실린더/잠금장치",info:[["규격","46*275"]],images:[],drawings:[],videos:[]},
+  "실린더-엣지라인(45T용)":{cat:"실린더/잠금장치",info:[["규격","50*30"]],images:[],drawings:[],videos:[]},
+  "NEW 반달핸들(블랙)":{cat:"실린더/잠금장치",info:[["규격","90*180*40"]],images:[],drawings:[],videos:[]},
+  "실린더(에리스-A)":{cat:"실린더/잠금장치",info:[["규격","70*70"]],images:[],drawings:[],videos:[]},
+  "실린더-엣지라인(35T용)":{cat:"실린더/잠금장치",info:[["규격","50*30"]],images:[],drawings:[],videos:[]},
+  "모티스락-웨이브(흑니켈)*":{cat:"실린더/잠금장치",info:[["규격","53*150"]],images:[],drawings:[],videos:[]},
+  "모티스락-샤프*":{cat:"실린더/잠금장치",info:[["규격","53*150"]],images:[],drawings:[],videos:[]},
+  "NEW 슬림라운드핸들(화이트)":{cat:"실린더/잠금장치",info:[["규격","48*350*40"]],images:[],drawings:[],videos:[]},
+  "NEW 반달핸들(화이트)":{cat:"실린더/잠금장치",info:[["규격","90*180*40"]],images:[],drawings:[],videos:[]},
+  "실린더(소구경,플란-골드)":{cat:"실린더/잠금장치",info:[["규격","54*54"]],images:[],drawings:[],videos:[]},
+  "양개(샤프-모티스 + 더미)":{cat:"실린더/잠금장치",info:[["규격","53*150"]],images:[],drawings:[],videos:[]},
+  "실린더(파이프-블랙)":{cat:"실린더/잠금장치",info:[["규격","70*70"]],images:[],drawings:[],videos:[]},
+  "실린더-데드락(하프)":{cat:"실린더/잠금장치",info:[["규격","54*54"]],images:[],drawings:[],videos:[]},
+  "실린더(네모-화이트)":{cat:"실린더/잠금장치",info:[["규격","70*70"]],images:[],drawings:[],videos:[]},
+  "데드락(P-99,니켈)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(P-04,블랙니켈)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(네오-실버)":{cat:"실린더/잠금장치",info:[["규격","70*70"]],images:[],drawings:[],videos:[]},
+  "실린더(P-04,매트골드)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(W20블랙)":{cat:"실린더/잠금장치",info:[["규격","70*70"]],images:[],drawings:[],videos:[]},
+  "실린더(엣지)":{cat:"실린더/잠금장치",info:[["규격","70*70"]],images:[],drawings:[],videos:[]},
+  "실린더(크리스탈)":{cat:"실린더/잠금장치",info:[["규격","70*70"]],images:[],drawings:[],videos:[]},
+  "모티스락(P-31,블랙니켈)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(P-04,니켈)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "모티스락(P-21,니켈)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "모티스락(P-31,매트골드)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(P-05,매트골드)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(P-01,블랙니켈)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(P-03,블랙니켈)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(P-03,매트골드)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(P-05,블랙니켈)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(포마-골드)":{cat:"실린더/잠금장치",info:[["규격","99*65"]],images:[],drawings:[],videos:[]},
+  "실린더(P-01,매트골드)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(P-03,니켈)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(P-05,니켈)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(포쉬-흑니켈)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(포마-흑니켈)":{cat:"실린더/잠금장치",info:[["규격","99*65"]],images:[],drawings:[],videos:[]},
+  "실린더(네모-블랙)":{cat:"실린더/잠금장치",info:[["규격","70*70"]],images:[],drawings:[],videos:[]},
+  "실린더(PM-01,블랙니켈)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(PM-02,블랙니켈)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "모티스락(P-31,니켈)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(포쉬-골드)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(샤프B-소구경)":{cat:"실린더/잠금장치",info:[["규격","54*54"]],images:[],drawings:[],videos:[]},
+  "실린더(PM-01,니켈)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(실키,유광골드)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(소구경,플란-EB)":{cat:"실린더/잠금장치",info:[["규격","54*54"]],images:[],drawings:[],videos:[]},
+  "실린더(PM-02,니켈)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "모티스락(P-71,니켈)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(소구경,플란-실버)":{cat:"실린더/잠금장치",info:[["규격","54*54"]],images:[],drawings:[],videos:[]},
+  "실린더(W20블랙-KEY)":{cat:"실린더/잠금장치",info:[["규격","70*70"]],images:[],drawings:[],videos:[]},
+  "실린더(P-02,니켈)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(로우-소구경)":{cat:"실린더/잠금장치",info:[["규격","54*54"]],images:[],drawings:[],videos:[]},
+  "실린더(카누-소구경)":{cat:"실린더/잠금장치",info:[["규격","54*54"]],images:[],drawings:[],videos:[]},
+  "실린더(W20그레이-KEY)":{cat:"실린더/잠금장치",info:[["규격","70*70"]],images:[],drawings:[],videos:[]},
+  "실린더(W30그레이)":{cat:"실린더/잠금장치",info:[["규격","70*70"]],images:[],drawings:[],videos:[]},
+  "실린더(P-51,골드)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(P-51,차콜)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(P-51,니켈)":{cat:"실린더/잠금장치",info:[],images:[],drawings:[],videos:[]},
+  "실린더(W20그레이)":{cat:"실린더/잠금장치",info:[["규격","70*70"]],images:[],drawings:[],videos:[]},
+  "힐링월(380)_폰티아화이트":{cat:"힐링월",info:[["규격","790*380*9"],["컬러","폰티아화이트"]],images:[],drawings:[],videos:[]},
+  "힐링월방염(380)_그레이스톤":{cat:"힐링월",info:[["규격","790*380*9"],["컬러","그레이스톤"]],images:[],drawings:[],videos:[]},
+  "힐링월방염(380)_알제이오크":{cat:"힐링월",info:[["규격","790*380*9"],["컬러","알제이오크"]],images:[],drawings:[],videos:[]},
+  "힐링월HG방염(380)_브론자이트":{cat:"힐링월",info:[["규격","790*380*9"],["컬러","브론자이트"]],images:[],drawings:[],videos:[]},
+  "힐링월방염(590)_라반트S1":{cat:"힐링월",info:[["규격","1200*590*9"],["컬러","라반트S1"]],images:[],drawings:[],videos:[]},
+  "힐링월방염(590)_솔리노V1":{cat:"힐링월",info:[["규격","1200*590*9"],["컬러","솔리노V1"]],images:[],drawings:[],videos:[]},
+  "힐링월방염(590)_카산드라V1":{cat:"힐링월",info:[["규격","1200*590*9"],["컬러","카산드라V1"]],images:[],drawings:[],videos:[]},
+  "힐링월방염(590)_카스피오S1":{cat:"힐링월",info:[["규격","1200*590*9"],["컬러","카스피오S1"]],images:[],drawings:[],videos:[]},
+  "힐링월방염(800)_솔리노V1":{cat:"힐링월",info:[["규격","800*2420*9"],["컬러","솔리노V1"]],images:[],drawings:[],videos:[]},
+  "힐링월방염(800)_카산드라베이지":{cat:"힐링월",info:[["규격","800*2420*9"],["컬러","카산드라베이지"]],images:[],drawings:[],videos:[]},
+  "힐링월HG방염(380)_살로메":{cat:"힐링월",info:[["규격","790*380*9"],["컬러","살로메"]],images:[],drawings:[],videos:[]},
+  "힐링월방염(380)_카산드라베이지":{cat:"힐링월",info:[["규격","790*380*9"],["컬러","카산드라베이지"]],images:[],drawings:[],videos:[]},
+  "힐링월방염(380)_솔리노V1":{cat:"힐링월",info:[["규격","790*380*9"],["컬러","솔리노V1"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*10)_그레이":{cat:"힐링월",info:[["규격","19*2400*10"],["컬러","그레이"],["타입","19*10"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*10)_그레이스톤":{cat:"힐링월",info:[["규격","19*2400*10"],["컬러","그레이스톤"],["타입","19*10"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*10)_라반트S1":{cat:"힐링월",info:[["규격","19*2400*10"],["컬러","라반트S1"],["타입","19*10"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*10)_브론자이트":{cat:"힐링월",info:[["규격","19*2400*10"],["컬러","브론자이트"],["타입","19*10"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*10)_블랙":{cat:"힐링월",info:[["규격","19*2400*10"],["컬러","블랙"],["타입","19*10"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*10)_솔리노V1":{cat:"힐링월",info:[["규격","19*2400*10"],["컬러","솔리노V1"],["타입","19*10"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*10)_알제이오크":{cat:"힐링월",info:[["규격","19*2400*10"],["컬러","알제이오크"],["타입","19*10"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*10)_카산드라V1":{cat:"힐링월",info:[["규격","19*2400*10"],["컬러","카산드라V1"],["타입","19*10"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*10)_카스피오S1":{cat:"힐링월",info:[["규격","19*2400*10"],["컬러","카스피오S1"],["타입","19*10"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*10)_폰티아화이트":{cat:"힐링월",info:[["규격","19*2400*10"],["컬러","폰티아화이트"],["타입","19*10"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*10)_살로메(HG)":{cat:"힐링월",info:[["규격","19*2400*10"],["컬러","살로메(HG)"],["타입","19*10"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*10)_브론자이트(HG)":{cat:"힐링월",info:[["규격","19*2400*10"],["컬러","브론자이트(HG)"],["타입","19*10"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*19)_그레이":{cat:"힐링월",info:[["규격","19*2400*19"],["컬러","그레이"],["타입","19*19"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*19)_그레이스톤":{cat:"힐링월",info:[["규격","19*2400*19"],["컬러","그레이스톤"],["타입","19*19"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*19)_라반트S1":{cat:"힐링월",info:[["규격","19*2400*19"],["컬러","라반트S1"],["타입","19*19"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*19)_브론자이트":{cat:"힐링월",info:[["규격","19*2400*19"],["컬러","브론자이트"],["타입","19*19"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*19)_블랙":{cat:"힐링월",info:[["규격","19*2400*19"],["컬러","블랙"],["타입","19*19"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*19)_솔리노V1":{cat:"힐링월",info:[["규격","19*2400*19"],["컬러","솔리노V1"],["타입","19*19"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*19)_카산드라V1":{cat:"힐링월",info:[["규격","19*2400*19"],["컬러","카산드라V1"],["타입","19*19"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*19)_카스피오S1":{cat:"힐링월",info:[["규격","19*2400*19"],["컬러","카스피오S1"],["타입","19*19"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*19)_폰티아화이트":{cat:"힐링월",info:[["규격","19*2400*19"],["컬러","폰티아화이트"],["타입","19*19"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*19)_브론자이트(HG)":{cat:"힐링월",info:[["규격","19*2400*19"],["컬러","브론자이트(HG)"],["타입","19*19"]],images:[],drawings:[],videos:[]},
+  "힐링월몰딩(19*19)_살로메(HG)":{cat:"힐링월",info:[["규격","19*2400*19"],["컬러","살로메(HG)"],["타입","19*19"]],images:[],drawings:[],videos:[]},
+  "(구)비지오그란데(블랙25715)":{cat:"비지오/세라민",info:[["규격","605*282*8"]],images:[],drawings:[],videos:[]},
+  "비지오그란데(시멘트베이지56022)":{cat:"비지오/세라민",info:[["규격","604*280*8"]],images:[],drawings:[],videos:[]},
+  "비지오그란데(슬레이트그레이56018)":{cat:"비지오/세라민",info:[["규격","604*280*8"]],images:[],drawings:[],videos:[]},
+  "비지오그란데(그래닛화이트56017)":{cat:"비지오/세라민",info:[["규격","604*280*8"]],images:[],drawings:[],videos:[]},
+  "비지오그란데(베이지56029)":{cat:"비지오/세라민",info:[["규격","604*280*8"]],images:[],drawings:[],videos:[]},
+  "세라민타일-마우스그레이":{cat:"비지오/세라민",info:[["규격","1180*392*3"]],images:[],drawings:[],videos:[]},
+  "세라민타일-마잘란그레이":{cat:"비지오/세라민",info:[["규격","1180*392*3"]],images:[],drawings:[],videos:[]},
+  "세라민타일-마르모르베이지":{cat:"비지오/세라민",info:[["규격","1180*392*3"]],images:[],drawings:[],videos:[]},
+  "NEW 리빙보드(자개-8자)":{cat:"리빙보드",info:[["규격","300*2400*10"],["코드","BD21130-000-000"]],images:[],drawings:[],videos:[]},
+  "NEW 리빙보드(자개-10자)":{cat:"리빙보드",info:[["규격","300*3000*10"],["코드","BD21140-000-000"]],images:[],drawings:[],videos:[]},
+  "NEW 리빙보드(자개-12자)":{cat:"리빙보드",info:[["규격","300*3600*10"],["코드","BD21150-000-000"]],images:[],drawings:[],videos:[]},
+  "NEW 리빙보드(펄백색-8자)":{cat:"리빙보드",info:[["규격","300*2400*10"],["코드","BD21160-000-000"]],images:[],drawings:[],videos:[]},
+  "NEW 리빙보드(펄백색-10자)":{cat:"리빙보드",info:[["규격","300*3000*10"],["코드","BD21170-000-000"]],images:[],drawings:[],videos:[]},
+  "NEW 리빙보드(펄백색-12자)":{cat:"리빙보드",info:[["규격","300*3600*10"],["코드","BD21180-000-000"]],images:[],drawings:[],videos:[]}
+};
+
+/* ══ 검색 (한 글자도, 숫자도 포함 검색) ══ */
+function search(q){
+  if(!q||!q.trim()) return [];
+  var ql = q.trim().toLowerCase().replace(/\s/g,'');
+  return Object.keys(DB).filter(function(k){
+    return k.toLowerCase().replace(/\s/g,'').indexOf(ql) !== -1;
+  });
+}
+
+/* ══ 자동완성 ══ */
+var acEl=document.getElementById('ac'), siEl=document.getElementById('ii');
+var acIdx=-1, acList=[];
+function renderAC(q){
+  acList=search(q); acIdx=-1; acEl.innerHTML='';
+  if(!acList.length){acEl.classList.remove('show');return;}
+  acList.forEach(function(k){
+    var p=DB[k];
+    var div=document.createElement('div'); div.className='aci';
+    var imgKey=(p.images&&p.images[0])?p.images[0].f:(p.drawings&&p.drawings[0])?p.drawings[0].f:null;
+    var src=imgKey?gi(imgKey):'';
+    if(src){var th=document.createElement('img');th.src=src;th.className='acth';th.alt=k;div.appendChild(th);}
+    else{var ph=document.createElement('div');ph.className='acth-ph';ph.textContent='🏠';div.appendChild(ph);}
+    var info=document.createElement('div');
+    info.innerHTML='<div class="acn">'+k+'</div><div class="acs">'+p.cat+'</div>';
+    div.appendChild(info);
+    div.addEventListener('click',function(){selectAC(k);});
+    acEl.appendChild(div);
+  });
+  acEl.classList.add('show');
+}
+function selectAC(key){acEl.classList.remove('show');siEl.value='';handleInput(key);}
+siEl.addEventListener('input',function(){renderAC(this.value);});
+siEl.addEventListener('keydown',function(e){
+  var items=acEl.querySelectorAll('.aci');
+  if(e.key==='ArrowDown'){e.preventDefault();acIdx=Math.min(acIdx+1,items.length-1);items.forEach(function(el,i){el.classList.toggle('fc',i===acIdx);});}
+  else if(e.key==='ArrowUp'){e.preventDefault();acIdx=Math.max(acIdx-1,0);items.forEach(function(el,i){el.classList.toggle('fc',i===acIdx);});}
+  else if(e.key==='Enter'){
+    if(acIdx>=0&&acList[acIdx]) selectAC(acList[acIdx]);
+    else if(acList.length===1) selectAC(acList[0]);
+    else if(this.value.trim()){handleInput(this.value);siEl.value='';acEl.classList.remove('show');}
+  } else if(e.key==='Escape') acEl.classList.remove('show');
+});
+document.addEventListener('click',function(e){if(!document.getElementById('ir').contains(e.target))acEl.classList.remove('show');});
+
+/* ══ 슬라이더 ══ */
+function buildSlider(slides){
+  if(!slides.length) return null;
+  var wrap=document.createElement('div');wrap.className='slw';
+  var outer=document.createElement('div');outer.className='slo';
+  var track=document.createElement('div');track.className='slt';
+  slides.forEach(function(s){
+    var sl=document.createElement('div');sl.className='sli';
+    var im=document.createElement('img');im.src=s.src;im.alt=s.l||'';
+    var ss=s.src,sl2=s.l||'';
+    sl.addEventListener('click',function(){openLB(ss,sl2);});
+    sl.appendChild(im);
+    if(s.l){var lb2=document.createElement('div');lb2.className='slil';lb2.textContent=s.l;sl.appendChild(lb2);}
+    track.appendChild(sl);
+  });
+  outer.appendChild(track);wrap.appendChild(outer);
+  var cnt=document.createElement('div');cnt.className='slc';cnt.textContent='1/'+slides.length;wrap.appendChild(cnt);
+  var dw=document.createElement('div');dw.className='slds';
+  slides.forEach(function(_,i){var d=document.createElement('div');d.className='sld'+(i===0?' on':'');d.addEventListener('click',function(){goTo(i);});dw.appendChild(d);});
+  if(slides.length>1)wrap.appendChild(dw);
+  var prev=document.createElement('button');prev.className='slb prev';prev.innerHTML='&#8249;';
+  var next=document.createElement('button');next.className='slb next';next.innerHTML='&#8250;';
+  if(slides.length>1){wrap.appendChild(prev);wrap.appendChild(next);}
+  var cur=0;
+  function goTo(n){
+    cur=Math.max(0,Math.min(n,slides.length-1));
+    track.style.transform='translateX(-'+(cur*100)+'%)';
+    cnt.textContent=(cur+1)+'/'+slides.length;
+    dw.querySelectorAll('.sld').forEach(function(d,i){d.classList.toggle('on',i===cur);});
+    prev.classList.toggle('hide',cur===0);
+    next.classList.toggle('hide',cur===slides.length-1);
+  }
+  prev.addEventListener('click',function(e){e.stopPropagation();goTo(cur-1);});
+  next.addEventListener('click',function(e){e.stopPropagation();goTo(cur+1);});
+  var sx=0;
+  outer.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;},{passive:true});
+  outer.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40)goTo(dx<0?cur+1:cur-1);},{passive:true});
+  goTo(0);return wrap;
+}
+
+/* ══ 제품 카드 ══ */
+function buildCard(key){
+  var p=DB[key];if(!p)return null;
+  var card=document.createElement('div');card.className='pcard';
+  var tbr=document.createElement('div');tbr.className='tbr';
+  var panes={img:document.createElement('div'),draw:document.createElement('div'),video:document.createElement('div')};
+  [{id:'img',l:'🖼 이미지'},{id:'draw',l:'📐 도면'},{id:'video',l:'📋 상세설명'}].forEach(function(td,i){
+    var btn=document.createElement('button');btn.className='tab'+(i===0?' on':'');btn.textContent=td.l;
+    var pane=panes[td.id];pane.className='tp'+(i===0?' on':'');
+    btn.addEventListener('click',function(){
+      tbr.querySelectorAll('.tab').forEach(function(b){b.classList.remove('on');});
+      Object.values(panes).forEach(function(pp){pp.classList.remove('on');});
+      btn.classList.add('on');pane.classList.add('on');
+    });
+    tbr.appendChild(btn);
+  });
+  card.appendChild(tbr);
+  var isl=(p.images||[]).map(function(im){return{src:gi(im.f),l:im.l};}).filter(function(s){return s.src;});
+  if(isl.length){var sv=buildSlider(isl);if(sv)panes.img.appendChild(sv);}
+  else{var e1=document.createElement('div');e1.className='etp';e1.innerHTML='<span class="ei">🖼</span>이미지 준비 중';panes.img.appendChild(e1);}
+  var dsl=(p.drawings||[]).map(function(d){return{src:gi(d.f),l:d.l};}).filter(function(s){return s.src;});
+  if(dsl.length){var sv2=buildSlider(dsl);if(sv2)panes.draw.appendChild(sv2);}
+  else{var e2=document.createElement('div');e2.className='etp';e2.innerHTML='<span class="ei">📐</span>도면 준비 중';panes.draw.appendChild(e2);}
+  if(p.videos&&p.videos.length){
+    var descSlides=(p.videos||[]).map(function(v){return{src:gi(v.f),l:v.l};}).filter(function(s){return s.src;});
+    if(descSlides.length){var sv3=buildSlider(descSlides);if(sv3)panes.video.appendChild(sv3);}
+    else{var e3=document.createElement('div');e3.className='etp';e3.innerHTML='<span class="ei">📋</span>이미지 없음';panes.video.appendChild(e3);}
+  } else {
+    var e3=document.createElement('div');e3.className='etp';
+    e3.innerHTML='<span class="ei">📋</span>상세설명 준비 중<br><small>관리자 모드에서 이미지를 추가하세요</small>';
+    panes.video.appendChild(e3);
+  }
+  Object.values(panes).forEach(function(pane){card.appendChild(pane);});
+  var pb=document.createElement('div');pb.className='pb';
+  var pt=document.createElement('div');pt.className='pt';pt.textContent=key;
+  var bc=document.createElement('span');bc.className='bc';bc.textContent=p.cat;pt.appendChild(bc);pb.appendChild(pt);
+  if(p.info&&p.info.length){
+    var tbl=document.createElement('table');tbl.className='it';
+    p.info.forEach(function(r){
+      var tr=document.createElement('tr');
+      var td1=document.createElement('td');td1.className='lbl';td1.textContent=r[0];
+      var td2=document.createElement('td');td2.textContent=r[1];
+      tr.appendChild(td1);tr.appendChild(td2);tbl.appendChild(tr);
+    });
+    pb.appendChild(tbl);
+  }
+  card.appendChild(pb);return card;
+}
+
+/* ══ 메시지 UI ══ */
+var msgs=document.getElementById('msgs'),ii=document.getElementById('ii');
+function ft(){return new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});}
+function addUser(t){
+  var w=document.createElement('div');w.className='mw u';
+  var b=document.createElement('div');b.className='bub u';b.textContent=t;
+  var ts=document.createElement('div');ts.className='ts';ts.textContent=ft();
+  w.appendChild(b);w.appendChild(ts);msgs.appendChild(w);msgs.scrollTop=99999;
+}
+
+/* ══ GitHub 연동 ══ */
+var GH_STORAGE_KEY='woodin_gh_config';
+
+function admGhLoadConfig(){
+  try{return JSON.parse(localStorage.getItem(GH_STORAGE_KEY)||'null');}catch(e){return null;}
+}
+function admGhSaveConfig(){
+  var owner=(document.getElementById('adm-gh-owner').value||'').trim();
+  var repo=(document.getElementById('adm-gh-repo').value||'').trim();
+  var path=(document.getElementById('adm-gh-path').value||'').trim();
+  var token=(document.getElementById('adm-gh-token').value||'').trim();
+  if(!owner||!repo||!path||!token){alert('모든 항목을 입력해 주세요.');return;}
+  var cfg={owner:owner,repo:repo,path:path,token:token};
+  localStorage.setItem(GH_STORAGE_KEY,JSON.stringify(cfg));
+  admGhUpdateStatus();
+  admGhCloseModal();
+  alert('✅ GitHub 연동 설정이 저장되었습니다!');
+}
+function admGhClearConfig(){
+  if(!confirm('GitHub 연동 설정을 초기화하시겠습니까?'))return;
+  localStorage.removeItem(GH_STORAGE_KEY);
+  admGhUpdateStatus();
+  admGhCloseModal();
+}
+function admGhOpenModal(){
+  var cfg=admGhLoadConfig();
+  if(cfg){
+    document.getElementById('adm-gh-owner').value=cfg.owner||'';
+    document.getElementById('adm-gh-repo').value=cfg.repo||'';
+    document.getElementById('adm-gh-path').value=cfg.path||'chatbot.html';
+    document.getElementById('adm-gh-token').value=cfg.token||'';
+  }
+  document.getElementById('adm-gh-modal').classList.add('show');
+}
+function admGhCloseModal(){
+  document.getElementById('adm-gh-modal').classList.remove('show');
+}
+function admGhUpdateStatus(){
+  var cfg=admGhLoadConfig();
+  var el=document.getElementById('adm-gh-status');
+  var btn=document.getElementById('adm-gh-setup-btn');
+  if(!el)return;
+  if(cfg&&cfg.owner&&cfg.repo&&cfg.token){
+    el.textContent=cfg.owner+'/'+cfg.repo;
+    el.className='ok';
+    if(btn)btn.textContent='변경';
+  } else {
+    el.textContent='미설정';
+    el.className='no';
+    if(btn)btn.textContent='설정';
+  }
+}
+
+/* 현재 HTML 전체를 문자열로 직렬화 */
+function admGetCurrentHTML(){
+  var hideIds=['adm-upload-overlay','adm-panel','adm-login-overlay','adm-gh-modal','lb'];
+  var removed=[];
+  hideIds.forEach(function(id){
+    var el=document.getElementById(id);
+    if(el&&el.classList.contains('show')){el.classList.remove('show');removed.push(el);}
+  });
+  var dt=document.doctype;
+  var dtStr=dt?'<!DOCTYPE '+dt.name+'>':'';
+  var html=dtStr+document.documentElement.outerHTML;
+  removed.forEach(function(el){el.classList.add('show');});
+  return html;
+}
+
+/* GitHub API 단일 파일 PUT 헬퍼 */
+async function ghPutFile(cfg, filePath, content, commitMsg){
+  var apiUrl='https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/contents/'+encodeURIComponent(filePath);
+  var headers={Authorization:'token '+cfg.token,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'};
+  // 기존 SHA 가져오기
+  var sha='';
+  var getRes=await fetch(apiUrl,{headers:headers});
+  if(getRes.ok){var j=await getRes.json();sha=j.sha||'';}
+  // PUT 업로드
+  var body={message:commitMsg,content:content};
+  if(sha)body.sha=sha;
+  var putRes=await fetch(apiUrl,{method:'PUT',headers:headers,body:JSON.stringify(body)});
+  if(!putRes.ok){
+    var errJson=await putRes.json().catch(function(){return{};});
+    throw new Error('업로드 실패 ('+putRes.status+'): '+(errJson.message||JSON.stringify(errJson)));
+  }
+  return putRes;
+}
+
+/* GitHub API로 HTML + 새 이미지 개별 파일 업로드 */
+async function admPushToGitHub(onSuccess){
+  var cfg=admGhLoadConfig();
+  if(!cfg||!cfg.token){
+    alert('GitHub 연동 설정이 없습니다.\n먼저 설정 버튼을 눌러 설정해 주세요.');
+    return;
+  }
+  var overlay=document.getElementById('adm-upload-overlay');
+  var msg=document.getElementById('adm-upload-msg');
+  overlay.classList.add('show');
+  try{
+    var now=new Date().toLocaleString('ko-KR');
+    var folder=cfg.path.replace(/[^/]*$/,''); // 예: "" 또는 "folder/"
+    var imgFolder=folder+'images/';
+
+    // ── 1) base64 이미지만 개별 파일로 GitHub 업로드 ──────────────
+    var newImgs=Object.keys(I).filter(function(k){
+      return I[k]&&I[k]!=='__IMG_PLACEHOLDER__'&&I[k].startsWith('data:');
+    });
+    if(newImgs.length>0){
+      msg.textContent='이미지 업로드 중 (0/'+newImgs.length+')...';
+      for(var i=0;i<newImgs.length;i++){
+        var fname=newImgs[i];
+        msg.textContent='이미지 업로드 중 ('+(i+1)+'/'+newImgs.length+'): '+fname;
+        // data:image/jpeg;base64,xxxx → xxxx 부분만 추출
+        var b64data=I[fname].split(',')[1];
+        if(!b64data)continue;
+        await ghPutFile(cfg, imgFolder+fname, b64data, '이미지 추가: '+fname+' ('+now+')');
+        // 업로드 완료 후 I에서 base64 제거 (Raw URL로 대체됨)
+        I[fname]='__IMG_PLACEHOLDER__';
+      }
+    }
+
+    // ── 2) HTML 업로드 (I는 이미 __IMG_PLACEHOLDER__ 상태) ─────────
+    msg.textContent='HTML 파일 인코딩 중...';
+    var html=admGetCurrentHTML();
+    var htmlB64=btoa(unescape(encodeURIComponent(html)));
+    msg.textContent='HTML 업로드 중...';
+    await ghPutFile(cfg, cfg.path, htmlB64, '챗봇 업데이트 ('+now+')');
+
+    overlay.classList.remove('show');
+    var pageUrl='https://'+cfg.owner+'.github.io/'+cfg.repo+'/'+cfg.path;
+    if(onSuccess)onSuccess();
+    var imgMsg=newImgs.length>0?'\n✅ 새 이미지 '+newImgs.length+'개 (images/ 폴더)':'\n(새 이미지 없음)';
+    alert('🚀 GitHub 업로드 성공!\n\n✅ chatbot.html'+imgMsg+'\n\nGitHub Pages URL:\n'+pageUrl+'\n\n※ Pages 반영까지 1~2분 소요됩니다.');
+  } catch(e){
+    overlay.classList.remove('show');
+    alert('❌ 업로드 오류\n'+e.message);
+  }
+}
+
+/* 저장 + GitHub 업로드 (편집 탭) */
+function admSaveAndPush(){
+  var pname=document.getElementById('adm-product-sel').value;
+  if(!pname){alert('제품을 선택하세요.');return;}
+  admSaveLocal();
+  admPushToGitHub(null);
+}
+
+/* 추가 + GitHub 업로드 (새 제품 탭) */
+function admAddProductAndPush(){
+  var name=(document.getElementById('adm-new-name').value||'').trim();
+  if(!name){alert('제품명을 입력하세요.');return;}
+  if(DB[name]){alert('"'+name+'" 제품이 이미 존재합니다.');return;}
+  var cat=document.getElementById('adm-new-cat').value;
+  if(!cat||cat==='__new__'){alert('카테고리를 선택하세요.');return;}
+  admAddProductLocal();
+  admPushToGitHub(null);
+}
+
+/* ══ 관리자 모드 ══ */
+var ADM_PW='woodin2026';
+var admPending={real:[],draw:[],desc:[],newReal:[],newDraw:[],newDesc:[]};
+var ADM_CATS=['천장몰딩','대칭몰딩','비대칭몰딩','허리몰딩','평몰딩','걸레받이','마감재','포인트몰딩','계단몰딩','PVC몰딩','인조대리석','리빙보드','힐링월','비지오/세라민','실린더/잠금장치','하드웨어'];
+
+function admOpenLogin(){
+  document.getElementById('adm-pw-input').value='';
+  document.getElementById('adm-err').style.display='none';
+  document.getElementById('adm-login-overlay').classList.add('show');
+  setTimeout(function(){document.getElementById('adm-pw-input').focus();},100);
+}
+function admCloseLogin(){
+  document.getElementById('adm-login-overlay').classList.remove('show');
+}
+function admCheckPw(){
+  var v=document.getElementById('adm-pw-input').value;
+  if(v===ADM_PW){admCloseLogin();admOpenPanel();}
+  else{
+    document.getElementById('adm-err').style.display='block';
+    document.getElementById('adm-pw-input').value='';
+    document.getElementById('adm-pw-input').focus();
+  }
+}
+
+function admPopulateCats(){
+  // DB에서 카테고리 동적 수집 + 하드코딩 목록 합치기
+  var cats=ADM_CATS.slice();
+  Object.values(DB).forEach(function(p){if(p.cat&&cats.indexOf(p.cat)<0)cats.push(p.cat);});
+  ['adm-edit-cat','adm-new-cat'].forEach(function(id){
+    var sel=document.getElementById(id);
+    if(!sel)return;
+    sel.innerHTML='';
+    cats.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});
+    // 직접입력 옵션
+    var other=document.createElement('option');other.value='__new__';other.textContent='직접 입력…';sel.appendChild(other);
+    sel.onchange=function(){
+      if(this.value==='__new__'){
+        var v=prompt('새 카테고리 이름을 입력하세요:','');
+        if(v&&v.trim()){
+          var o2=document.createElement('option');o2.value=v.trim();o2.textContent=v.trim();
+          sel.insertBefore(o2,sel.lastElementChild);
+          sel.value=v.trim();
+        } else {sel.value=cats[0]||'';}
+      }
+    };
+  });
+}
+
+function admOpenPanel(){
+  admPending={real:[],draw:[],desc:[],newReal:[],newDraw:[],newDesc:[]};
+  // 제품 드롭다운
+  var sel=document.getElementById('adm-product-sel');
+  sel.innerHTML='<option value="">-- 제품을 선택하세요 --</option>';
+  Object.keys(DB).sort().forEach(function(k){
+    var o=document.createElement('option');o.value=k;o.textContent=k;sel.appendChild(o);
+  });
+  // 카테고리 채우기
+  admPopulateCats();
+  // 그리드 초기화
+  ['real','draw','desc'].forEach(function(t){admRenderGrid(t);});
+  ['newReal','newDraw','newDesc'].forEach(function(t){admRenderGrid(t);});
+  // info rows 초기화
+  document.getElementById('adm-edit-info-rows').innerHTML='';
+  document.getElementById('adm-new-info-rows').innerHTML='';
+  // 드롭존 드래그 설정
+  ['real','draw','desc','newReal','newDraw','newDesc'].forEach(function(t){
+    admSetupDrop('adm-'+admDropId(t)+'-drop',t);
+  });
+  document.getElementById('adm-meta-sec').style.display='none';
+  document.getElementById('adm-del-btn').style.display='none';
+  admSwitchTab('edit');
+  admGhUpdateStatus();
+  document.getElementById('adm-panel').classList.add('show');
+}
+function admDropId(type){
+  var m={real:'real',draw:'draw',desc:'desc',newReal:'new-real',newDraw:'new-draw',newDesc:'new-desc'};
+  return m[type];
+}
+function admClosePanel(){
+  document.getElementById('adm-panel').classList.remove('show');
+}
+function admSwitchTab(tab){
+  document.getElementById('adm-tab-edit').classList.toggle('on',tab==='edit');
+  document.getElementById('adm-tab-new').classList.toggle('on',tab==='new');
+  document.getElementById('adm-edit-view').classList.toggle('on',tab==='edit');
+  document.getElementById('adm-new-view').classList.toggle('on',tab==='new');
+}
+
+function admSetupDrop(dropId,type){
+  var el=document.getElementById(dropId);
+  if(!el||el._admDrop)return;
+  el._admDrop=true;
+  el.addEventListener('dragover',function(e){e.preventDefault();el.classList.add('drag-over');});
+  el.addEventListener('dragleave',function(){el.classList.remove('drag-over');});
+  el.addEventListener('drop',function(e){e.preventDefault();el.classList.remove('drag-over');admProcessFiles(e.dataTransfer.files,type);});
+}
+function admHandleFiles(input,type){admProcessFiles(input.files,type);input.value='';}
+function admProcessFiles(files,type){
+  Array.from(files).forEach(function(f){
+    if(!f.type.startsWith('image/'))return;
+    var reader=new FileReader();
+    var fname=f.name; // 원본 파일명 보존
+    reader.onload=function(e){
+      admPending[type].push({src:e.target.result,label:fname.replace(/\.[^.]+$/,''),origF:fname});
+      admRenderGrid(type);
+    };
+    reader.readAsDataURL(f);
+  });
+}
+
+function admLoadProduct(){
+  var pname=document.getElementById('adm-product-sel').value;
+  admPending.real=[];admPending.draw=[];admPending.desc=[];
+  var metaSec=document.getElementById('adm-meta-sec');
+  var delBtn=document.getElementById('adm-del-btn');
+  if(!pname){
+    metaSec.style.display='none';
+    delBtn.style.display='none';
+    ['real','draw','desc'].forEach(function(t){admRenderGrid(t);});
+    return;
+  }
+  var p=DB[pname];
+  if(!p)return;
+  // 기본 정보 섹션 표시
+  metaSec.style.display='block';
+  delBtn.style.display='';
+  // 카테고리 세팅
+  var editCat=document.getElementById('adm-edit-cat');
+  if(editCat){
+    // 없는 카테고리면 옵션 추가
+    var found=false;
+    for(var i=0;i<editCat.options.length;i++){if(editCat.options[i].value===p.cat){found=true;break;}}
+    if(!found&&p.cat){var o=document.createElement('option');o.value=p.cat;o.textContent=p.cat;editCat.insertBefore(o,editCat.lastElementChild);}
+    editCat.value=p.cat||'';
+  }
+  // info rows
+  var infoContainer=document.getElementById('adm-edit-info-rows');
+  infoContainer.innerHTML='';
+  (p.info||[]).forEach(function(row){admAddInfoRow('adm-edit-info-rows',row[0],row[1]);});
+  // 이미지
+  (p.images||[]).forEach(function(obj){
+    admPending.real.push({src:gi(obj.f)||'',label:obj.l||obj.f,origF:obj.f,origL:obj.l});
+  });
+  (p.drawings||[]).forEach(function(obj){
+    admPending.draw.push({src:gi(obj.f)||'',label:obj.l||obj.f,origF:obj.f,origL:obj.l});
+  });
+  (p.videos||[]).forEach(function(obj){
+    admPending.desc.push({src:gi(obj.f)||'',label:obj.l||obj.f,origF:obj.f,origL:obj.l});
+  });
+  ['real','draw','desc'].forEach(function(t){admRenderGrid(t);});
+}
+
+function admRenderGrid(type){
+  var ids={real:'adm-real-grid',draw:'adm-draw-grid',desc:'adm-desc-grid',
+            newReal:'adm-new-real-grid',newDraw:'adm-new-draw-grid',newDesc:'adm-new-desc-grid'};
+  var grid=document.getElementById(ids[type]);
+  if(!grid)return;
+  grid.innerHTML='';
+  var arr=admPending[type]||[];
+  if(!arr.length){
+    var em=document.createElement('p');em.className='adm-empty';em.textContent='(이미지 없음)';
+    grid.appendChild(em);return;
+  }
+  arr.forEach(function(item,idx){
+    var card=document.createElement('div');card.className='adm-card';
+    var img=document.createElement('img');
+    img.src=item.src||'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="90" height="66"><rect fill="%23eee" width="90" height="66"/></svg>';
+    img.alt=item.label;
+    var lbl=document.createElement('div');lbl.className='adm-card-lbl';lbl.textContent=item.label||'';
+    var ov=document.createElement('div');ov.className='adm-del-ov';
+    var x=document.createElement('span');x.textContent='×';ov.appendChild(x);
+    (function(i,t){ov.addEventListener('click',function(e){e.stopPropagation();admPending[t].splice(i,1);admRenderGrid(t);});})(idx,type);
+    card.appendChild(img);card.appendChild(lbl);card.appendChild(ov);
+    grid.appendChild(card);
+  });
+}
+
+/* info row 추가/삭제 */
+function admAddInfoRow(containerId,key,val){
+  var c=document.getElementById(containerId);if(!c)return;
+  var row=document.createElement('div');row.className='adm-info-row';
+  var k=document.createElement('input');k.type='text';k.placeholder='항목 (예: 규격)';k.value=key||'';
+  var v=document.createElement('input');v.type='text';v.placeholder='값 (예: 10×40mm)';v.value=val||'';
+  var del=document.createElement('button');del.textContent='×';
+  del.onclick=function(){c.removeChild(row);};
+  row.appendChild(k);row.appendChild(v);row.appendChild(del);
+  c.appendChild(row);
+}
+function admGetInfoRows(containerId){
+  var rows=document.querySelectorAll('#'+containerId+' .adm-info-row');
+  var result=[];
+  rows.forEach(function(r){
+    var inputs=r.querySelectorAll('input');
+    var k=(inputs[0]&&inputs[0].value.trim())||'';
+    var v=(inputs[1]&&inputs[1].value.trim())||'';
+    if(k||v)result.push([k,v]);
+  });
+  return result;
+}
+
+/* 저장 (기존 제품 편집) */
+function admSaveLocal(){
+  var pname=document.getElementById('adm-product-sel').value;
+  if(!pname)return false;
+  var p=DB[pname];if(!p)return false;
+  var ec=document.getElementById('adm-edit-cat');
+  if(ec&&ec.value&&ec.value!=='__new__')p.cat=ec.value;
+  p.info=admGetInfoRows('adm-edit-info-rows');
+  p.images=admPending.real.map(function(item,idx){
+    var f=item.origF||(pname+'_real_'+idx+'.jpg');var l=item.label||f;
+    if(item.src&&item.src.startsWith('data:'))I[f]=item.src;
+    return{f:f,l:l};
+  });
+  p.drawings=admPending.draw.map(function(item,idx){
+    var f=item.origF||(pname+'_draw_'+idx+'.jpg');var l=item.label||f;
+    if(item.src&&item.src.startsWith('data:'))I[f]=item.src;
+    return{f:f,l:l};
+  });
+  p.videos=admPending.desc.map(function(item,idx){
+    var f=item.origF||(pname+'_desc_'+idx+'.jpg');var l=item.label||f;
+    if(item.src&&item.src.startsWith('data:'))I[f]=item.src;
+    return{f:f,l:l};
+  });
+  return true;
+}
+function admSave(){
+  var pname=document.getElementById('adm-product-sel').value;
+  if(!pname){alert('제품을 선택하세요.');return;}
+  if(!admSaveLocal()){alert('제품을 찾을 수 없습니다.');return;}
+  alert('✅ 저장되었습니다!\n영구 저장은 GitHub 업로드 버튼을 눌러주세요.');
+}
+
+/* 새 제품 추가 */
+function admAddProductLocal(){
+  var name=(document.getElementById('adm-new-name').value||'').trim();
+  if(!name)return false;
+  var cat=document.getElementById('adm-new-cat').value;
+  if(!cat||cat==='__new__')return false;
+  var info=admGetInfoRows('adm-new-info-rows');
+  var images=admPending.newReal.map(function(item,idx){
+    var f=item.origF||(name+'_real_'+idx+'.jpg');var l=item.label||f;
+    if(item.src)I[f]=item.src;return{f:f,l:l};
+  });
+  var drawings=admPending.newDraw.map(function(item,idx){
+    var f=item.origF||(name+'_draw_'+idx+'.jpg');var l=item.label||f;
+    if(item.src)I[f]=item.src;return{f:f,l:l};
+  });
+  var videos=admPending.newDesc.map(function(item,idx){
+    var f=item.origF||(name+'_desc_'+idx+'.jpg');var l=item.label||f;
+    if(item.src)I[f]=item.src;return{f:f,l:l};
+  });
+  DB[name]={cat:cat,info:info,images:images,drawings:drawings,videos:videos};
+  // 폼 초기화
+  document.getElementById('adm-new-name').value='';
+  document.getElementById('adm-new-info-rows').innerHTML='';
+  admPending.newReal=[];admPending.newDraw=[];admPending.newDesc=[];
+  ['newReal','newDraw','newDesc'].forEach(function(t){admRenderGrid(t);});
+  return true;
+}
+function admAddProduct(){
+  var name=(document.getElementById('adm-new-name').value||'').trim();
+  if(!name){alert('제품명을 입력하세요.');document.getElementById('adm-new-name').focus();return;}
+  if(DB[name]){alert('"'+name+'" 제품이 이미 존재합니다.\n다른 이름을 사용하거나 편집 탭에서 수정하세요.');return;}
+  var cat=document.getElementById('adm-new-cat').value;
+  if(!cat||cat==='__new__'){alert('카테고리를 선택하세요.');return;}
+  admAddProductLocal();
+  alert('✅ "'+name+'" 제품이 추가되었습니다!\n챗봇에서 바로 검색할 수 있습니다.');
+}
+
+/* 제품 삭제 */
+function admDeleteProduct(){
+  var pname=document.getElementById('adm-product-sel').value;
+  if(!pname)return;
+  if(!confirm('"'+pname+'" 제품을 삭제하시겠습니까?\n이 작업은 현재 세션에만 적용됩니다.'))return;
+  delete DB[pname];
+  alert('"'+pname+'" 제품이 삭제되었습니다.');
+  admOpenPanel(); // 제품 목록 새로고침
+}
+
+function addBot(html,chips,extra){
+  var w=document.createElement('div');w.className='mw b';
+  var row=document.createElement('div');row.style.cssText='display:flex;gap:7px;align-items:flex-end';
+  var av=document.createElement('div');av.className='av';av.style.cssText='width:28px;height:28px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;align-self:flex-end';av.innerHTML='<img src="data:image/png;base64,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" style="width:22px;height:auto">';
+  var col=document.createElement('div');col.style.cssText='flex:1;min-width:0';
+  if(html){var bub=document.createElement('div');bub.className='bub b';bub.innerHTML=html;col.appendChild(bub);}
+  if(extra)col.appendChild(extra);
+  var ts=document.createElement('div');ts.className='ts';ts.textContent=ft();col.appendChild(ts);
+  row.appendChild(av);row.appendChild(col);w.appendChild(row);
+  if(chips&&chips.length){
+    var cr=document.createElement('div');cr.className='chips';
+    chips.forEach(function(c){
+      var b=document.createElement('button');b.className='chip';b.textContent=c;
+      b.addEventListener('click',function(){handleInput(c);});cr.appendChild(b);
+    });
+    w.appendChild(cr);
+  }
+  msgs.appendChild(w);msgs.scrollTop=99999;
+}
+
+/* ══ 입력 처리 ══ */
+function handleInput(t){
+  if(!t||!t.trim())return;
+  addUser(t);ii.value='';
+  setTimeout(function(){respond(t);},230);
+}
+
+function respond(q){
+  var ql=q.toLowerCase().replace(/\s/g,'');
+  // 정확 매칭 우선
+  var ks=Object.keys(DB);
+  for(var i=0;i<ks.length;i++){
+    if(ks[i].toLowerCase().replace(/\s/g,'')===ql){
+      addBot(null,['다른 제품 검색'],buildCard(ks[i]));return;
+    }
+  }
+  // 부분 매칭 1개
+  var matches=search(q);
+  if(matches.length===1){addBot(null,['다른 제품 검색'],buildCard(matches[0]));return;}
+  // 여러 개 매칭
+  if(matches.length>1){
+    addBot('<b>🔍 "'+q+'" 검색결과 ('+matches.length+'개)</b><br><small style="color:#90a4ae">원하는 제품을 선택하세요</small>',matches);return;
+  }
+  // 인사
+  if(q.indexOf('안녕')!==-1||ql==='hi'||ql==='hello'){
+    addBot('안녕하세요! 👋<br>우딘 하드웨어 챗봇입니다.<br>위 <b>🔍 검색창</b>에 제품명을 입력하면 자동완성으로 바로 찾을 수 있어요!',
+      ['대칭','비대칭','걸레받이','마감재','커브','PVC','사각포인트']);return;
+  }
+  addBot('"'+q+'" 제품을 찾지 못했어요. 위 검색창에 다시 입력해 보세요! 😊',
+    ['대칭','비대칭','걸레받이','마감재','커브','PVC','사각포인트']);
+}
+
+document.getElementById('sb').addEventListener('click',function(){handleInput(ii.value);});
+ii.addEventListener('keydown',function(e){if(e.key==='Enter')handleInput(ii.value);});
+
+addBot('안녕하세요! 👋 <b>우딘 하드웨어 챗봇</b>입니다.<br>필요한 제품명을 검색하면 이미지와 도면 등 제품 정보가 나오며, 제품명 · 숫자 · 키워드를 입력하면 제품을 찾을 수 있습니다.');
+</script>
+
+<script>
+// I 객체는 base64 캐시용. GitHub Raw URL은 gi()에서 동적으로 생성하므로 별도 로딩 불필요.
+// 단, 로컬에서 열 경우를 위해 woodin_images.json 시도
+(function() {
+  function loadImages() {
+    var base = location.href.replace(/[^/]*$/, '');
+    // GitHub Pages에서는 gi()가 Raw URL 반환하므로 JSON 로딩 불필요
+    if(location.hostname.endsWith('github.io'))return;
+    // 로컬에서 열 때만 woodin_images.json 시도
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', base + 'woodin_images.json', true);
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        try {
+          var imgs = JSON.parse(xhr.responseText);
+          if (typeof I !== 'undefined') {
+            for (var k in imgs) { I[k] = imgs[k]; }
+          }
+        } catch(e) {}
+      }
+    };
+    xhr.send();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadImages);
+  } else {
+    loadImages();
+  }
+})();
+</script>
+
+</body>
+</html>

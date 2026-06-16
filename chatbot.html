@@ -688,15 +688,12 @@ function admGetCurrentHTML(){
   try{
     var dbJson=JSON.stringify(DB);
     // outerHTML에서 DB_START~DB_END 사이를 현재 DB로 교체
-    var startMarker='/*DB_START*/';
-    var endMarker='/*DB_END*/';
-    var si=html.indexOf(startMarker);
-    var ei=html.indexOf(endMarker);
+    var sm='/*DB_START*/';
+    var em='/*DB_END*/';
+    var si=html.indexOf(sm);
+    var ei=html.indexOf(em);
     if(si!==-1&&ei!==-1){
-      var before=html.substring(0,si+startMarker.length);
-      var after=html.substring(ei);
-      // DB JSON에서 앞뒤 {} 제거 후 삽입
-      html=before+dbJson.slice(1,-1)+'\n};\n/*DB_END*/'+after.substring(endMarker.length);
+      html=html.substring(0,si)+sm+dbJson.slice(1,-1)+'\n};\n'+em+html.substring(ei+em.length);
     }
   }catch(e){console.error('DB 직렬화 오류:',e);}
 

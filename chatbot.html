@@ -1198,12 +1198,12 @@ function respond(q){
   var ks=Object.keys(DB);
   for(var i=0;i<ks.length;i++){
     if(ks[i].toLowerCase().replace(/\s/g,'')===ql){
-      addBot(null,['다른 제품 검색'],buildCard(ks[i]));return;
+      addBot(null,[],buildCard(ks[i]));return;
     }
   }
   // 부분 매칭 1개
   var matches=search(q);
-  if(matches.length===1){addBot(null,['다른 제품 검색'],buildCard(matches[0]));return;}
+  if(matches.length===1){addBot(null,[],buildCard(matches[0]));return;}
   // 여러 개 매칭
   if(matches.length>1){
     addBot('<b>🔍 "'+q+'" 검색결과 ('+matches.length+'개)</b><br><small style="color:#90a4ae">원하는 제품을 선택하세요</small>',matches);return;

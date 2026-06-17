@@ -325,7 +325,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
       <!-- 도면 이미지 -->
       <div class="adm-sec">
         <p class="adm-sec-hd">📐 도면 이미지</p>
-        <div class="adm-grid" id="adm-draw-grid"><div class="adm-card"><img src="" alt="도면"><div class="adm-card-lbl">도면</div><div class="adm-del-ov"><span>×</span></div></div></div>
+        <div class="adm-grid" id="adm-draw-grid"><p class="adm-empty">(이미지 없음)</p></div>
         <div class="adm-drop" id="adm-draw-drop" onclick="document.getElementById('adm-draw-file').click()">
           <input type="file" id="adm-draw-file" accept="image/*" multiple="" onchange="admHandleFiles(this,'draw')">
           ＋ 클릭 또는 드래그하여 도면 이미지 추가

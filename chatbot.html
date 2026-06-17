@@ -315,7 +315,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
       <!-- 실물 이미지 -->
       <div class="adm-sec">
         <p class="adm-sec-hd">📷 실물 이미지</p>
-        <div class="adm-grid" id="adm-real-grid"><div class="adm-card"><img src="" alt="실물"><div class="adm-card-lbl">실물</div><div class="adm-del-ov"><span>×</span></div></div></div>
+        <div class="adm-grid" id="adm-real-grid"><p class="adm-empty">(이미지 없음)</p></div>
         <div class="adm-drop" id="adm-real-drop" onclick="document.getElementById('adm-real-file').click()">
           <input type="file" id="adm-real-file" accept="image/*" multiple="" onchange="admHandleFiles(this,'real')">
           ＋ 클릭 또는 드래그하여 실물 이미지 추가

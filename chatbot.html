@@ -1044,9 +1044,8 @@ function admGetCurrentHTML(){
   // 카테고리 반영
   html=html.replace(/var ADM_CATS=\[.*?\];/,'var ADM_CATS='+JSON.stringify(ADM_CATS)+';');
 
-  // 안내메시지 반영
-  var noticeSafe=ADM_NOTICE.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-  html=html.replace(/\/\*NOTICE_START\*\/[\s\S]*?\/\*NOTICE_END\*\//,'/*NOTICE_START*/'안녕하세요. 👋<br><br><b>하드웨어 챗봇</b>입니다.<br><br>본 챗봇은 Q&amp;A 방식이 아닌 제품 검색 시 나오는 <b>이미지와 도면 상세설명 페이지</b>의 내용을 확인하는 용도이며,<br>상세설명 페이지의 내용 중 수정이 필요하거나 궁금했던 내용의 답이 없을 시 <b>관리자질문</b>에 적어 보내면 확인 후 실시간 업데이트 됩니다.<br><br><b>* 검색방법</b><br>1. 안내 메시지 아래 전체 카테고리에서 필요한 제품 클릭 (마우스 클릭으로만 검색)<br>2. 제품명을 하단 검색란에 입력   예) <i>p-51</i>  51만 검색하여도 검색어 자동완성으로 검색 가능<br>3. 간단한 질문으로 검색 가능   예) <i>45t 정적용가능 모티스</i>, <i>인조대리석 납기</i> 등'/*NOTICE_END*/');
+  // 안내메시지 반영 (JSON.stringify 방식 - 안전)
+  html=html.replace(/var ADM_NOTICE=(?:"[^"]*"|'[^']*');/,'var ADM_NOTICE='+JSON.stringify(ADM_NOTICE)+';');
 
   return html;
 }
@@ -1998,7 +1997,7 @@ function respond(q){
 document.getElementById('sb').addEventListener('click',function(){handleInput(ii.value);});
 ii.addEventListener('keydown',function(e){if(e.key==='Enter')handleInput(ii.value);});
 
-var ADM_NOTICE=/*NOTICE_START*/'안녕하세요. 👋<br><br><b>하드웨어 챗봇</b>입니다.<br><br>본 챗봇은 Q&amp;A 방식이 아닌 제품 검색 시 나오는 <b>이미지와 도면 상세설명 페이지</b>의 내용을 확인하는 용도이며,<br>상세설명 페이지의 내용 중 수정이 필요하거나 궁금했던 내용의 답이 없을 시 <b>관리자질문</b>에 적어 보내면 확인 후 실시간 업데이트 됩니다.<br><br><b>* 검색방법</b><br>1. 안내 메시지 아래 전체 카테고리에서 필요한 제품 클릭 (마우스 클릭으로만 검색)<br>2. 제품명을 하단 검색란에 입력 &nbsp; 예) <i>p-51</i> &nbsp; 실런더 51만 검색하여도 검색어 자동완성으로 검색 가능<br>3. 간단한 질문으로 검색 가능 &nbsp; 예) <i>45t 정적용가능 모티스</i>, <i>인조대리석 납기</i> 등'/*NOTICE_END*/;
+var ADM_NOTICE="안녕하세요. 👋<br><br><b>하드웨어 챗봇</b>입니다.<br><br>본 챗봇은 Q&amp;A 방식이 아닌 제품 검색 시 나오는 <b>이미지와 도면 상세설명 페이지</b>의 내용을 확인하는 용도이며,<br>상세설명 페이지의 내용 중 수정이 필요하거나 궁금했던 내용의 답이 없을 시 <b>관리자질문</b>에 적어 보내면 확인 후 실시간 업데이트 됩니다.<br><br><b>* 검색방법</b><br>1. 안내 메시지 아래 전체 카테고리에서 필요한 제품 클릭 (마우스 클릭으로만 검색)<br>2. 제품명을 하단 검색란에 입력 &nbsp; 예) <i>p-51</i> &nbsp; 실런더 51만 검색하여도 검색어 자동완성으로 검색 가능<br>3. 간단한 질문으로 검색 가능 &nbsp; 예) <i>45t 정적용가능 모티스</i>, <i>인조대리석 납기</i> 등";
 addBot(ADM_NOTICE,ADM_CATS);
 </script>
 

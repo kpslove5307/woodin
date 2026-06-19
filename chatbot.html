@@ -821,6 +821,9 @@ function admGetCurrentHTML(){
   // 비밀번호 반영
   html=html.replace(/var ADM_PW=\([^)]*\);/,'var ADM_PW=\''+ADM_PW.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+"';");
 
+  // 카테고리 반영
+  html=html.replace(/var ADM_CATS=\[.*?\];/,'var ADM_CATS='+JSON.stringify(ADM_CATS)+';');
+
   return html;
 }
 

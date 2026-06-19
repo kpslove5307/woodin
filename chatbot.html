@@ -824,6 +824,7 @@ function admGhUpdateStatus(){
 // ── 관리자질문 (GitHub Issues) ──────────────────────────
 var ASK_REPO_OWNER='kpslove5307';
 var ASK_REPO_NAME='woodin';
+var ASK_TOKEN='';  // 발급 후 여기에 입력
 
 async function askSubmit(){
   var name=document.getElementById('side-ask-name').value.trim()||'익명';
@@ -832,14 +833,14 @@ async function askSubmit(){
   var msg=document.getElementById('side-ask-msg');
   if(!text){msg.style.color='#c33';msg.textContent='내용을 입력해 주세요.';return;}
   btn.disabled=true;msg.style.color='#888';msg.textContent='전송 중...';
-  var cfg=admGhLoadConfig();
-  if(!cfg||!cfg.token){msg.style.color='#c33';msg.textContent='전송 토큰이 설정되지 않았습니다.';btn.disabled=false;return;}
+  var askTok=ASK_TOKEN;
+  if(!askTok){msg.style.color='#c33';msg.textContent='전송 토큰이 설정되지 않았습니다.';btn.disabled=false;return;}
   var title='[질문] '+name+' — '+text.substring(0,40)+(text.length>40?'...':'');
   var body='**작성자:** '+name+'\n\n**내용:**\n'+text+'\n\n---\n*우딘 하드웨어 챗봇에서 접수*';
   try{
     var res=await fetch('https://api.github.com/repos/'+ASK_REPO_OWNER+'/'+ASK_REPO_NAME+'/issues',{
       method:'POST',
-      headers:{Authorization:'token '+cfg.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+      headers:{Authorization:'token '+askTok,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
       body:JSON.stringify({title:title,body:body,labels:['챗봇질문']})
     });
     if(res.ok){
@@ -865,11 +866,11 @@ function askSwitchTab(tab){
 async function askLoadList(){
   var inner=document.getElementById('ask-list-inner');
   inner.innerHTML='<div style="font-size:12px;color:#aaa;text-align:center;padding:20px 0">로딩 중...</div>';
-  var cfg=admGhLoadConfig();
-  if(!cfg||!cfg.token){inner.innerHTML='<div style="font-size:12px;color:#c33;text-align:center;padding:12px">토큰 미설정</div>';return;}
+  var askTok=ASK_TOKEN;
+  if(!askTok){inner.innerHTML='<div style="font-size:12px;color:#c33;text-align:center;padding:12px">토큰 미설정</div>';return;}
   try{
     var res=await fetch('https://api.github.com/repos/'+ASK_REPO_OWNER+'/'+ASK_REPO_NAME+'/issues?labels=%EC%B1%97%EB%B4%87%EC%A7%88%EB%AC%B8&state=all&per_page=30',{
-      headers:{Authorization:'token '+cfg.token,'Accept':'application/vnd.github.v3+json'}
+      headers:{Authorization:'token '+askTok,'Accept':'application/vnd.github.v3+json'}
     });
     var issues=await res.json();
     if(!Array.isArray(issues)||issues.length===0){inner.innerHTML='<div style="font-size:12px;color:#aaa;text-align:center;padding:20px 0">접수된 질문이 없습니다.</div>';return;}

@@ -709,7 +709,7 @@ function buildCard(key){
   if(p.videos&&p.videos.length||p.descText){
     if(p.descText){
       var dt=document.createElement('div');
-      dt.style.cssText='white-space:pre-wrap;line-height:1.7;font-size:13px;color:#333;padding:10px 12px;background:#f8f9fc;border-radius:8px;margin-bottom:10px;border-left:3px solid var(--p)';
+      dt.style.cssText='white-space:pre-wrap;line-height:1.7;font-size:13px;color:#333;padding:10px 12px;background:#fff;border-radius:8px;margin-bottom:10px;border-left:3px solid var(--p)';
       dt.textContent=p.descText;
       panes.video.appendChild(dt);
     }
@@ -1808,22 +1808,31 @@ function getProductText(k){
   var parts=[k];
   if(p.cat)parts.push(p.cat);
   if(p.info)p.info.forEach(function(row){parts.push(row[0]);parts.push(row[1]);});
-  if(p.descText)parts.push(p.descText);
+  if(p.descText)parts.push(p.descText.replace(/[\r\n\s]+/g,' '));
   return parts.join(' ').toLowerCase();
 }
 
 // 단어 분리 스마트 검색: 단어 많이 매칭될수록 높은 점수
 function smartSearch(q){
-  var words=q.trim().toLowerCase().split(/\s+/).filter(function(w){return w.length>0;});
+  var ql=q.trim().toLowerCase();
+  // 공백 제거한 전체 문자열도 하나의 토큰으로 추가 (붙여쓰기 대응)
+  var words=ql.split(/\s+/).filter(function(w){return w.length>0;});
+  var noSpace=ql.replace(/\s+/g,'');
+  if(noSpace&&words.indexOf(noSpace)===-1)words.push(noSpace);
   if(!words.length)return[];
   var scored=[];
   Object.keys(DB).forEach(function(k){
     var txt=getProductText(k);
+    var txtNoSpace=txt.replace(/\s+/g,'');
     var score=0;
-    words.forEach(function(w){if(txt.indexOf(w)!==-1)score++;});
+    words.forEach(function(w){
+      // 공백 있는 텍스트에서 매칭
+      if(txt.indexOf(w)!==-1)score+=2;
+      // 공백 제거 텍스트에서 매칭 (추가 보너스)
+      else if(txtNoSpace.indexOf(w)!==-1)score+=1;
+    });
     if(score>0)scored.push({k:k,score:score});
   });
-  // 점수 내림차순, 같으면 이름순
   scored.sort(function(a,b){return b.score-a.score||a.k.localeCompare(b.k,'ko');});
   return scored;
 }
@@ -1858,15 +1867,11 @@ function respond(q){
     addBot('안녕하세요! 👋<br>우딘 하드웨어 챗봇입니다.',ADM_CATS);return;
   }
   // 스마트 검색 (제품명 검색 실패 시 → info/descText 포함 전문 검색)
-  var words=q.trim().split(/\s+/);
   var scored=smartSearch(q);
   if(scored.length>0){
-    // 최고점 기준으로 필터 (최고점의 60% 이상만)
     var topScore=scored[0].score;
-    var totalWords=words.filter(function(w){return w.length>0;}).length;
-    // 단어가 1개면 모두, 2개 이상이면 최소 절반 이상 매칭
-    var minScore=totalWords<=1?1:Math.max(1,Math.floor(totalWords*0.5));
-    var filtered=scored.filter(function(s){return s.score>=minScore;}).map(function(s){return s.k;});
+    // 최고점의 50% 이상인 것만 필터
+    var filtered=scored.filter(function(s){return s.score>=Math.max(1,topScore*0.5);}).map(function(s){return s.k;});
     if(filtered.length===1){
       addBot(null,[],buildCard(filtered[0]));return;
     }

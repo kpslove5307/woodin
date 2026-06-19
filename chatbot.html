@@ -320,6 +320,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
       <button class="adm-tab" id="adm-tab-cat" onclick="admSwitchTab('cat')">🏷 카테고리</button>
       <button class="adm-tab" id="adm-tab-stock" onclick="admSwitchTab('stock')">📦 재고</button>
       <button class="adm-tab" id="adm-tab-issues" onclick="admSwitchTab('issues')">💬 질문목록</button>
+      <button class="adm-tab" id="adm-tab-notice" onclick="admSwitchTab('notice')">📝 안내메시지</button>
     </div>
 
     <!-- 탭1: 기존 제품 편집 -->
@@ -559,6 +560,22 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
           </span>
         </p>
         <div id="adm-issues-inner" style="display:flex;flex-direction:column;gap:10px;max-height:75vh;overflow-y:auto"></div>
+      </div>
+    </div>
+
+    <!-- 탭6: 안내메시지 편집 -->
+    <div id="adm-notice-view" style="display:none;padding:2px 2px 16px">
+      <div class="adm-sec">
+        <p class="adm-sec-hd">📝 안내메시지 편집</p>
+        <div style="font-size:12px;color:#888;margin-bottom:8px">HTML 태그 사용 가능. &lt;b&gt;굵게&lt;/b&gt;, &lt;br&gt;줄바꿈, &lt;i&gt;기울임&lt;/i&gt;</div>
+        <textarea id="adm-notice-ta" style="width:100%;box-sizing:border-box;min-height:300px;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit;line-height:1.6;resize:vertical;outline:none"></textarea>
+        <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+          <button onclick="admNoticePreview()" style="padding:7px 14px;border:1px solid var(--p);border-radius:7px;background:#fff;color:var(--p);cursor:pointer;font-size:13px;font-weight:600">👁 미리보기</button>
+          <button onclick="admNoticeSave()" style="padding:7px 14px;background:var(--p);color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600">💾🚀 저장 + 업로드</button>
+          <button onclick="admSwitchTab('edit')" style="padding:7px 14px;border:1px solid #aaa;border-radius:7px;background:#fff;color:#666;cursor:pointer;font-size:13px">✕ 닫기</button>
+        </div>
+        <div id="adm-notice-msg" style="margin-top:8px;font-size:12px;min-height:18px"></div>
+        <div id="adm-notice-preview" style="display:none;margin-top:12px;background:#f4f7ff;border-radius:10px;padding:14px;font-size:13px;line-height:1.7;border-left:3px solid var(--p)"></div>
       </div>
     </div>
 
@@ -818,6 +835,34 @@ function admGhUpdateStatus(){
 }
 
 /* 현재 HTML 전체를 문자열로 직렬화 */
+// ── 안내메시지 편집 ──────────────────────────────────────
+function admNoticeLoad(){
+  var ta=document.getElementById('adm-notice-ta');
+  // HTML 엔티티 디코딩해서 편집 가능하게
+  ta.value=ADM_NOTICE.replace(/<br>/g,'\n').replace(/&amp;/g,'&').replace(/&nbsp;/g,' ');
+  document.getElementById('adm-notice-preview').style.display='none';
+  document.getElementById('adm-notice-msg').textContent='';
+}
+function admNoticePreview(){
+  var raw=document.getElementById('adm-notice-ta').value;
+  var html=raw.replace(/&/g,'&amp;').replace(/\n/g,'<br>');
+  var prev=document.getElementById('adm-notice-preview');
+  prev.innerHTML=html;
+  prev.style.display='block';
+}
+function admNoticeSave(){
+  var raw=document.getElementById('adm-notice-ta').value.trim();
+  if(!raw){alert('내용을 입력해 주세요.');return;}
+  var html=raw.replace(/&/g,'&amp;').replace(/\n/g,'<br>');
+  ADM_NOTICE=html;
+  // 채팅창 첫 메시지 업데이트 (새로고침 없이 반영)
+  document.getElementById('adm-notice-msg').style.color='#1a7a3a';
+  document.getElementById('adm-notice-msg').textContent='저장 중...';
+  admPushToGitHub(function(){
+    document.getElementById('adm-notice-msg').textContent='✅ 저장 완료! 페이지 새로고침 후 반영됩니다.';
+  });
+}
+
 // ── 관리자질문 (GitHub Issues) ──────────────────────────
 var ASK_REPO_OWNER='kpslove5307';
 var ASK_REPO_NAME='woodin';
@@ -981,6 +1026,9 @@ function admGetCurrentHTML(){
 
   // 카테고리 반영
   html=html.replace(/var ADM_CATS=\[.*?\];/,'var ADM_CATS='+JSON.stringify(ADM_CATS)+';');
+
+  // 안내메시지 반영
+  html=html.replace(/\/\*NOTICE_START\*\/[\s\S]*?\/\*NOTICE_END\*\//,'/*NOTICE_START*/'+ADM_NOTICE.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\'/*NOTICE_END*/');
 
   return html;
 }
@@ -1257,14 +1305,17 @@ function admSwitchTab(tab){
   document.getElementById('adm-tab-cat').classList.toggle('on',tab==='cat');
   document.getElementById('adm-tab-stock').classList.toggle('on',tab==='stock');
   document.getElementById('adm-tab-issues').classList.toggle('on',tab==='issues');
+  document.getElementById('adm-tab-notice').classList.toggle('on',tab==='notice');
   document.getElementById('adm-edit-view').classList.toggle('on',tab==='edit');
   document.getElementById('adm-new-view').classList.toggle('on',tab==='new');
   document.getElementById('adm-cat-view').style.display=(tab==='cat')?'block':'none';
   document.getElementById('adm-stock-view').style.display=(tab==='stock')?'block':'none';
   document.getElementById('adm-issues-view').style.display=(tab==='issues')?'block':'none';
+  document.getElementById('adm-notice-view').style.display=(tab==='notice')?'block':'none';
   if(tab==='cat')admCatRender();
   if(tab==='stock'){admStockRenderList('');admStockUpdateDate();}
   if(tab==='issues')admLoadIssues();
+  if(tab==='notice')admNoticeLoad();
 }
 
 // ── 카테고리 관리 ──────────────────────────────────────
@@ -1883,7 +1934,8 @@ function respond(q){
 document.getElementById('sb').addEventListener('click',function(){handleInput(ii.value);});
 ii.addEventListener('keydown',function(e){if(e.key==='Enter')handleInput(ii.value);});
 
-addBot('안녕하세요. 👋<br><br><b>하드웨어 챗봇</b>입니다.<br><br>본 챗봇은 Q&amp;A 방식이 아닌 제품 검색 시 나오는 <b>이미지와 도면 상세설명 페이지</b>의 내용을 확인하는 용도이며,<br>상세설명 페이지의 내용 중 수정이 필요하거나 궁금했던 내용의 답이 없을 시 <b>관리자질문</b>에 적어 보내면 확인 후 실시간 업데이트 됩니다.<br><br><b>* 검색방법</b><br>1. 안내 메시지 아래 전체 카테고리에서 필요한 제품 클릭 (마우스 클릭으로만 검색)<br>2. 제품명을 하단 검색란에 입력 &nbsp; 예) <i>p-51</i> &nbsp; 실런더 51만 검색하여도 검색어 자동완성으로 검색 가능<br>3. 간단한 질문으로 검색 가능 &nbsp; 예) <i>45t 정적용가능 모티스</i>, <i>인조대리석 납기</i> 등',ADM_CATS);
+var ADM_NOTICE=/*NOTICE_START*/'안녕하세요. 👋<br><br><b>하드웨어 챗봇</b>입니다.<br><br>본 챗봇은 Q&amp;A 방식이 아닌 제품 검색 시 나오는 <b>이미지와 도면 상세설명 페이지</b>의 내용을 확인하는 용도이며,<br>상세설명 페이지의 내용 중 수정이 필요하거나 궁금했던 내용의 답이 없을 시 <b>관리자질문</b>에 적어 보내면 확인 후 실시간 업데이트 됩니다.<br><br><b>* 검색방법</b><br>1. 안내 메시지 아래 전체 카테고리에서 필요한 제품 클릭 (마우스 클릭으로만 검색)<br>2. 제품명을 하단 검색란에 입력 &nbsp; 예) <i>p-51</i> &nbsp; 실런더 51만 검색하여도 검색어 자동완성으로 검색 가능<br>3. 간단한 질문으로 검색 가능 &nbsp; 예) <i>45t 정적용가능 모티스</i>, <i>인조대리석 납기</i> 등'/*NOTICE_END*/;
+addBot(ADM_NOTICE,ADM_CATS);
 </script>
 
 <script>

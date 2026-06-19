@@ -661,7 +661,7 @@ siEl.addEventListener('keydown',function(e){
 document.addEventListener('click',function(e){if(!document.getElementById('ir').contains(e.target))acEl.classList.remove('show');});
 
 /* ══ 슬라이더 ══ */
-function buildSlider(slides){
+function buildSlider(slides,stockMap,stockDate){
   if(!slides.length) return null;
   var wrap=document.createElement('div');wrap.className='slw';
   var outer=document.createElement('div');outer.className='slo';
@@ -673,6 +673,22 @@ function buildSlider(slides){
     sl.addEventListener('click',function(){openLB(ss,sl2);});
     sl.appendChild(im);
     if(s.l){var lb2=document.createElement('div');lb2.className='slil';lb2.textContent=s.l;sl.appendChild(lb2);}
+    // 색상별 재고 배지
+    if(stockMap&&s.l){
+      var label=s.l.toLowerCase();
+      var matchedQty=null;
+      Object.keys(stockMap).forEach(function(colorKey){
+        if(label.indexOf(colorKey.toLowerCase())!==-1){matchedQty=stockMap[colorKey];}
+      });
+      if(matchedQty!==null){
+        var isLow=(!isNaN(matchedQty)&&Number(matchedQty)<=5);
+        var sb=document.createElement('div');
+        sb.style.cssText='text-align:center;padding:3px 0 5px;font-size:11px;font-weight:700;color:'+(isLow?'#e53935':'#27ae60');
+        sb.innerHTML='📦 '+(isLow?'<span style="color:#e53935">부족 ('+matchedQty+')</span>':matchedQty+'개')
+          +(stockDate?'<span style="font-weight:400;color:#aaa;margin-left:4px;font-size:10px">'+stockDate.slice(5,10)+'</span>':'');
+        sl.appendChild(sb);
+      }
+    }
     track.appendChild(sl);
   });
   outer.appendChild(track);wrap.appendChild(outer);
@@ -718,7 +734,7 @@ function buildCard(key){
   });
   card.appendChild(tbr);
   var isl=(p.images||[]).map(function(im){return{src:gi(im.f),l:im.l};}).filter(function(s){return s.src;});
-  if(isl.length){var sv=buildSlider(isl);if(sv)panes.img.appendChild(sv);}
+  if(isl.length){var sv=buildSlider(isl,p.stockByColor||null,p.stockDate||null);if(sv)panes.img.appendChild(sv);}
   else{var e1=document.createElement('div');e1.className='etp';e1.innerHTML='<span class="ei">🖼</span>이미지 준비 중';panes.img.appendChild(e1);}
   var dsl=(p.drawings||[]).map(function(d){return{src:gi(d.f),l:d.l};}).filter(function(s){return s.src;});
   if(dsl.length){var sv2=buildSlider(dsl);if(sv2)panes.draw.appendChild(sv2);}
@@ -742,8 +758,8 @@ function buildCard(key){
   var pb=document.createElement('div');pb.className='pb';
   var pt=document.createElement('div');pt.className='pt';pt.textContent=key;
   var bc=document.createElement('span');bc.className='bc';bc.textContent=p.cat;pt.appendChild(bc);pb.appendChild(pt);
-  // 재고 표시
-  if(p.stock!==undefined&&p.stock!==null&&p.stock!==''){
+  // 재고 표시 (색상별 재고 없을 때만 단일 표시)
+  if(!p.stockByColor&&p.stock!==undefined&&p.stock!==null&&p.stock!==''){
     var qty=p.stock;
     var isLow=(!isNaN(qty)&&Number(qty)<=5);
     var stockBadge=document.createElement('div');
@@ -1516,18 +1532,48 @@ function admStockParseCSV(text){
 
 function admStockParseRows(rows){
   _stockRows=[];
-  // 첫 행이 헤더인지 확인 (숫자가 아니면 헤더로 간주)
   var start=0;
   if(rows.length>0){
     var firstB=String(rows[0][1]||'').trim();
     if(isNaN(firstB)||firstB==='')start=1;
   }
+  // 1차: 모든 행 수집
+  var rawRows=[];
   for(var i=start;i<rows.length;i++){
     var name=String(rows[i][0]||'').trim();
     var qty=String(rows[i][1]||'').trim();
     if(!name)continue;
-    _stockRows.push({name:name,qty:qty});
+    rawRows.push({name:name,qty:qty});
   }
+  // 2차: 제품명이 DB에 없으면 "제품명 색상" 분리 시도
+  var colorMap={};  // {제품명: {색상: qty}}
+  rawRows.forEach(function(row){
+    if(DB.hasOwnProperty(row.name)){
+      // 정확 매칭 → 단일 재고
+      _stockRows.push({name:row.name,qty:row.qty,color:null});
+    } else {
+      // DB 제품명이 row.name의 앞부분인지 확인 (제품명 + 색상)
+      var matched=false;
+      Object.keys(DB).forEach(function(dbKey){
+        var dl=dbKey.toLowerCase();
+        var nl=row.name.toLowerCase();
+        if(nl.indexOf(dl)===0&&nl.length>dl.length){
+          var color=row.name.slice(dbKey.length).trim();
+          if(!colorMap[dbKey])colorMap[dbKey]=[];
+          colorMap[dbKey].push({color:color,qty:row.qty});
+          matched=true;
+        }
+      });
+      if(!matched){
+        // 그냥 추가 (미매칭으로 표시)
+        _stockRows.push({name:row.name,qty:row.qty,color:null});
+      }
+    }
+  });
+  // colorMap 항목을 _stockRows에 추가 (색상별 묶음)
+  Object.keys(colorMap).forEach(function(dbKey){
+    _stockRows.push({name:dbKey,qty:null,colors:colorMap[dbKey]});
+  });
   admStockShowPreview();
 }
 
@@ -1559,8 +1605,20 @@ function admStockApply(){
   var dateStr=now.getFullYear()+'.'+(now.getMonth()+1).toString().padStart(2,'0')+'.'+now.getDate().toString().padStart(2,'0')+' '+now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
   _stockRows.forEach(function(row){
     if(DB.hasOwnProperty(row.name)){
-      DB[row.name].stock=row.qty;
-      DB[row.name].stockDate=dateStr;
+      if(row.colors){
+        // 색상별 재고
+        if(!DB[row.name].stockByColor)DB[row.name].stockByColor={};
+        row.colors.forEach(function(c){
+          DB[row.name].stockByColor[c.color]=c.qty;
+        });
+        DB[row.name].stockDate=dateStr;
+        // 단일 stock 제거 (색상별로 대체)
+        delete DB[row.name].stock;
+      } else {
+        DB[row.name].stock=row.qty;
+        DB[row.name].stockDate=dateStr;
+        delete DB[row.name].stockByColor;
+      }
       count++;
     }
   });

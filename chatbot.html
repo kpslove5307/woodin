@@ -681,10 +681,9 @@ function buildSlider(slides,stockMap,stockDate){
         if(label.indexOf(colorKey.toLowerCase())!==-1){matchedQty=stockMap[colorKey];}
       });
       if(matchedQty!==null){
-        var isLow=(!isNaN(matchedQty)&&Number(matchedQty)<=5);
         var sb=document.createElement('div');
-        sb.style.cssText='text-align:center;padding:3px 0 5px;font-size:11px;font-weight:700;color:'+(isLow?'#e53935':'#27ae60');
-        sb.innerHTML='📦 '+(isLow?'<span style="color:#e53935">부족 ('+matchedQty+')</span>':matchedQty+'개')
+        sb.style.cssText='text-align:center;padding:3px 0 5px;font-size:11px;font-weight:700;color:#27ae60';
+        sb.innerHTML='📦 '+matchedQty+'개'
           +(stockDate?'<span style="font-weight:400;color:#aaa;margin-left:4px;font-size:10px">'+stockDate.slice(5,10)+'</span>':'');
         sl.appendChild(sb);
       }
@@ -761,7 +760,6 @@ function buildCard(key){
   // 재고 표시 (색상별 재고 없을 때만 단일 표시)
   if(!p.stockByColor&&p.stock!==undefined&&p.stock!==null&&p.stock!==''){
     var qty=p.stock;
-    var isLow=(!isNaN(qty)&&Number(qty)<=5);
     var stockBadge=document.createElement('div');
     stockBadge.style.cssText='display:inline-flex;align-items:center;gap:4px;margin:4px 0 2px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;background:#f0fff4;color:#27ae60;border:1px solid #b2dfdb';
     stockBadge.innerHTML='📦 재고: '+qty+

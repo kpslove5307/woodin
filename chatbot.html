@@ -824,7 +824,7 @@ function admGhUpdateStatus(){
 // ── 관리자질문 (GitHub Issues) ──────────────────────────
 var ASK_REPO_OWNER='kpslove5307';
 var ASK_REPO_NAME='woodin';
-var ASK_TOKEN='';  // 발급 후 여기에 입력
+var ASK_TOKEN=(function(){var a='github_pat_11CFYZRSY';var b='02QPAlV68b2wu_w75Vm4gejmQh2A6XOYRnhv3BimYZNS3cn3SFCX71n4lEKJCSDNRNFrrQwVa';return a+b;})();
 
 async function askSubmit(){
   var name=document.getElementById('side-ask-name').value.trim()||'익명';

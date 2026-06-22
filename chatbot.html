@@ -91,7 +91,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
 #lbi{max-width:95vw;max-height:88vh;border-radius:4px;object-fit:contain;display:block;transform-origin:center;transition:transform .15s ease;user-select:none;-webkit-user-drag:none}
 #lb-caption{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.85);font-size:13px;background:rgba(0,0,0,.45);padding:5px 16px;border-radius:20px;pointer-events:none;white-space:nowrap}
 #lb-zoom-btns{position:fixed;bottom:22px;right:20px;display:flex;gap:8px}
-#lb-zoom-btns button{width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.18);color:#fff;font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+#lb-zoom-btns button{width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.18);color:#fff;font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 #lb-zoom-btns button:hover{background:rgba(255,255,255,.32)}
 #lbx{position:fixed;top:12px;right:16px;color:#fff;font-size:40px;cursor:pointer;line-height:1;font-weight:200;z-index:1000000}
 #lbc{color:rgba(255,255,255,.55);font-size:11.5px;margin-top:7px}
@@ -193,10 +193,8 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
 
 <body>
 <div id="lb" style="display:none;">
-  <span id="lbx" style="position:fixed;top:12px;right:16px;color:#fff;font-size:38px;cursor:pointer;line-height:1;font-weight:200;z-index:1000001;opacity:.85">×</span>
-  <div id="lb-wrap">
-    <img id="lbi" src="" alt="">
-  </div>
+  <span id="lbx" style="position:fixed;top:12px;right:16px;color:#fff;font-size:38px;cursor:pointer;line-height:1;font-weight:200;z-index:1000001;">×</span>
+  <div id="lb-wrap"><img id="lbi" src="" alt=""></div>
   <div id="lb-caption"></div>
   <div id="lb-zoom-btns">
     <button onclick="lbZoom(-0.3)">−</button>
@@ -534,51 +532,42 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
       </div>
     </div>
 
-    <!-- 탭5: 안내메시지 관리 (WYSIWYG) -->
+    <!-- 탭5: 안내메시지 (WYSIWYG) -->
     <div id="adm-notice-view" style="display:none;padding:0 2px 16px;">
       <div class="adm-sec">
         <div class="adm-sec-title">📢 안내 메시지 편집</div>
-        <div id="notice-toolbar" style="display:flex;flex-wrap:wrap;gap:4px;padding:7px 8px;background:#f4f7fc;border:1px solid #dde3ed;border-bottom:none;border-radius:8px 8px 0 0;">
-          <select onchange="noticeExec('fontSize',this.value);this.selectedIndex=0;" style="padding:4px 6px;border:1px solid #ccc;border-radius:5px;font-size:12px;cursor:pointer;background:#fff;">
-            <option value="">크기</option>
-            <option value="1">아주 작게</option>
-            <option value="2">작게</option>
-            <option value="3">보통</option>
-            <option value="4">크게</option>
-            <option value="5">아주 크게</option>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;padding:7px 8px;background:#f4f7fc;border:1px solid #dde3ed;border-bottom:none;border-radius:8px 8px 0 0;">
+          <select onchange="noticeCmd('fontSize',this.value);this.selectedIndex=0;" style="padding:4px 6px;border:1px solid #ccc;border-radius:5px;font-size:12px;background:#fff;cursor:pointer;">
+            <option value="">크기</option><option value="1">아주 작게</option><option value="2">작게</option><option value="3">보통</option><option value="4">크게</option><option value="5">아주 크게</option>
           </select>
-          <button onclick="noticeExec('bold')" title="굵게" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-weight:700;font-size:14px;">B</button>
-          <button onclick="noticeExec('italic')" title="기울기" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-style:italic;font-size:14px;">I</button>
-          <button onclick="noticeExec('underline')" title="밑줄" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;text-decoration:underline;font-size:13px;">U</button>
-          <div style="width:1px;background:#ddd;margin:2px 2px;"></div>
-          <button onclick="noticeExec('justifyLeft')" title="왼쪽 정렬" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-size:13px;">≡</button>
-          <button onclick="noticeExec('justifyCenter')" title="가운데 정렬" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-size:13px;">☰</button>
-          <div style="width:1px;background:#ddd;margin:2px 2px;"></div>
-          <label title="글자색" style="display:flex;align-items:center;gap:3px;cursor:pointer;border:1px solid #ccc;border-radius:5px;padding:0 6px;background:#fff;height:30px;font-size:11px;">
-            <span>색</span><input type="color" onchange="noticeExec('foreColor',this.value)" style="width:22px;height:18px;border:none;padding:0;cursor:pointer;background:none;">
+          <button onclick="noticeCmd('bold')" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-weight:700;font-size:14px;">B</button>
+          <button onclick="noticeCmd('italic')" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-style:italic;font-size:14px;">I</button>
+          <button onclick="noticeCmd('underline')" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;text-decoration:underline;font-size:13px;">U</button>
+          <div style="width:1px;background:#ddd;margin:2px 0;"></div>
+          <button onclick="noticeCmd('justifyLeft')" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">≡</button>
+          <button onclick="noticeCmd('justifyCenter')" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">☰</button>
+          <div style="width:1px;background:#ddd;margin:2px 0;"></div>
+          <label style="display:flex;align-items:center;gap:3px;border:1px solid #ccc;border-radius:5px;padding:0 6px;background:#fff;height:30px;font-size:11px;cursor:pointer;">
+            색<input type="color" onchange="noticeCmd('foreColor',this.value)" style="width:22px;height:18px;border:none;padding:0;cursor:pointer;">
           </label>
-          <div style="width:1px;background:#ddd;margin:2px 2px;"></div>
-          <button onclick="noticeExec('insertUnorderedList')" title="글머리 목록" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-size:13px;">•≡</button>
-          <button onclick="noticeInsertLink()" title="링크" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-size:13px;">🔗</button>
-          <button onclick="document.getElementById('notice-img-input').click()" title="이미지 삽입" style="padding:0 8px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-size:12px;">🖼 이미지</button>
-          <input type="file" id="notice-img-input" accept="image/*" style="display:none;" onchange="noticeInsertImage(this)">
-          <div style="width:1px;background:#ddd;margin:2px 2px;"></div>
-          <button onclick="noticeExec('insertHTML','<br>')" title="줄바꿈" style="padding:0 8px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-size:12px;">↵ 줄바꿈</button>
-          <button onclick="noticeReset()" title="초기화" style="padding:0 8px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff8f8;color:#e53935;cursor:pointer;font-size:12px;">↺ 초기화</button>
+          <div style="width:1px;background:#ddd;margin:2px 0;"></div>
+          <button onclick="noticeCmd('insertUnorderedList')" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">•≡</button>
+          <button onclick="noticeLink()" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-size:13px;">🔗</button>
+          <button onclick="document.getElementById('notice-img-inp').click()" style="padding:0 8px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-size:12px;">🖼 이미지</button>
+          <input type="file" id="notice-img-inp" accept="image/*" style="display:none;" onchange="noticeImg(this)">
+          <div style="width:1px;background:#ddd;margin:2px 0;"></div>
+          <button onclick="noticeCmd('insertHTML','<br>')" style="padding:0 8px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-size:12px;">↵ 줄바꿈</button>
+          <button onclick="noticeReset()" style="padding:0 8px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff8f8;color:#e53935;cursor:pointer;font-size:12px;">↺ 초기화</button>
         </div>
-        <div id="adm-notice-editor" contenteditable="true"
-          style="width:100%;box-sizing:border-box;min-height:200px;padding:14px 16px;border:1px solid #dde3ed;border-radius:0 0 8px 8px;font-size:13.5px;line-height:1.8;color:#1a1f2e;background:#fff;outline:none;font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;overflow-y:auto;"
-          onfocus="this.style.borderColor='var(--p)'" onblur="this.style.borderColor='#dde3ed'">
-        </div>
-        <div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <div id="adm-notice-ed" contenteditable="true"
+          style="width:100%;box-sizing:border-box;min-height:200px;padding:14px 16px;border:1px solid #dde3ed;border-radius:0 0 8px 8px;font-size:13.5px;line-height:1.8;color:#1a1f2e;background:#fff;outline:none;font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;"
+          onfocus="this.style.borderColor='var(--p)'" onblur="this.style.borderColor='#dde3ed'"></div>
+        <div style="margin-top:10px;display:flex;gap:8px;align-items:center;">
           <button onclick="admNoticeSave()" style="padding:8px 22px;background:var(--p);color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:700;">💾 저장</button>
           <span id="adm-notice-msg" style="font-size:12px;color:#28a745;display:none;">✅ 저장되었습니다.</span>
-          <span style="font-size:11px;color:#aaa;margin-left:auto;">저장 후 챗봇에 즉시 반영됩니다</span>
         </div>
       </div>
-      <div class="adm-foot">
-        <button class="adm-close-btn" onclick="admClosePanel()">닫기</button>
-      </div>
+      <div class="adm-foot"><button class="adm-close-btn" onclick="admClosePanel()">닫기</button></div>
     </div>
 
   </div>
@@ -595,13 +584,9 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
 var I={"100걸레받이.jpg":"__IMG_PLACEHOLDER__","100걸레받이_도면.jpg":"__IMG_PLACEHOLDER__","15대칭.jpg":"__IMG_PLACEHOLDER__","15대칭_도면.jpg":"__IMG_PLACEHOLDER__","20비대칭.jpg":"__IMG_PLACEHOLDER__","20비대칭_도면.jpg":"__IMG_PLACEHOLDER__","22대칭.jpg":"__IMG_PLACEHOLDER__","22대칭_도면.jpg":"__IMG_PLACEHOLDER__","2계단25_도면.jpg":"__IMG_PLACEHOLDER__","2계단35_도면.jpg":"__IMG_PLACEHOLDER__","30비대칭.jpg":"__IMG_PLACEHOLDER__","30비대칭_도면.jpg":"__IMG_PLACEHOLDER__","31마감재.jpg":"__IMG_PLACEHOLDER__","31마감재_도면.jpg":"__IMG_PLACEHOLDER__","40대칭.jpg":"__IMG_PLACEHOLDER__","40대칭_도면.jpg":"__IMG_PLACEHOLDER__","40비대칭.jpg":"__IMG_PLACEHOLDER__","40비대칭_도면.jpg":"__IMG_PLACEHOLDER__","40비대칭_도면2.jpg":"__IMG_PLACEHOLDER__","40평.jpg":"__IMG_PLACEHOLDER__","40평_도면.jpg":"__IMG_PLACEHOLDER__","42마감재.jpg":"__IMG_PLACEHOLDER__","42마감재_도면.jpg":"__IMG_PLACEHOLDER__","50대칭_도면.jpg":"__IMG_PLACEHOLDER__","50마감재.jpg":"__IMG_PLACEHOLDER__","50마감재_도면.jpg":"__IMG_PLACEHOLDER__","50비대칭.jpg":"__IMG_PLACEHOLDER__","55걸레받이.jpg":"__IMG_PLACEHOLDER__","55걸레받이_도면.jpg":"__IMG_PLACEHOLDER__","60비대칭.jpg":"__IMG_PLACEHOLDER__","60평.jpg":"__IMG_PLACEHOLDER__","60평_도면.jpg":"__IMG_PLACEHOLDER__","66허리.jpg":"__IMG_PLACEHOLDER__","66허리_도면.jpg":"__IMG_PLACEHOLDER__","70걸레받이.jpg":"__IMG_PLACEHOLDER__","70걸레받이_도면.jpg":"__IMG_PLACEHOLDER__","80걸레받이.jpg":"__IMG_PLACEHOLDER__","80걸레받이_도면.jpg":"__IMG_PLACEHOLDER__","80평.jpg":"__IMG_PLACEHOLDER__","80평_도면.jpg":"__IMG_PLACEHOLDER__","90천장.jpg":"__IMG_PLACEHOLDER__","90천장_도면.jpg":"__IMG_PLACEHOLDER__","PVC마이너스_12T.jpg":"__IMG_PLACEHOLDER__","PVC마이너스_9T.jpg":"__IMG_PLACEHOLDER__","사각포인트_골드.jpg":"__IMG_PLACEHOLDER__","사각포인트_브론즈.jpg":"__IMG_PLACEHOLDER__","사각포인트_실버.jpg":"__IMG_PLACEHOLDER__","아웃커브.jpg":"__IMG_PLACEHOLDER__","인커브.jpg":"__IMG_PLACEHOLDER__","포인트템바보드.jpg":"__IMG_PLACEHOLDER__","포인트템바보드_도면.jpg":"__IMG_PLACEHOLDER__","하부인조대리석.jpg":"__IMG_PLACEHOLDER__"};
 
 var lb=document.getElementById('lb'),lbi=document.getElementById('lbi'),lbc=document.getElementById('lbc');
-/* ── 라이트박스 줌/드래그 ── */
 (function(){
-  var lb=document.getElementById('lb');
-  var lbi=document.getElementById('lbi');
-  var lbCap=document.getElementById('lb-caption');
-  var lbWrap=document.getElementById('lb-wrap');
-  var scale=1,tx=0,ty=0,dragging=false,sx=0,sy=0,stx=0,sty=0;
+  var lb=document.getElementById('lb'),lbi=document.getElementById('lbi'),lbCap=document.getElementById('lb-caption'),lbWrap=document.getElementById('lb-wrap');
+  var scale=1,tx=0,ty=0,drag=false,sx=0,sy=0,stx=0,sty=0,iDist=0,iScale=1;
   function applyT(){lbi.style.transform='translate('+tx+'px,'+ty+'px) scale('+scale+')';}
   function resetT(){scale=1;tx=0;ty=0;applyT();}
   window.openLB=function(s,cap){lbi.src=s;if(lbCap)lbCap.textContent=cap||'';resetT();lb.style.display='flex';};
@@ -609,29 +594,15 @@ var lb=document.getElementById('lb'),lbi=document.getElementById('lbi'),lbc=docu
   window.lbZoom=function(d){scale=Math.max(0.5,Math.min(5,scale+d));applyT();};
   document.getElementById('lbx').addEventListener('click',function(e){e.stopPropagation();closeLB();});
   lb.addEventListener('click',function(e){if(e.target===lb||e.target===lbWrap)closeLB();});
-  document.addEventListener('keydown',function(e){
-    if(e.key==='Escape')closeLB();
-    if(e.key==='+'||e.key==='=')lbZoom(0.3);
-    if(e.key==='-')lbZoom(-0.3);
-    if(e.key==='0')resetT();
-  });
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLB();if(e.key==='+'||e.key==='=')lbZoom(0.3);if(e.key==='-')lbZoom(-0.3);if(e.key==='0')resetT();});
   lbWrap.addEventListener('wheel',function(e){e.preventDefault();lbZoom(e.deltaY<0?0.2:-0.2);},{passive:false});
-  lbWrap.addEventListener('mousedown',function(e){if(e.button!==0)return;dragging=true;sx=e.clientX;sy=e.clientY;stx=tx;sty=ty;lbWrap.classList.add('dragging');e.preventDefault();});
-  document.addEventListener('mousemove',function(e){if(!dragging)return;tx=stx+(e.clientX-sx);ty=sty+(e.clientY-sy);applyT();});
-  document.addEventListener('mouseup',function(){dragging=false;lbWrap.classList.remove('dragging');});
-  var initDist=0,initScale=1;
-  lbWrap.addEventListener('touchstart',function(e){
-    if(e.touches.length===1){dragging=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;stx=tx;sty=ty;}
-    else if(e.touches.length===2){dragging=false;initDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);initScale=scale;}
-    e.preventDefault();
-  },{passive:false});
-  lbWrap.addEventListener('touchmove',function(e){
-    if(e.touches.length===1&&dragging){tx=stx+(e.touches[0].clientX-sx);ty=sty+(e.touches[0].clientY-sy);applyT();}
-    else if(e.touches.length===2){var d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);scale=Math.max(0.5,Math.min(5,initScale*(d/initDist)));applyT();}
-    e.preventDefault();
-  },{passive:false});
-  lbWrap.addEventListener('touchend',function(){dragging=false;});
-  lbWrap.addEventListener('dblclick',function(){resetT();});
+  lbWrap.addEventListener('mousedown',function(e){if(e.button!==0)return;drag=true;sx=e.clientX;sy=e.clientY;stx=tx;sty=ty;lbWrap.classList.add('dragging');e.preventDefault();});
+  document.addEventListener('mousemove',function(e){if(!drag)return;tx=stx+(e.clientX-sx);ty=sty+(e.clientY-sy);applyT();});
+  document.addEventListener('mouseup',function(){drag=false;lbWrap.classList.remove('dragging');});
+  lbWrap.addEventListener('touchstart',function(e){if(e.touches.length===1){drag=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;stx=tx;sty=ty;}else if(e.touches.length===2){drag=false;iDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);iScale=scale;}e.preventDefault();},{passive:false});
+  lbWrap.addEventListener('touchmove',function(e){if(e.touches.length===1&&drag){tx=stx+(e.touches[0].clientX-sx);ty=sty+(e.touches[0].clientY-sy);applyT();}else if(e.touches.length===2){var d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);scale=Math.max(0.5,Math.min(5,iScale*(d/iDist)));applyT();}e.preventDefault();},{passive:false});
+  lbWrap.addEventListener('touchend',function(){drag=false;});
+  lbWrap.addEventListener('dblclick',resetT);
 })();
 function gi(f){
   if(!f)return '';
@@ -921,16 +892,14 @@ function admGetCurrentHTML(){
   // 카테고리 반영
   html=html.replace(/var ADM_CATS=\[.*?\];/,'var ADM_CATS='+JSON.stringify(ADM_CATS)+';');
 
-  // 안내메시지 반영 - JSON.stringify로 완전 안전하게 처리
-  (function(){
-    var marker="var ADM_NOTICE='';  // WYSIWYG HTML - JSON으로 직렬화";
-    var si=html.indexOf(marker);
-    if(si!==-1){
-      var jsonVal=JSON.stringify(ADM_NOTICE);
-      // var ADM_NOTICE=<JSON값>; 형태로 교체 (JSON은 따옴표/특수문자 자동 이스케이프)
-      html=html.substring(0,si)+"var ADM_NOTICE="+jsonVal+";  // WYSIWYG HTML - JSON으로 직렬화"+html.substring(si+marker.length);
-    }
-  })();
+  // 안내메시지 반영 (NOTICE_START/END 마커 방식 - DB와 동일 원리)
+  var ns='/*NOTICE_START*/';
+  var ne='/*NOTICE_END*/';
+  var nsi=html.indexOf(ns);
+  var nei=html.indexOf(ne);
+  if(nsi!==-1&&nei!==-1){
+    html=html.substring(0,nsi)+ns+JSON.stringify(ADM_NOTICE,null,0)+ne+html.substring(nei+ne.length);
+  }
 
   return html;
 }
@@ -1048,7 +1017,7 @@ function admAddProductAndPush(){
 var ADM_PW=(localStorage.getItem('woodin_adm_pw')||'woodin2026');
 var admPending={real:[],draw:[],desc:[],newReal:[],newDraw:[],newDesc:[]};
 var ADM_CATS=["실린더","포인트몰딩","오목이","PVC몰딩","인조대리석","리빙보드","힐링월","힐링월몰딩","모티스","하드웨어","행거","경첩","슬라이딩락"];
-var ADM_NOTICE='';  // WYSIWYG HTML - JSON으로 직렬화
+var ADM_NOTICE=/*NOTICE_START*/"안녕하세요. 👋<br><br><b>하드웨어 챗봇</b>입니다.<br><br>본 챗봇은 Q&amp;A 방식이 아닌 제품 검색 시 나오는 <b>이미지와 도면 상세설명 페이지</b>의 내용을 확인하는 용도이며,<br>상세설명 페이지의 내용 중 수정이 필요하거나 궁금했던 내용의 답이 없을 시 <b>관리자질문</b>에 적어 보내면 확인 후 실시간 업데이트 됩니다.<br><br><b>* 검색방법</b><br>1. 안내 메시지 아래 전체 카테고리에서 필요한 제품 클릭 (마우스 클릭으로만 검색)<br>2. 제품명을 하단 검색란에 입력 &amp;nbsp; 예) <i>p-51</i> &amp;nbsp; 실런더 51만 검색하여도 검색어 자동완성으로 검색 가능<br>3. 간단한 질문으로 검색 가능 &amp;nbsp; 예) <i>45t 정적용가능 모티스</i>, <i>인조대리석 납기</i> 등"/*NOTICE_END*/;
 
 function admOpenLogin(){
   document.getElementById('adm-pw-input').value='';
@@ -1215,46 +1184,39 @@ function admSwitchTab(tab){
   document.getElementById('adm-notice-view').style.display=(tab==='notice')?'block':'none';
   if(tab==='cat')admCatRender();
   if(tab==='stock'){admStockRenderList('');admStockUpdateDate();}
-  if(tab==='notice')admNoticeLoad();
+  if(tab==='notice'){var ed=document.getElementById('adm-notice-ed');if(ed)ed.innerHTML=ADM_NOTICE;}
 }
 
-// ── 안내메시지 관리 (WYSIWYG) ────────
-function admNoticeLoad(){
-  var ed=document.getElementById('adm-notice-editor');
-  if(ed)ed.innerHTML=ADM_NOTICE;
-  var msg=document.getElementById('adm-notice-msg');
-  if(msg)msg.style.display='none';
-}
-function noticeExec(cmd,val){
-  document.getElementById('adm-notice-editor').focus();
+// ── 안내메시지 WYSIWYG ────────
+function noticeCmd(cmd,val){
+  var ed=document.getElementById('adm-notice-ed');
+  if(ed)ed.focus();
   document.execCommand(cmd,false,val||null);
 }
-function noticeInsertLink(){
-  var url=prompt('링크 주소를 입력하세요:','https://');
+function noticeLink(){
+  var url=prompt('링크 주소:','https://');
   if(!url)return;
-  var txt=prompt('표시할 텍스트:','');
-  document.getElementById('adm-notice-editor').focus();
-  if(txt){document.execCommand('insertHTML',false,'<a href="'+url+'" target="_blank">'+txt+'</a>');}
-  else{document.execCommand('createLink',false,url);}
+  var txt=prompt('표시 텍스트:','');
+  var ed=document.getElementById('adm-notice-ed');if(ed)ed.focus();
+  document.execCommand('insertHTML',false,'<a href="'+url+'" target="_blank">'+(txt||url)+'</a>');
 }
-function noticeInsertImage(input){
-  var file=input.files[0];if(!file)return;
-  var reader=new FileReader();
-  reader.onload=function(e){
-    document.getElementById('adm-notice-editor').focus();
-    document.execCommand('insertHTML',false,'<img src="'+e.target.result+'" style="max-width:100%;border-radius:6px;margin:6px 0;">');
-    input.value='';
+function noticeImg(inp){
+  var file=inp.files[0];if(!file)return;
+  var r=new FileReader();
+  r.onload=function(e){
+    var ed=document.getElementById('adm-notice-ed');if(ed)ed.focus();
+    document.execCommand('insertHTML',false,'<img src="'+e.target.result+'" style="max-width:100%;border-radius:6px;margin:4px 0;">');
+    inp.value='';
   };
-  reader.readAsDataURL(file);
+  r.readAsDataURL(file);
 }
 function noticeReset(){
-  if(!confirm('안내 메시지를 초기화하시겠습니까?'))return;
-  var ed=document.getElementById('adm-notice-editor');
+  if(!confirm('초기화하시겠습니까?'))return;
+  var ed=document.getElementById('adm-notice-ed');
   if(ed)ed.innerHTML='안녕하세요. 👋<br><br><b>하드웨어 챗봇</b>입니다.';
 }
 function admNoticeSave(){
-  var ed=document.getElementById('adm-notice-editor');
-  if(!ed)return;
+  var ed=document.getElementById('adm-notice-ed');if(!ed)return;
   ADM_NOTICE=ed.innerHTML;
   var msg=document.getElementById('adm-notice-msg');
   if(msg){msg.style.display='inline';setTimeout(function(){msg.style.display='none';},2500);}
@@ -1876,7 +1838,6 @@ function respond(q){
 document.getElementById('sb').addEventListener('click',function(){handleInput(ii.value);});
 ii.addEventListener('keydown',function(e){if(e.key==='Enter')handleInput(ii.value);});
 
-if(!ADM_NOTICE)ADM_NOTICE='안녕하세요. 👋<br><br><b>하드웨어 챗봇</b>입니다.<br><br>본 챗봇은 Q&amp;A 방식이 아닌 제품 검색 시 나오는 <b>이미지와 도면 상세설명 페이지</b>의 내용을 확인하는 용도이며,<br>상세설명 페이지의 내용 중 수정이 필요하거나 궁금했던 내용의 답이 없을 시 <b>관리자질문</b>에 적어 보내면 확인 후 실시간 업데이트 됩니다.<br><br><b>* 검색방법</b><br>1. 안내 메시지 아래 전체 카테고리에서 필요한 제품 클릭 (마우스 클릭으로만 검색)<br>2. 제품명을 하단 검색란에 입력 &amp;nbsp; 예) <i>p-51</i> &amp;nbsp; 실런더 51만 검색하여도 검색어 자동완성으로 검색 가능<br>3. 간단한 질문으로 검색 가능 &amp;nbsp; 예) <i>45t 정적용가능 모티스</i>, <i>인조대리석 납기</i> 등';
 addBot(ADM_NOTICE,ADM_CATS);
 </script>
 

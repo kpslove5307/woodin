@@ -1811,15 +1811,27 @@ function respond(q){
     addBot('안녕하세요! 👋<br>우딘 하드웨어 챗봇입니다.',ADM_CATS);return;
   }
   // 스마트 검색 (제품명 검색 실패 시 → info/descText 포함 전문 검색)
-  var words=q.trim().split(/\s+/);
+  var words=q.trim().split(/\s+/).filter(function(w){return w.length>0;});
+  var totalWords=words.length;
   var scored=smartSearch(q);
   if(scored.length>0){
-    // 최고점 기준으로 필터 (최고점의 60% 이상만)
-    var topScore=scored[0].score;
-    var totalWords=words.filter(function(w){return w.length>0;}).length;
-    // 단어가 1개면 모두, 2개 이상이면 최소 절반 이상 매칭
-    var minScore=totalWords<=1?1:Math.max(1,Math.floor(totalWords*0.5));
-    var filtered=scored.filter(function(s){return s.score>=minScore;}).map(function(s){return s.k;});
+    // 단어 1개: 그대로 / 2개 이상: 70% 이상 매칭 필요
+    var minScore=totalWords<=1?1:Math.max(2,Math.ceil(totalWords*0.7));
+    var filtered=scored.filter(function(s){
+      if(s.score<minScore)return false;
+      // 단어 2개 이상 질문형 검색: 제품명에만 매칭된 제품 제외
+      // (descText나 info에도 최소 1개 단어가 매칭돼야 포함)
+      if(totalWords>=2){
+        var p=DB[s.k];
+        var detailParts=[];
+        if(p.info)p.info.forEach(function(row){detailParts.push(row[0]);detailParts.push(row[1]);});
+        if(p.descText)detailParts.push(p.descText);
+        var detailTxt=detailParts.join(' ').toLowerCase();
+        var detailMatch=words.filter(function(w){return detailTxt.indexOf(w.toLowerCase())!==-1;}).length;
+        if(detailMatch===0)return false;
+      }
+      return true;
+    }).map(function(s){return s.k;});
     if(filtered.length===1){
       addBot(null,[],buildCard(filtered[0]));return;
     }

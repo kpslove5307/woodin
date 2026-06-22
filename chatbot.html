@@ -535,20 +535,62 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
       </div>
     </div>
 
-    <!-- 탭5: 안내메시지 관리 -->
+    <!-- 탭5: 안내메시지 관리 (WYSIWYG) -->
     <div id="adm-notice-view" style="display:none;padding:0 2px 16px;">
       <div class="adm-sec">
         <div class="adm-sec-title">📢 안내 메시지 편집</div>
-        <p style="font-size:12px;color:#888;margin-bottom:10px;">챗봇 시작 시 표시되는 안내 메시지를 수정합니다. HTML 태그 사용 가능합니다.</p>
-        <textarea id="adm-notice-textarea" style="width:100%;box-sizing:border-box;min-height:220px;padding:10px 12px;border:1px solid #ccc;border-radius:7px;font-size:13px;font-family:inherit;resize:vertical;line-height:1.6;outline:none;" onfocus="this.style.borderColor='var(--p)'" onblur="this.style.borderColor='#ccc'"></textarea>
-        <div style="margin-top:6px;display:flex;gap:8px;align-items:center;">
-          <button onclick="admNoticePreview()" style="padding:7px 14px;background:#f0f4ff;color:var(--p);border:1px solid var(--p);border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">👁 미리보기</button>
-          <button onclick="admNoticeSave()" style="padding:7px 18px;background:var(--p);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700;">저장</button>
-          <span id="adm-notice-msg" style="font-size:12px;color:#28a745;display:none;">✅ 저장되었습니다.</span>
+        <!-- 툴바 -->
+        <div id="notice-toolbar" style="display:flex;flex-wrap:wrap;gap:4px;padding:7px 8px;background:#f4f7fc;border:1px solid #dde3ed;border-bottom:none;border-radius:8px 8px 0 0;">
+          <!-- 글자 크기 -->
+          <select onchange="noticeExec('fontSize',this.value);this.selectedIndex=0;" style="padding:4px 6px;border:1px solid #ccc;border-radius:5px;font-size:12px;cursor:pointer;background:#fff;">
+            <option value="">크기</option>
+            <option value="1">아주 작게</option>
+            <option value="2">작게</option>
+            <option value="3">보통</option>
+            <option value="4">크게</option>
+            <option value="5">아주 크게</option>
+          </select>
+          <!-- 굵게/기울기/밑줄 -->
+          <button onclick="noticeExec('bold')" title="굵게" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-weight:700;font-size:14px;">B</button>
+          <button onclick="noticeExec('italic')" title="기울기" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-style:italic;font-size:14px;">I</button>
+          <button onclick="noticeExec('underline')" title="밑줄" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;text-decoration:underline;font-size:13px;">U</button>
+          <!-- 구분선 -->
+          <div style="width:1px;background:#ddd;margin:2px 2px;"></div>
+          <!-- 정렬 -->
+          <button onclick="noticeExec('justifyLeft')" title="왼쪽 정렬" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-size:13px;">≡</button>
+          <button onclick="noticeExec('justifyCenter')" title="가운데 정렬" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-size:13px;">☰</button>
+          <!-- 구분선 -->
+          <div style="width:1px;background:#ddd;margin:2px 2px;"></div>
+          <!-- 글자색 -->
+          <label title="글자색" style="display:flex;align-items:center;gap:3px;cursor:pointer;border:1px solid #ccc;border-radius:5px;padding:0 6px;background:#fff;height:30px;font-size:11px;">
+            <span>색</span><input type="color" onchange="noticeExec('foreColor',this.value)" style="width:22px;height:18px;border:none;padding:0;cursor:pointer;background:none;">
+          </label>
+          <!-- 구분선 -->
+          <div style="width:1px;background:#ddd;margin:2px 2px;"></div>
+          <!-- 목록 -->
+          <button onclick="noticeExec('insertUnorderedList')" title="글머리 목록" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-size:13px;">•≡</button>
+          <!-- 링크 -->
+          <button onclick="noticeInsertLink()" title="링크" style="width:30px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-size:13px;">🔗</button>
+          <!-- 이미지 -->
+          <button onclick="document.getElementById('notice-img-input').click()" title="이미지 삽입" style="padding:0 8px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-size:12px;">🖼 이미지</button>
+          <input type="file" id="notice-img-input" accept="image/*" style="display:none;" onchange="noticeInsertImage(this)">
+          <!-- 구분선 -->
+          <div style="width:1px;background:#ddd;margin:2px 2px;"></div>
+          <!-- 줄바꿈/초기화 -->
+          <button onclick="noticeExec('insertHTML','<br>')" title="줄바꿈" style="padding:0 8px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-size:12px;">↵ 줄바꿈</button>
+          <button onclick="noticeReset()" title="초기화" style="padding:0 8px;height:30px;border:1px solid #ccc;border-radius:5px;background:#fff8f8;color:#e53935;cursor:pointer;font-size:12px;">↺ 초기화</button>
         </div>
-        <div id="adm-notice-preview-box" style="display:none;margin-top:14px;padding:12px 14px;background:#f8f9fc;border:1px solid #dde3ed;border-radius:8px;">
-          <div style="font-size:11px;color:#888;margin-bottom:6px;font-weight:600;">미리보기</div>
-          <div id="adm-notice-preview-content" style="font-size:13.5px;line-height:1.7;color:#1a1f2e;"></div>
+        <!-- 편집 영역 -->
+        <div id="adm-notice-editor"
+          contenteditable="true"
+          style="width:100%;box-sizing:border-box;min-height:200px;padding:14px 16px;border:1px solid #dde3ed;border-radius:0 0 8px 8px;font-size:13.5px;line-height:1.8;color:#1a1f2e;background:#fff;outline:none;font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;overflow-y:auto;"
+          onfocus="this.style.borderColor='var(--p)'"
+          onblur="this.style.borderColor='#dde3ed'">
+        </div>
+        <div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <button onclick="admNoticeSave()" style="padding:8px 22px;background:var(--p);color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:700;">💾 저장</button>
+          <span id="adm-notice-msg" style="font-size:12px;color:#28a745;display:none;">✅ 저장되었습니다.</span>
+          <span style="font-size:11px;color:#aaa;margin-left:auto;">저장 후 챗봇에 즉시 반영됩니다</span>
         </div>
       </div>
       <div class="adm-foot">
@@ -1234,26 +1276,45 @@ function admSwitchTab(tab){
   if(tab==='notice')admNoticeLoad();
 }
 
-// ── 안내메시지 관리 ────────
+// ── 안내메시지 관리 (WYSIWYG) ────────
 function admNoticeLoad(){
-  var ta=document.getElementById('adm-notice-textarea');
-  if(ta)ta.value=ADM_NOTICE;
-  document.getElementById('adm-notice-preview-box').style.display='none';
+  var ed=document.getElementById('adm-notice-editor');
+  if(ed)ed.innerHTML=ADM_NOTICE;
   var msg=document.getElementById('adm-notice-msg');
   if(msg)msg.style.display='none';
 }
-function admNoticePreview(){
-  var ta=document.getElementById('adm-notice-textarea');
-  var box=document.getElementById('adm-notice-preview-box');
-  var pc=document.getElementById('adm-notice-preview-content');
-  if(!ta||!box||!pc)return;
-  pc.innerHTML=ta.value;
-  box.style.display='block';
+function noticeExec(cmd,val){
+  document.getElementById('adm-notice-editor').focus();
+  document.execCommand(cmd,false,val||null);
+}
+function noticeInsertLink(){
+  var url=prompt('링크 주소를 입력하세요:','https://');
+  if(url){
+    var txt=prompt('표시할 텍스트:','');
+    if(txt){document.execCommand('insertHTML',false,'<a href="'+url+'" target="_blank">'+txt+'</a>');}
+    else{document.execCommand('createLink',false,url);}
+  }
+}
+function noticeInsertImage(input){
+  var file=input.files[0];
+  if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    document.getElementById('adm-notice-editor').focus();
+    document.execCommand('insertHTML',false,'<img src="'+e.target.result+'" style="max-width:100%;border-radius:6px;margin:6px 0;">');
+    input.value='';
+  };
+  reader.readAsDataURL(file);
+}
+function noticeReset(){
+  if(!confirm('안내 메시지를 초기화하시겠습니까?'))return;
+  var ed=document.getElementById('adm-notice-editor');
+  if(ed)ed.innerHTML='안녕하세요. 👋<br><br><b>하드웨어 챗봇</b>입니다.';
 }
 function admNoticeSave(){
-  var ta=document.getElementById('adm-notice-textarea');
-  if(!ta)return;
-  ADM_NOTICE=ta.value;
+  var ed=document.getElementById('adm-notice-editor');
+  if(!ed)return;
+  ADM_NOTICE=ed.innerHTML;
   var msg=document.getElementById('adm-notice-msg');
   if(msg){msg.style.display='inline';setTimeout(function(){msg.style.display='none';},2500);}
 }

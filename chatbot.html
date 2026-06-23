@@ -916,7 +916,7 @@ function admGetCurrentHTML(){
   }catch(e){console.error('DB 직렬화 오류:',e);}
 
   // 비밀번호 반영
-  html=html.replace(/var ADM_PW=\([^)]*\);/,'var ADM_PW=\''+ADM_PW.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+"';");
+  html=html.replace(/var ADM_PW=[^;]*;/,'var ADM_PW=\''+ADM_PW.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+"';");
 
   // 카테고리 반영
   html=html.replace(/var ADM_CATS=\[.*?\];/,'var ADM_CATS='+JSON.stringify(ADM_CATS)+';');
@@ -1044,7 +1044,7 @@ function admAddProductAndPush(){
 }
 
 /* ══ 관리자 모드 ══ */
-var ADM_PW=(localStorage.getItem('woodin_adm_pw')||'woodin2026');
+var ADM_PW='woodin2026';
 var admPending={real:[],draw:[],desc:[],newReal:[],newDraw:[],newDesc:[]};
 var ADM_CATS=["실린더","포인트몰딩","오목이","PVC몰딩","인조대리석","리빙보드","힐링월","힐링월몰딩","모티스","하드웨어","행거","경첩","슬라이딩락","핸들"];
 
@@ -1086,9 +1086,8 @@ function admDoChangePw(){
   if(nw.length<4){err.textContent='새 비밀번호는 4자 이상이어야 합니다.';err.style.display='block';return;}
   if(nw!==cf){err.textContent='새 비밀번호가 일치하지 않습니다.';err.style.display='block';return;}
   ADM_PW=nw;
-  localStorage.setItem('woodin_adm_pw',nw);
   admCloseChangePw();
-  alert('✅ 비밀번호가 변경되었습니다.\n🚀 HTML만 GitHub 업로드를 눌러 영구 저장하세요.');
+  alert('✅ 비밀번호가 변경되었습니다.\n🚀 반드시 GitHub 업로드를 눌러야 모든 기기에 영구 저장됩니다!');
 }
 function admFilterProducts(query){
   var sel=document.getElementById('adm-product-sel');

@@ -1797,7 +1797,8 @@ function handleInput(t){
   setTimeout(function(){respond(t);},230);
 }
 
-// 제품의 검색가능한 텍스트 전체를 하나의 문자열로 반환
+// ── 통합 검색 엔진 ──────────────────────────────────────
+// 제품 텍스트: 원본 + 띄어쓰기제거본 둘 다 포함
 function getProductText(k){
   var p=DB[k];
   var parts=[k];
@@ -1805,133 +1806,99 @@ function getProductText(k){
   if(p.info)p.info.forEach(function(row){parts.push(row[0]);parts.push(row[1]);});
   if(p.descText)parts.push(p.descText);
   var normal=parts.join(' ').toLowerCase();
-  // 띄어쓰기 제거 버전도 포함 (붙여쓰기 검색 대응)
-  var nospace=normal.replace(/\s/g,'');
-  return normal+' '+nospace;
+  return normal+' '+normal.replace(/\s/g,'');
 }
 
-// 쿼리를 의미 단위로 분리 (공백 + 숫자/한글 경계 분리)
+// 쿼리에서 검색 토큰 추출 (원본단어 + 붙여쓰기 + 숫자/문자 분리)
 function tokenize(q){
   var ql=q.trim().toLowerCase();
-  // 공백으로 먼저 분리 후 각 덩어리를 숫자/문자 경계로 추가 분리
-  var raw=ql.split(/\s+/);
   var tokens=[];
-  raw.forEach(function(w){
-    if(!w)return;
-    // 숫자↔비숫자 경계에서 분리
-    var parts=w.replace(/([0-9]+)([^0-9])/g,'$1 $2').replace(/([^0-9])([0-9]+)/g,'$1 $2').split(/\s+/);
-    parts=parts.filter(function(p){return p.length>0;});
-    // 원본 덩어리도 포함 (45t 같은 단위는 그대로 매칭)
+  // 1) 공백 기준 분리
+  var bySpace=ql.split(/\s+/).filter(function(w){return w.length>0;});
+  bySpace.forEach(function(w){
     tokens.push(w);
+    // 숫자↔문자 경계 분리 (예: 45t → 45, t)
+    var parts=w.replace(/([0-9]+)([^0-9])/g,'$1 $2').replace(/([^0-9])([0-9]+)/g,'$1 $2').split(/\s+/).filter(function(p){return p.length>0;});
     parts.forEach(function(p){if(p!==w)tokens.push(p);});
   });
+  // 2) 전체 붙여쓰기 버전 추가 (띄어쓰기 없이 입력한 경우 대응)
+  var nospace=ql.replace(/\s/g,'');
+  if(nospace&&tokens.indexOf(nospace)===-1)tokens.push(nospace);
+  // 중복 제거
   return tokens.filter(function(v,i,a){return a.indexOf(v)===i&&v.length>0;});
 }
 
-// 공백 없이 붙여쓴 쿼리의 실질 단어 수 추정
-function countSemanticWords(q){
-  var ql=q.trim().toLowerCase();
-  // 공백으로 분리된 단어 수
-  var spaceWords=ql.split(/\s+/).filter(function(w){return w.length>0;});
-  if(spaceWords.length>1)return spaceWords.length;
-  // 공백 없으면 숫자/문자 경계 분리 수로 추정
-  var joined=ql.replace(/\s/g,'');
-  var parts=joined.replace(/([0-9]+)([^0-9])/g,'$1 $2').replace(/([^0-9])([0-9]+)/g,'$1 $2').split(/\s+/).filter(function(p){return p.length>0;});
-  return Math.max(spaceWords.length, parts.length);
+// 토큰별 독립 매칭 점수 계산 (순서 무관, 띄어쓰기 무관)
+function scoreProduct(k, tokens){
+  var txt=getProductText(k);
+  var score=0;
+  tokens.forEach(function(t){if(txt.indexOf(t)!==-1)score++;});
+  return score;
 }
 
-// 단어 분리 스마트 검색: 단어 많이 매칭될수록 높은 점수
+// 통합 스마트 검색
 function smartSearch(q){
-  var words=tokenize(q);
-  if(!words.length)return[];
-  // 붙여쓰기 쿼리 자체도 토큰으로 추가 (전체를 공백 없이 붙인 것)
-  var qNospace=q.trim().toLowerCase().replace(/\s/g,'');
-  if(qNospace&&words.indexOf(qNospace)===-1)words.push(qNospace);
+  var tokens=tokenize(q);
+  if(!tokens.length)return[];
   var scored=[];
   Object.keys(DB).forEach(function(k){
-    var txt=getProductText(k);
-    var score=0;
-    words.forEach(function(w){if(txt.indexOf(w)!==-1)score++;});
-    if(score>0)scored.push({k:k,score:score,words:words});
+    var s=scoreProduct(k,tokens);
+    if(s>0)scored.push({k:k,score:s});
   });
   scored.sort(function(a,b){return b.score-a.score||a.k.localeCompare(b.k,'ko');});
   return scored;
 }
 
 function respond(q){
-  var ql=q.toLowerCase().replace(/\s/g,'');
-  // 정확 매칭 우선 (제품명)
-  var ks=Object.keys(DB);
-  for(var i=0;i<ks.length;i++){
-    if(ks[i].toLowerCase().replace(/\s/g,'')===ql){
-      showProductCard(ks[i]);return;
-    }
-  }
-  // 카테고리 매칭 (띄어쓰기 무시)
-  var matchedCat=ADM_CATS.filter(function(cat){return cat.replace(/\s/g,'')===ql;})[0]||
-                 (ADM_CATS.indexOf(q)!==-1?q:null);
-  if(matchedCat){
-    var catProducts=Object.keys(DB).filter(function(k){return DB[k].cat===matchedCat;});
-    if(catProducts.length>0){
-      addBot('<b>📂 '+matchedCat+'</b> ('+catProducts.length+'개 제품)',catProducts);
-    } else {
-      addBot('<b>📂 '+matchedCat+'</b> — 등록된 제품이 없습니다.',ADM_CATS);
-    }
-    return;
-  }
-  // 제품명 부분 매칭
-  var matches=search(q);
-  if(matches.length===1){showProductCard(matches[0]);return;}
-  if(matches.length>1){
-    addBot('<b>🔍 "'+q+'" 검색결과 ('+matches.length+'개)</b><br><small style="color:#90a4ae">원하는 제품을 선택하세요</small>',matches);return;
-  }
-  // 인사
+  var ql=q.trim().toLowerCase().replace(/\s/g,'');
+
+  // ── 0. 인사 ──
   if(q.indexOf('안녕')!==-1||ql==='hi'||ql==='hello'){
     addBot('안녕하세요! 👋<br>우딘 하드웨어 챗봇입니다.',ADM_CATS);return;
   }
-  // 스마트 검색 (제품명 검색 실패 시 → info/descText 포함 전문 검색)
-  var words=tokenize(q);
-  var totalWords=countSemanticWords(q); // 붙여쓰기 포함 의미단어 수
-  var scored=smartSearch(q);
-  if(scored.length>0){
-    // 단어 1개: 그대로 / 2개 이상: 70% 이상 매칭 필요
-    var minScore=totalWords<=1?1:Math.max(2,Math.ceil(totalWords*0.7));
-    var filtered=scored.filter(function(s){
-      if(s.score<minScore)return false;
-      // 단어 2개 이상 질문형 검색: 제품명에만 매칭된 제품 제외
-      // (descText나 info에도 최소 1개 단어가 매칭돼야 포함)
-      if(totalWords>=2){
-        var p=DB[s.k];
-        var detailParts=[];
-        if(p.info)p.info.forEach(function(row){detailParts.push(row[0]);detailParts.push(row[1]);});
-        if(p.descText)detailParts.push(p.descText);
-        var detailTxt=detailParts.join(' ').toLowerCase();
-        var detailTxtNospace=detailTxt.replace(/\s/g,'');
-        var detailMatch=words.filter(function(w){return detailTxt.indexOf(w.toLowerCase())!==-1||detailTxtNospace.indexOf(w.toLowerCase())!==-1;}).length;
-        if(detailMatch===0)return false;
-      }
-      return true;
-    }).map(function(s){return s.k;});
-    if(filtered.length===1){
-      // descText 있고 단어 2개 이상 질문이면 AI 답변 시도
-      if(totalWords>=2&&DB[filtered[0]]&&DB[filtered[0]].descText){
-        askAI(q,filtered);return;
-      }
-      showProductCard(filtered[0]);return;
-    }
-    if(filtered.length>1&&filtered.length<=30){
-      // descText 있는 제품이 포함돼 있고 질문형이면 AI 답변 시도
-      var hasDesc=filtered.some(function(k){return DB[k]&&DB[k].descText;});
-      if(totalWords>=2&&hasDesc){
-        askAI(q,filtered.slice(0,5));return;
-      }
-      addBot('<b>🔍 "'+q+'" 관련 제품 ('+filtered.length+'개)</b><br><small style="color:#90a4ae">원하는 제품을 선택하세요</small>',filtered);return;
-    }
-    if(filtered.length>30){
-      addBot('<b>🔍 "'+q+'" 검색결과가 너무 많아요 ('+filtered.length+'개)</b><br><small style="color:#90a4ae">더 구체적인 키워드를 추가해 보세요</small>',filtered.slice(0,20));return;
-    }
+
+  // ── 1. 카테고리 정확 매칭 (띄어쓰기 무시) ──
+  var matchedCat=null;
+  for(var ci=0;ci<ADM_CATS.length;ci++){
+    if(ADM_CATS[ci].replace(/\s/g,'')===ql){matchedCat=ADM_CATS[ci];break;}
   }
-  addBot('"'+q+'" 관련 제품을 찾지 못했어요. 카테고리에서 선택하거나 다른 키워드로 검색해 보세요! 😊',ADM_CATS);
+  if(matchedCat){
+    var catProducts=Object.keys(DB).filter(function(k){return DB[k].cat===matchedCat;});
+    if(catProducts.length>0){addBot('<b>📂 '+matchedCat+'</b> ('+catProducts.length+'개 제품)',catProducts);}
+    else{addBot('<b>📂 '+matchedCat+'</b> — 등록된 제품이 없습니다.',ADM_CATS);}
+    return;
+  }
+
+  // ── 2. 통합 스마트 검색 (제품명/카테고리/스펙/상세설명 모두, 순서·띄어쓰기 무관) ──
+  var tokens=tokenize(q);
+  var scored=smartSearch(q);
+
+  if(!scored.length){
+    addBot('"'+q+'" 관련 제품을 찾지 못했어요. 카테고리에서 선택하거나 다른 키워드로 검색해 보세요! 😊',ADM_CATS);
+    return;
+  }
+
+  var topScore=scored[0].score;
+  // 상위 점수 제품만 남김 (최고점의 50% 이상)
+  var filtered=scored.filter(function(s){return s.score>=Math.max(1,topScore*0.5);}).map(function(s){return s.k;});
+
+  if(filtered.length===1){
+    // 단일 결과: 상세설명 있으면 AI 답변 시도
+    if(tokens.length>=2&&DB[filtered[0]]&&DB[filtered[0]].descText){
+      askAI(q,filtered);return;
+    }
+    showProductCard(filtered[0]);return;
+  }
+  if(filtered.length<=30){
+    // AI 답변 시도 (상세설명 있는 제품 포함 + 토큰 2개 이상)
+    var hasDesc=filtered.some(function(k){return DB[k]&&DB[k].descText;});
+    if(tokens.length>=2&&hasDesc){
+      askAI(q,filtered.slice(0,5));return;
+    }
+    addBot('<b>🔍 "'+q+'" 검색결과 ('+filtered.length+'개)</b><br><small style="color:#90a4ae">원하는 제품을 선택하세요</small>',filtered);return;
+  }
+  // 결과 너무 많으면 상위 20개
+  addBot('<b>🔍 "'+q+'" 검색결과가 많아요 ('+filtered.length+'개)</b><br><small style="color:#90a4ae">더 구체적인 키워드를 추가해 보세요</small>',filtered.slice(0,20));
 }
 
 /* ── AI 상세설명 답변 ── */

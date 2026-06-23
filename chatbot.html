@@ -2077,7 +2077,7 @@ var CURRENT_USER = null; // 로그인된 사용자
 function gateInit(){
   // 이미 로그인된 사용자 확인
   try {
-    var saved = JSON.parse(sessionStorage.getItem('woodin_user')||'null');
+    var saved = JSON.parse(localStorage.getItem('woodin_user')||'null');
     if(saved && ADM_USERS.some(function(u){return u.id===saved.id&&u.pw===saved.pw;})){
       CURRENT_USER = saved;
       document.getElementById('user-gate').style.display='none';
@@ -2129,12 +2129,12 @@ function userDoChpw(){
   // ADM_USERS에서 비번 업데이트
   user.pw = nw;
   // 세션도 갱신
-  sessionStorage.setItem('woodin_user', JSON.stringify({id:CURRENT_USER.id, name:CURRENT_USER.name}));
+  localStorage.setItem('woodin_user', JSON.stringify({id:CURRENT_USER.id, name:CURRENT_USER.name}));
   userCloseChpw();
   alert('✅ 비밀번호가 변경되었습니다.\n관리자가 GitHub 업로드를 해야 영구 저장됩니다.');
 }
 function userLogout(){
-  sessionStorage.removeItem('woodin_user');
+  localStorage.removeItem('woodin_user');
   CURRENT_USER = null;
   document.getElementById('user-info').style.display='none';
   gateShowLogin();
@@ -2189,7 +2189,7 @@ function gateDoLogin(){
   var user = ADM_USERS.filter(function(u){return u.id===id&&u.pw===pw;})[0];
   if(!user){err.textContent='아이디 또는 비밀번호가 올바르지 않습니다.';err.style.display='block';return;}
   CURRENT_USER = {id:user.id, name:user.name};
-  sessionStorage.setItem('woodin_user', JSON.stringify(CURRENT_USER));
+  localStorage.setItem('woodin_user', JSON.stringify(CURRENT_USER));
   document.getElementById('user-gate').style.display='none';
   gateShowUserInfo();
   showUserReplies();

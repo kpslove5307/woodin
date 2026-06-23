@@ -1098,7 +1098,12 @@ function admGetCurrentHTML(){
   html=html.replace(/var ADM_PW='[^']*';/,'var ADM_PW=\''+ADM_PW.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+"';");
 
   // 사용자 목록 반영
-  html=html.replace(/var ADM_USERS=\[[^\]]*\];/,'var ADM_USERS='+JSON.stringify(ADM_USERS)+';');
+  // ADM_USERS 반영 - MARKER 방식 (replies 등 중첩 배열 안전하게 처리)
+  var usS='/*USERS_START*/';var usE='/*USERS_END*/';
+  var usSi=html.indexOf(usS);var usEi=html.indexOf(usE);
+  if(usSi!==-1&&usEi!==-1){
+    html=html.substring(0,usSi)+usS+JSON.stringify(ADM_USERS)+usE+html.substring(usEi+usE.length);
+  }
 
   // 카테고리 반영
   html=html.replace(/var ADM_CATS=\[.*?\];/,'var ADM_CATS='+JSON.stringify(ADM_CATS)+';');
@@ -1234,7 +1239,7 @@ function admBtnClick(){
 }
 var ADM_PW='dnels1122';
 // 승인된 사용자 목록 [{id, name, pw, approved}]
-var ADM_USERS=[{"id":"1234","name":"테스트1234","pw":"1234"},{"id":"우딘","name":"우딘","pw":"1234"}];
+var ADM_USERS=/*USERS_START*/[{"id":"1234","name":"테스트1234","pw":"1234"},{"id":"우딘","name":"우딘","pw":"1234"}]/*USERS_END*/;
 var admPending={real:[],draw:[],desc:[],newReal:[],newDraw:[],newDesc:[]};
 var ADM_CATS=["실린더","포인트몰딩","오목이","PVC몰딩","인조대리석","리빙보드","힐링월","힐링월몰딩","모티스","하드웨어","행거","경첩","슬라이딩락","핸들"];
 
@@ -2261,10 +2266,10 @@ function admSaveReply(issueNum, writerName, replyId, btn){
   // ADM_USERS에서 해당 사용자 찾아서 답글 저장
   var found=false;
   ADM_USERS.forEach(function(u){
-    if(u.name===writerName){
+    // 이름 완전일치 또는 포함 매칭
+    if(u.name===writerName||writerName.indexOf(u.name)!==-1||u.name.indexOf(writerName)!==-1){
       found=true;
       if(!u.replies)u.replies=[];
-      // 같은 issueNum 답글 있으면 업데이트
       var existing=u.replies.filter(function(r){return r.issueNum===issueNum;})[0];
       if(existing){
         existing.text=text;
@@ -2274,7 +2279,7 @@ function admSaveReply(issueNum, writerName, replyId, btn){
       }
     }
   });
-  if(!found){alert('등록된 사용자가 아닙니다. (이름이 아이디와 다를 수 있어요)');btn.disabled=false;btn.textContent='답글 저장';return;}
+  if(!found){alert('사용자를 찾을 수 없습니다.\n문의 작성자 이름('+writerName+')과 승인된 사용자 이름이 일치하는지 확인하세요.');btn.disabled=false;btn.textContent='답글 저장';return;}
 
   // GitHub 업로드
   admPushToGitHub(function(){

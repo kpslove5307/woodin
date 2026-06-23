@@ -718,8 +718,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
   <div style="background:#fff;border-radius:14px;padding:24px 20px;width:92%;max-width:400px;box-shadow:0 4px 24px rgba(0,0,0,0.18)">
     <div style="font-size:15px;font-weight:700;color:#1a4fa0;margin-bottom:6px">✏️ 제품 추가 · 개선 요청</div>
     <div style="font-size:12px;color:#555;margin-bottom:14px;line-height:1.7;background:#f0f4ff;border-radius:8px;padding:10px 12px">하드웨어 중 추가를 원하는 제품이나 개선을 바라는 점을<br>적어 주시면 관리자가 확인 후 피드백 드립니다.</div>
-    <input id="inquiry-writer" type="text" placeholder="이름 및 대리점명" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-bottom:10px;outline:none">
-    <textarea id="inquiry-content" placeholder="내용을 입력하세요" rows="5" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;resize:vertical;font-family:inherit;margin-bottom:12px;outline:none"></textarea>
+      <textarea id="inquiry-content" placeholder="내용을 입력하세요" rows="5" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;resize:vertical;font-family:inherit;margin-bottom:12px;outline:none"></textarea>
     <div id="inquiry-err" style="display:none;color:#c33;font-size:12px;margin-bottom:8px;text-align:center"></div>
     <div style="display:flex;gap:8px">
       <button onclick="inquirySubmit()" style="flex:1;padding:10px;background:#1a4fa0;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">제출</button>
@@ -2134,10 +2133,9 @@ function inquiryClose(){
   document.getElementById('inquiry-modal').style.display = 'none';
 }
 async function inquirySubmit(){
-  var writer  = (document.getElementById('inquiry-writer').value||'').trim();
+  var writer = (CURRENT_USER&&CURRENT_USER.name)||'사용자';
   var content = (document.getElementById('inquiry-content').value||'').trim();
   var err     = document.getElementById('inquiry-err');
-  if(!writer){err.textContent='이름 및 대리점명을 입력하세요.';err.style.display='block';return;}
   if(!content){err.textContent='내용을 입력하세요.';err.style.display='block';return;}
 
   var cfg = getIssueConfig();

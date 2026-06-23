@@ -2403,7 +2403,7 @@ async function admLoadInquiries(){
       card.appendChild(chk);
 
       // 내용 영역
-      var replyHtml=existReply?'<div style="background:#f0f7ff;border-left:3px solid #1a4fa0;padding:8px 10px;border-radius:0 6px 6px 0;margin-bottom:8px;font-size:11px"><span style="color:#1a4fa0;font-weight:700">📣 관리자 답글</span><br><span style="color:#333;white-space:pre-wrap">'+existReply.text+'</span></div>':'';
+      var replyHtml=existReply?'<div style="margin:6px 0 8px 0;font-size:12px;color:#aaa">📣 <b style="color:#1a4fa0">관리자 답글</b>&nbsp;&nbsp;<span style="color:#333;white-space:pre-wrap">'+existReply.text+'</span></div>':'';'
       var body=document.createElement('div');
       body.style.cssText='flex:1;min-width:0';
       body.innerHTML=
@@ -2595,9 +2595,9 @@ async function loadMyInquiries(){
         +'</div>'
         +'<div style="font-size:13px;color:#333;white-space:pre-wrap;line-height:1.7;margin-bottom:'+(reply?'10px':'4px')+'">'+contentText+'</div>'
         +(reply
-          ?'<div style="background:#fff;border-left:3px solid #1a4fa0;padding:8px 12px;border-radius:0 8px 8px 0;margin-top:6px">'
-           +'<div style="font-size:11px;color:#1a4fa0;font-weight:700;margin-bottom:4px">📣 관리자 답글 <span style="font-weight:400;color:#aaa">'+reply.date+'</span></div>'
-           +'<div style="font-size:12px;color:#333;white-space:pre-wrap;line-height:1.6">'+reply.text+'</div></div>'
+          ?'<div style="background:#f0f4ff;border-radius:10px;padding:12px 14px;margin-top:8px;border:1px solid #c5d0e8">'
+           +'<div style="font-size:11px;color:#1a4fa0;font-weight:700;margin-bottom:6px">📣 관리자 답글 <span style="font-weight:400;color:#aaa">'+reply.date+'</span></div>'
+           +'<div style="font-size:13px;color:#333;white-space:pre-wrap;line-height:1.7">'+reply.text+'</div></div>'
           :'<div style="font-size:11px;color:#aaa;margin-top:2px">⏳ 답글 대기 중</div>')
         +'</div></div>';
       container.appendChild(card);

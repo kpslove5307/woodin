@@ -1182,7 +1182,7 @@ function admGetCurrentHTML(){
 
   // 사용자 목록 반영
   // ADM_USERS 반영 - MARKER 방식
-  var usS='/*USERS_START*/[{"id":"1234","name":"테스트1234","pw":"1234"},{"id":"우딘","name":"우딘","pw":"1234","replies":[{"issueNum":24,"text":"다울아ㅜ라울","date":"2026. 6. 23."},{"issueNum":23,"text":"ㄹㄹㄹ4ㄹ4","date":"2026. 6. 23."}]},{"id":"수주팀이남준","name":"수주팀이남준","pw":"1234"}]/*USERS_END*/';
+  var usS='/*USERS_START*/';
   var usSi=html.indexOf(usS);var usEi=html.indexOf(usE);
   if(usSi!==-1&&usEi!==-1){
     html=html.substring(0,usSi)+usS+JSON.stringify(ADM_USERS)+usE+html.substring(usEi+usE.length);

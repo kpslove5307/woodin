@@ -2472,8 +2472,11 @@ async function admLoadInquiries(){
       headers:{'Authorization':'token '+cfg.token,'Accept':'application/vnd.github.v3+json'}
     });
     var issues = await res.json();
-    // [문의] 제목만 필터
-    issues = issues.filter(function(i){return i.title&&i.title.indexOf('[문의]')===0;});
+    // [문의] 또는 [삭제됨] [문의] 제목 필터
+    issues = issues.filter(function(i){
+      if(!i.title)return false;
+      return i.title.indexOf('[문의]')===0||i.title.indexOf('[삭제됨] [문의]')===0;
+    });
     if(!issues.length){
       el.innerHTML='<div style="padding:20px;text-align:center;color:#bbb;font-size:12px">접수된 문의가 없습니다</div>';
       return;
@@ -2491,16 +2494,21 @@ async function admLoadInquiries(){
       var dateMatch=(issue.body||'').match(/접수일시: (.+)/);
       var dateStr=dateMatch?dateMatch[1]:'';
 
+      // [삭제됨] 여부 확인
+      var isDeleted=issue.title&&issue.title.indexOf('[삭제됨]')===0;
+      // 실제 작성자명 (제목에서 [삭제됨] 제거 후 파싱)
+      var realWriter=isDeleted?writer.replace('[삭제됨] ','').trim():writer;
+
       // 기존 답글 찾기
       var existReply=null;
       ADM_USERS.forEach(function(u){
-        if(u.name===writer&&u.replies){
+        if((u.name===realWriter||u.name===writer)&&u.replies){
           u.replies.forEach(function(r){if(r.issueNum===issue.number)existReply=r;});
         }
       });
       var replyId='reply-'+issue.number;
       var card=document.createElement('div');
-      card.style.cssText='padding:12px 14px;border-bottom:1px solid #f0f0f0;font-size:12px;display:flex;gap:10px;align-items:flex-start';
+      card.style.cssText='padding:12px 14px;border-bottom:1px solid #f0f0f0;font-size:12px;display:flex;gap:10px;align-items:flex-start'+(isDeleted?';opacity:0.45;background:#f5f5f5':'');
       card.dataset.issueNum=issue.number;
 
       // 체크박스
@@ -2518,7 +2526,8 @@ async function admLoadInquiries(){
       body.style.cssText='flex:1;min-width:0';
       body.innerHTML=
         '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">'
-        +'<span style="font-weight:700;color:#333">'+writer+'</span>'
+        +(isDeleted?'<span style="font-size:10px;background:#ff6b6b;color:#fff;padding:1px 6px;border-radius:4px;font-weight:700">사용자삭제</span>':'')
+        +'<span style="font-weight:700;color:'+(isDeleted?'#999':'#333')+'">'+realWriter+'</span>'
         +'<span style="color:#bbb;font-size:10px">'+dateStr+'</span>'
         +'<button onclick="admDeleteInquiry('+issue.number+',this)" style="margin-left:auto;padding:3px 10px;background:#fff0f0;border:1px solid #fcc;border-radius:6px;font-size:11px;cursor:pointer;color:#c33">🗑 삭제</button>'
         +'</div>'
@@ -2537,38 +2546,49 @@ async function admLoadInquiries(){
 }
 
 /* ══ 사용자 문의 삭제 ══ */
-function userDeleteOneInquiry(issueNum, btn){
+async function userDeleteOneInquiry(issueNum, btn){
   if(!confirm('이 문의를 삭제하시겠습니까?'))return;
-  userHideInquiry(issueNum);
+  btn.disabled=true; btn.textContent='삭제중...';
+  await userHideInquiry(issueNum);
   var card=btn.closest('.user-inq-card');
   if(card)card.remove();
 }
 
-function userDeleteSelectedInquiries(containerId){
+async function userDeleteSelectedInquiries(containerId){
   var container=document.getElementById(containerId);
   if(!container)return;
   var checked=container.querySelectorAll('.user-inq-check:checked');
   if(!checked.length){alert('삭제할 문의를 선택하세요.');return;}
-  if(!confirm(checked.length+'개 문의를 목록에서 제거하시겠습니까?'))return;
-  checked.forEach(function(cb){
-    userHideInquiry(parseInt(cb.dataset.num));
-    var card=cb.closest('.user-inq-card');
-    if(card)card.remove();
-  });
-  alert('✅ '+checked.length+'개가 목록에서 제거되었습니다.');
+  if(!confirm(checked.length+'개 문의를 삭제하시겠습니까?'))return;
+  var cards=[];
+  checked.forEach(function(cb){cards.push({num:parseInt(cb.dataset.num),card:cb.closest('.user-inq-card')});});
+  for(var i=0;i<cards.length;i++){
+    await userHideInquiry(cards[i].num);
+    if(cards[i].card)cards[i].card.remove();
+  }
+  alert('✅ '+cards.length+'개가 삭제되었습니다.');
 }
 
-/* ══ 사용자 문의 숨김 (localStorage) ══ */
-function userHideInquiry(issueNum){
-  var key='woodin_hidden_inq_'+(CURRENT_USER?CURRENT_USER.id:'');
-  var hidden=JSON.parse(localStorage.getItem(key)||'[]');
-  if(hidden.indexOf(issueNum)===-1)hidden.push(issueNum);
-  localStorage.setItem(key,JSON.stringify(hidden));
+/* ══ 사용자 문의 숨김 ══ */
+async function userHideInquiry(issueNum){
+  // Issue 제목 앞에 [삭제됨] 추가 → 관리자 패널에서 회색으로 표시
+  var cfg=getIssueConfig();
+  try{
+    // 현재 제목 가져오기
+    var res=await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues/'+issueNum,{
+      headers:{'Authorization':'token '+cfg.token,'Accept':'application/vnd.github.v3+json'}
+    });
+    var issue=await res.json();
+    if(issue.title&&issue.title.indexOf('[삭제됨]')===-1){
+      await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues/'+issueNum,{
+        method:'PATCH',
+        headers:{'Authorization':'token '+cfg.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+        body:JSON.stringify({title:'[삭제됨] '+issue.title})
+      });
+    }
+  }catch(e){console.log('숨김 처리 오류:',e);}
 }
-function userGetHiddenInquiries(){
-  var key='woodin_hidden_inq_'+(CURRENT_USER?CURRENT_USER.id:'');
-  return JSON.parse(localStorage.getItem(key)||'[]');
-}
+function userGetHiddenInquiries(){return [];}
 
 /* ══ 관리자 답글 저장 ══ */
 function admSaveReply(issueNum, writerName, replyId, btn){
@@ -2675,9 +2695,10 @@ async function loadMyInquiries(){
     var all=await res.json();
     // 내 이름으로 된 [문의] 이슈만 필터
     var myName=CURRENT_USER.name||CURRENT_USER.id;
-    var hidden=userGetHiddenInquiries();
     var mine=all.filter(function(i){
-      return i.title&&i.title.indexOf('[문의]')===0&&i.title.indexOf(myName)!==-1&&hidden.indexOf(i.number)===-1;
+      return i.title&&i.title.indexOf('[문의]')===0
+        &&i.title.indexOf('[삭제됨]')===-1
+        &&i.title.indexOf(myName)!==-1;
     });
     renderInquiries('user-replies-box','user-replies-section',mine);
     renderInquiries('modal-replies-box','modal-replies-section',mine);

@@ -961,8 +961,13 @@ function buildCard(key){
   var pb=document.createElement('div');pb.className='pb';
   var pt=document.createElement('div');pt.className='pt';pt.textContent=key;
   var bc=document.createElement('span');bc.className='bc';bc.textContent=p.cat;pt.appendChild(bc);pb.appendChild(pt);
-  // 재고 표시
-  if(p.stock!==undefined&&p.stock!==null&&p.stock!==''){
+  // 재고 표시 (수주팀/영업팀 아이디에만 표시)
+  var canSeeStock = CURRENT_USER && (
+    CURRENT_USER.id.indexOf('수주팀')!==-1 ||
+    CURRENT_USER.id.indexOf('영업팀')!==-1 ||
+    IS_ADMIN
+  );
+  if(canSeeStock&&p.stock!==undefined&&p.stock!==null&&p.stock!==''){
     var qty=p.stock;
     var isLow=(!isNaN(qty)&&Number(qty)<=5);
     var stockBadge=document.createElement('div');

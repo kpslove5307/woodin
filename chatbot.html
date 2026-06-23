@@ -1182,7 +1182,7 @@ function admGetCurrentHTML(){
 
   // 사용자 목록 반영
   // ADM_USERS 반영 - MARKER 방식
-  var usS='/*USERS_START*/';
+  var usS='/*USERS_START*/';var usE='/*USERS_END*/';
   var usSi=html.indexOf(usS);var usEi=html.indexOf(usE);
   if(usSi!==-1&&usEi!==-1){
     html=html.substring(0,usSi)+usS+JSON.stringify(ADM_USERS)+usE+html.substring(usEi+usE.length);

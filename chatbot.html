@@ -2507,8 +2507,27 @@ async function loadMyInquiries(){
   if(!CURRENT_USER)return;
   var cfg=getIssueConfig();
 
-  // 현재 로그인 사용자의 replies 가져오기
+  // 최신 ADM_USERS를 GitHub에서 직접 받아오기 (캐시 우회)
   var myUser=null;
+  try{
+    var ghCfg=admGhLoadConfig();
+    if(ghCfg&&ghCfg.token){
+      var rawRes=await fetch('https://api.github.com/repos/'+ghCfg.owner+'/'+ghCfg.repo+'/contents/'+ghCfg.path,{
+        headers:{'Authorization':'token '+ghCfg.token,'Accept':'application/vnd.github.v3+json'}
+      });
+      var rawD=await rawRes.json();
+      var rawHtml=decodeURIComponent(escape(atob(rawD.content.replace(/\n/g,''))));
+      var us=rawHtml.indexOf('/*USERS_START*/');
+      var ue=rawHtml.indexOf('/*USERS_END*/');
+      if(us!==-1&&ue!==-1){
+        var freshUsers=JSON.parse(rawHtml.substring(us+15,ue));
+        // 전역 ADM_USERS도 갱신
+        ADM_USERS.length=0;
+        freshUsers.forEach(function(u){ADM_USERS.push(u);});
+      }
+    }
+  }catch(e){console.warn('ADM_USERS 갱신 실패, 로컬값 사용:',e);}
+
   for(var ui=0;ui<ADM_USERS.length;ui++){
     if(ADM_USERS[ui].id===CURRENT_USER.id||ADM_USERS[ui].name===CURRENT_USER.name){
       myUser=ADM_USERS[ui]; break;

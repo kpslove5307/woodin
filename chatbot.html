@@ -2247,10 +2247,15 @@ async function admLoadPendingUsers(){
     el.innerHTML='';
     // [가입신청] 제목만 필터
     issues = issues.filter(function(i){return i.title&&i.title.indexOf('[가입신청]')===0;});
-    // 이미 승인된 아이디는 제외
-    issues = issues.filter(function(i){
-      var m=i.title.match(/\(([^)]+)\)\s*$/);
-      var id=m?m[1]:'';
+    // 이미 승인된 아이디는 제외 (body의 아이디 필드로 정확히 비교)
+    issues = issues.filter(function(issue){
+      var lines=(issue.body||'').split('\n');
+      var id='';
+      lines.forEach(function(l){if(l.startsWith('아이디: '))id=l.replace('아이디: ','').trim();});
+      if(!id){// body 파싱 안되면 제목에서 추출
+        var m=issue.title.match(/\(([^)]+)\)\s*$/);
+        id=m?m[1]:'';
+      }
       return !ADM_USERS.some(function(u){return u.id===id;});
     });
     if(!issues.length){el.innerHTML='<div style="padding:12px;text-align:center;color:#aaa;font-size:12px">신청 없음</div>';return;}
@@ -2280,7 +2285,7 @@ async function admLoadPendingUsers(){
           fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues/'+issueNum,{
             method:'PATCH',
             headers:{'Authorization':'token '+cfg.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
-            body:JSON.stringify({state:'closed',labels:['가입승인']})
+            body:JSON.stringify({state:'closed'})
           });
           row.style.opacity='0.4';
           btnApprove.disabled=true;
@@ -2297,7 +2302,7 @@ async function admLoadPendingUsers(){
           fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues/'+issueNum,{
             method:'PATCH',
             headers:{'Authorization':'token '+cfg.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
-            body:JSON.stringify({state:'closed',labels:['가입거부']})
+            body:JSON.stringify({state:'closed'})
           });
           row.style.opacity='0.3';
           btnApprove.disabled=true;

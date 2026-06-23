@@ -2537,44 +2537,25 @@ async function admLoadInquiries(){
 }
 
 /* ══ 사용자 문의 삭제 ══ */
-async function userDeleteOneInquiry(issueNum, btn){
+function userDeleteOneInquiry(issueNum, btn){
   if(!confirm('이 문의를 삭제하시겠습니까?'))return;
-  var cfg=getIssueConfig();
-  btn.disabled=true; btn.textContent='삭제중...';
-  try{
-    await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues/'+issueNum,{
-      method:'PATCH',
-      headers:{'Authorization':'token '+cfg.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
-      body:JSON.stringify({state:'closed'})
-    });
-    var card=btn.closest('div[data-issue-num]')||btn.closest('div[style*="border-radius:10px"]');
-    if(card)card.remove();
-  }catch(e){btn.disabled=false;btn.textContent='🗑 삭제';}
+  userHideInquiry(issueNum);
+  var card=btn.closest('.user-inq-card');
+  if(card)card.remove();
 }
 
-async function userDeleteSelectedInquiries(containerId){
+function userDeleteSelectedInquiries(containerId){
   var container=document.getElementById(containerId);
   if(!container)return;
   var checked=container.querySelectorAll('.user-inq-check:checked');
   if(!checked.length){alert('삭제할 문의를 선택하세요.');return;}
-  if(!confirm(checked.length+'개 문의를 삭제하시겠습니까?'))return;
-  var cfg=getIssueConfig();
-  var nums=[];
-  checked.forEach(function(cb){nums.push(parseInt(cb.dataset.num));});
-  for(var i=0;i<nums.length;i++){
-    try{
-      await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues/'+nums[i],{
-        method:'PATCH',
-        headers:{'Authorization':'token '+cfg.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
-        body:JSON.stringify({state:'closed'})
-      });
-    }catch(e){}
-  }
+  if(!confirm(checked.length+'개 문의를 목록에서 제거하시겠습니까?'))return;
   checked.forEach(function(cb){
-    var card=cb.closest('div[style*="border-radius:10px"]');
+    userHideInquiry(parseInt(cb.dataset.num));
+    var card=cb.closest('.user-inq-card');
     if(card)card.remove();
   });
-  alert('✅ '+nums.length+'개 삭제되었습니다.');
+  alert('✅ '+checked.length+'개가 목록에서 제거되었습니다.');
 }
 
 /* ══ 사용자 문의 숨김 (localStorage) ══ */

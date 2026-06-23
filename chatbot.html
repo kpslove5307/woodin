@@ -1009,10 +1009,10 @@ function admGetCurrentHTML(){
   }catch(e){console.error('DB 직렬화 오류:',e);}
 
   // 비밀번호 반영
-  html=html.replace(/var ADM_PW='dnels1122';]*;/,'var ADM_PW=\''+ADM_PW.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+"';");
+  html=html.replace(/var ADM_PW='[^']*';/,'var ADM_PW=\''+ADM_PW.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+"';");
 
   // 사용자 목록 반영
-  html=html.replace(/var ADM_USERS=[];]*;/,'var ADM_USERS='+JSON.stringify(ADM_USERS)+';');
+  html=html.replace(/var ADM_USERS=\[[^\]]*\];/,'var ADM_USERS='+JSON.stringify(ADM_USERS)+';');
 
   // 카테고리 반영
   html=html.replace(/var ADM_CATS=\[.*?\];/,'var ADM_CATS='+JSON.stringify(ADM_CATS)+';');
@@ -1988,8 +1988,12 @@ async function gateDoSignup(){
   if(ADM_USERS.some(function(u){return u.id===id;})){err.textContent='이미 사용 중인 아이디입니다.';err.style.display='block';return;}
   // GitHub Issue로 신청 전송
   var cfg = admGhLoadConfig();
+  // 토큰이 없으면 localStorage에서 직접 시도
   if(!cfg||!cfg.token){
-    err.textContent='시스템 오류: 관리자에게 문의하세요.';err.style.display='block';return;
+    try{var raw=JSON.parse(localStorage.getItem('woodin_gh_config')||'null');if(raw&&raw.token)cfg=raw;}catch(e){}
+  }
+  if(!cfg||!cfg.token){
+    err.textContent='가입 신청을 처리할 수 없습니다. 관리자에게 직접 연락해 아이디 등록을 요청하세요.';err.style.display='block';return;
   }
   var btn = document.querySelector('#gate-signup-form button');
   btn.disabled=true; btn.textContent='신청 중...';
@@ -2000,7 +2004,6 @@ async function gateDoSignup(){
       body:JSON.stringify({
         title:'[가입신청] '+name+' ('+id+')',
         body:'이름: '+name+'\n아이디: '+id+'\n비밀번호(해시불가): '+pw+'\n신청일시: '+new Date().toLocaleString('ko-KR'),
-        labels:['가입신청']
       })
     });
     if(res.ok){
@@ -2022,12 +2025,15 @@ async function admLoadPendingUsers(){
   var el = document.getElementById('adm-pending-users');
   el.innerHTML = '<div style="padding:12px;text-align:center;color:#aaa;font-size:12px">불러오는 중...</div>';
   try{
-    var res = await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues?labels=가입신청&state=open&per_page=30',{
+    var res = await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues?state=open&per_page=30',{
       headers:{'Authorization':'token '+cfg.token,'Accept':'application/vnd.github.v3+json'}
     });
     var issues = await res.json();
     if(!issues.length){el.innerHTML='<div style="padding:12px;text-align:center;color:#aaa;font-size:12px">신청 없음</div>';return;}
     el.innerHTML='';
+    // [가입신청] 제목만 필터
+    issues = issues.filter(function(i){return i.title&&i.title.indexOf('[가입신청]')===0;});
+    if(!issues.length){el.innerHTML='<div style="padding:12px;text-align:center;color:#aaa;font-size:12px">신청 없음</div>';return;}
     issues.forEach(function(issue){
       // body에서 아이디/이름/비밀번호 파싱
       var lines = (issue.body||'').split('\n');

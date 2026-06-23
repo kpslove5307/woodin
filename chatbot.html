@@ -198,7 +198,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
 
 <body>
 <!-- ══ 사용자 로그인/가입 오버레이 ══ -->
-<div id="user-gate" style="position: fixed; inset: 0px; background: rgb(240, 244, 250); z-index: 99999; display: none; align-items: center; justify-content: center; flex-direction: column;">
+<div id="user-gate" style="display:none;position:fixed;inset:0;background:#f0f4fa;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column">
   <div style="background:#fff;border-radius:16px;box-shadow:0 4px 32px rgba(0,0,0,0.13);padding:32px 28px;width:90%;max-width:360px">
     <div style="text-align:center;margin-bottom:20px">
       <div style="font-size:28px;margin-bottom:6px">🔐</div>
@@ -206,9 +206,11 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
       <div style="font-size:12px;color:#90a4ae;margin-top:4px">로그인 후 이용하실 수 있습니다</div>
     </div>
     <!-- 로그인 폼 -->
-    <div id="gate-login-form" style="display: none;">
-      <input id="gate-id" type="text" placeholder="아이디" autocomplete="username" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:10px;outline:none">
-      <input id="gate-pw" type="password" placeholder="비밀번호" autocomplete="current-password" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:14px;outline:none">
+    <div id="gate-login-form">
+      <input id="gate-id" type="text" placeholder="아이디" autocomplete="username"
+        style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:10px;outline:none">
+      <input id="gate-pw" type="password" placeholder="비밀번호" autocomplete="current-password"
+        style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:14px;outline:none">
       <div id="gate-login-err" style="display:none;color:#c33;font-size:12px;margin-bottom:10px;text-align:center"></div>
       <button onclick="gateDoLogin()" style="width:100%;padding:11px;background:#1a4fa0;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">로그인</button>
       <div style="text-align:center;margin-top:12px">
@@ -220,10 +222,11 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
       </div>
     </div>
     <!-- 관리자 로그인 폼 -->
-    <div id="gate-admin-form" style="display: block;">
+    <div id="gate-admin-form" style="display:none">
       <div style="text-align:center;margin-bottom:14px;font-size:13px;color:#555;font-weight:600">⚙ 관리자 로그인</div>
-      <input id="gate-adm-pw" type="password" placeholder="관리자 비밀번호" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:12px;outline:none">
-      <div id="gate-adm-err" style="display: block; color: rgb(204, 51, 51); font-size: 12px; margin-bottom: 10px; text-align: center;">비밀번호가 올바르지 않습니다.</div>
+      <input id="gate-adm-pw" type="password" placeholder="관리자 비밀번호"
+        style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:12px;outline:none">
+      <div id="gate-adm-err" style="display:none;color:#c33;font-size:12px;margin-bottom:10px;text-align:center"></div>
       <button onclick="gateDoAdminLogin()" style="width:100%;padding:11px;background:#333;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">관리자 입장</button>
       <div style="text-align:center;margin-top:12px">
         <button onclick="gateShowLogin()" style="background:none;border:none;color:#90a4ae;font-size:12px;cursor:pointer;text-decoration:underline">← 일반 로그인으로</button>
@@ -231,9 +234,12 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
     </div>
     <!-- 가입 신청 폼 -->
     <div id="gate-signup-form" style="display:none">
-      <input id="signup-name" type="text" placeholder="이름 (예: 홍길동)" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:10px;outline:none">
-      <input id="signup-id" type="text" placeholder="아이디 (영문/숫자)" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:10px;outline:none">
-      <input id="signup-pw" type="password" placeholder="사용할 비밀번호" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:14px;outline:none">
+      <input id="signup-name" type="text" placeholder="이름 (예: 홍길동)"
+        style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:10px;outline:none">
+      <input id="signup-id" type="text" placeholder="아이디 (영문/숫자)"
+        style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:10px;outline:none">
+      <input id="signup-pw" type="password" placeholder="사용할 비밀번호"
+        style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:14px;outline:none">
       <div id="gate-signup-err" style="display:none;color:#c33;font-size:12px;margin-bottom:10px;text-align:center"></div>
       <button onclick="gateDoSignup()" style="width:100%;padding:11px;background:#28a745;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">가입 신청하기</button>
       <div style="text-align:center;margin-top:12px">
@@ -253,7 +259,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
 
 <div id="lb" style="display:none;">
   <span id="lbx" style="position:fixed;top:12px;right:16px;color:#fff;font-size:38px;cursor:pointer;line-height:1;font-weight:200;z-index:1000001;">×</span>
-  <div id="lb-wrap"><img id="lbi" src="" alt="" style="transform: translate(0px, 0px) scale(1);"></div>
+  <div id="lb-wrap"><img id="lbi" src="" alt="" style="transform: translate(0px, 0px) scale(1.9);"></div>
   <div id="lb-caption"></div>
   <div id="lb-zoom-btns">
     <button onclick="lbZoom(-0.3)">−</button>
@@ -277,9 +283,12 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
 <div id="user-chpw-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99998;align-items:center;justify-content:center">
   <div style="background:#fff;border-radius:14px;padding:28px 24px;width:88%;max-width:320px;box-shadow:0 4px 24px rgba(0,0,0,0.18)">
     <div style="font-size:15px;font-weight:700;color:#333;margin-bottom:18px;text-align:center">🔑 비밀번호 변경</div>
-    <input id="user-chpw-cur" type="password" placeholder="현재 비밀번호" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-bottom:10px;outline:none">
-    <input id="user-chpw-new" type="password" placeholder="새 비밀번호" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-bottom:10px;outline:none">
-    <input id="user-chpw-confirm" type="password" placeholder="새 비밀번호 확인" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-bottom:12px;outline:none">
+    <input id="user-chpw-cur" type="password" placeholder="현재 비밀번호"
+      style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-bottom:10px;outline:none">
+    <input id="user-chpw-new" type="password" placeholder="새 비밀번호"
+      style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-bottom:10px;outline:none">
+    <input id="user-chpw-confirm" type="password" placeholder="새 비밀번호 확인"
+      style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-bottom:12px;outline:none">
     <div id="user-chpw-err" style="display:none;color:#c33;font-size:12px;margin-bottom:10px;text-align:center"></div>
     <div style="display:flex;gap:8px">
       <button onclick="userDoChpw()" style="flex:1;padding:10px;background:#1a4fa0;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">변경</button>
@@ -395,10 +404,10 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
     <div class="adm-edit-view on" id="adm-edit-view">
       <label id="adm-sel-label" for="adm-product-sel">제품 선택</label>
       <input type="text" id="adm-product-search" placeholder="🔍 제품명 검색..." oninput="admFilterProducts(this.value)">
-      <select id="adm-product-sel" onchange="admLoadProduct()"><option value="">-- 제품을 선택하세요 --</option><option value="(구)비지오그란데(블랙25715)">(구)비지오그란데(블랙25715)</option><option value="(신)행거양방커버(34*33/2m)">(신)행거양방커버(34*33/2m)</option><option value="(신)행거양방커버(34*33/3m)">(신)행거양방커버(34*33/3m)</option><option value="30kg댐퍼용행거철물(2방)">30kg댐퍼용행거철물(2방)</option><option value="F/L유리도어힌지">F/L유리도어힌지</option><option value="L가이드">L가이드</option><option value="NEW AL 라운드 아웃커브">NEW AL 라운드 아웃커브</option><option value="NEW AL 라운드 인커브">NEW AL 라운드 인커브</option><option value="NEW 목문스윙힌지">NEW 목문스윙힌지</option><option value="NEW 목문스윙힌지(쪽문용)">NEW 목문스윙힌지(쪽문용)</option><option value="NEW 반달핸들">NEW 반달핸들</option><option value="NEW 슬림라운드핸들">NEW 슬림라운드핸들</option><option value="PVC 아웃코너-백골">PVC 아웃코너-백골</option><option value="PVC 인코너-백골">PVC 인코너-백골</option><option value="PVC 히든걸레받이-백골">PVC 히든걸레받이-백골</option><option value="PVC걸레받이-백골">PVC걸레받이-백골</option><option value="PVC마이너스몰딩 12T">PVC마이너스몰딩 12T</option><option value="PVC마이너스몰딩 9T">PVC마이너스몰딩 9T</option><option value="PVC백색 25 2계단-백골">PVC백색 25 2계단-백골</option><option value="PVC백색 30 2계단-백골">PVC백색 30 2계단-백골</option><option value="PVC평몰딩 100평-백골">PVC평몰딩 100평-백골</option><option value="PVC평몰딩 25평-백골">PVC평몰딩 25평-백골</option><option value="PVC평몰딩 30평-백골">PVC평몰딩 30평-백골</option><option value="PVC평몰딩 40평-백골">PVC평몰딩 40평-백골</option><option value="PVC평몰딩 60평-백골">PVC평몰딩 60평-백골</option><option value="PVC평몰딩 80평-백골">PVC평몰딩 80평-백골</option><option value="SH05(엣찌풀-매립손잡이)">SH05(엣찌풀-매립손잡이)</option><option value="pvc마이너스몰딩(12T),(SS-1602),T자">pvc마이너스몰딩(12T),(SS-1602),T자</option><option value="pvc마이너스몰딩(9T),(SS-1601),T자">pvc마이너스몰딩(9T),(SS-1601),T자</option><option value="강화이지경첩(블랙-갑)">강화이지경첩(블랙-갑)</option><option value="강화이지경첩(실버-갑)">강화이지경첩(실버-갑)</option><option value="강화이지경첩(화이트-갑)">강화이지경첩(화이트-갑)</option><option value="글라스슬라이딩 세트/3m">글라스슬라이딩 세트/3m</option><option value="나비경첩(실버-갑)">나비경첩(실버-갑)</option><option value="나비경첩(황동-갑)">나비경첩(황동-갑)</option><option value="노출형행거댐퍼(40kg)">노출형행거댐퍼(40kg)</option><option value="노출형행거댐퍼(60kg)">노출형행거댐퍼(60kg)</option><option value="노출형행거세트(2m-검정)">노출형행거세트(2m-검정)</option><option value="노출형행거세트(2m-백색)">노출형행거세트(2m-백색)</option><option value="노출형행거세트(3m-검정)">노출형행거세트(3m-검정)</option><option value="노출형행거세트(3m-백색)">노출형행거세트(3m-백색)</option><option value="댐퍼용행거철물(1방)60KG">댐퍼용행거철물(1방)60KG</option><option value="댐퍼용행거철물(2방)60KG">댐퍼용행거철물(2방)60KG</option><option value="데드락 P-99">데드락 P-99</option><option value="도어스토퍼(골드)">도어스토퍼(골드)</option><option value="도어스토퍼(바닥고정형-골드)">도어스토퍼(바닥고정형-골드)</option><option value="도어스토퍼(바닥고정형-앤틱브론즈)">도어스토퍼(바닥고정형-앤틱브론즈)</option><option value="도어스토퍼(스프링내장형-블랙)">도어스토퍼(스프링내장형-블랙)</option><option value="도어스토퍼(스프링내장형-실버)">도어스토퍼(스프링내장형-실버)</option><option value="도어스토퍼(실버)">도어스토퍼(실버)</option><option value="롱핸들">롱핸들</option><option value="리빙보드(자개-10자)">리빙보드(자개-10자)</option><option value="리빙보드(자개-12자)">리빙보드(자개-12자)</option><option value="리빙보드(자개-8자)">리빙보드(자개-8자)</option><option value="리빙보드(펄백색-10자)">리빙보드(펄백색-10자)</option><option value="리빙보드(펄백색-12자)">리빙보드(펄백색-12자)</option><option value="리빙보드(펄백색-8자)">리빙보드(펄백색-8자)</option><option value="모티스락 P-21">모티스락 P-21</option><option value="모티스락 P-31">모티스락 P-31</option><option value="모티스락 P-71">모티스락 P-71</option><option value="모티스락-루이*">모티스락-루이*</option><option value="모티스락-샤프*">모티스락-샤프*</option><option value="모티스락-웨이브(흑니켈)*">모티스락-웨이브(흑니켈)*</option><option value="범퍼">범퍼</option><option value="범퍼(화이트)">범퍼(화이트)</option><option value="벽체고정용레일세트(검정)">벽체고정용레일세트(검정)</option><option value="볼레치">볼레치</option><option value="부착형 도어캐치">부착형 도어캐치</option><option value="비지오그란데(그래닛화이트56017)">비지오그란데(그래닛화이트56017)</option><option value="비지오그란데(베이지56029)">비지오그란데(베이지56029)</option><option value="비지오그란데(슬레이트그레이56018)">비지오그란데(슬레이트그레이56018)</option><option value="비지오그란데(시멘트베이지56022)">비지오그란데(시멘트베이지56022)</option><option value="사각포인트몰딩">사각포인트몰딩</option><option value="사각핸들">사각핸들</option><option value="세이프힌지(벽체형)">세이프힌지(벽체형)</option><option value="세이프힌지SET(하드웨별도)">세이프힌지SET(하드웨별도)</option><option value="스프링경첩(갑)">스프링경첩(갑)</option><option value="슬라이딩 모티스(미닫이용)">슬라이딩 모티스(미닫이용)</option><option value="슬라이딩락_고급형(레버타입)">슬라이딩락_고급형(레버타입)</option><option value="슬라이딩락_고급형(키타입/35T용)">슬라이딩락_고급형(키타입/35T용)</option><option value="슬라이딩락_고급형(키타입/40T이상)">슬라이딩락_고급형(키타입/40T이상)</option><option value="슬라이딩락_버튼타입(신형)">슬라이딩락_버튼타입(신형)</option><option value="실린더 P-01">실린더 P-01</option><option value="실린더 P-02">실린더 P-02</option><option value="실린더 P-03">실린더 P-03</option><option value="실린더 P-04">실린더 P-04</option><option value="실린더 P-05">실린더 P-05</option><option value="실린더 P-51">실린더 P-51</option><option value="실린더 PM-01">실린더 PM-01</option><option value="실린더 PM-02">실린더 PM-02</option><option value="실린더(W20그레이)">실린더(W20그레이)</option><option value="실린더(W20그레이-KEY)">실린더(W20그레이-KEY)</option><option value="실린더(W20블랙)">실린더(W20블랙)</option><option value="실린더(W20블랙-KEY)">실린더(W20블랙-KEY)</option><option value="실린더(W30그레이)">실린더(W30그레이)</option><option value="실린더(네모-블랙)">실린더(네모-블랙)</option><option value="실린더(네모-화이트)">실린더(네모-화이트)</option><option value="실린더(네오-실버)">실린더(네오-실버)</option><option value="실린더(로우-소구경)">실린더(로우-소구경)</option><option value="실린더(샤프B-소구경)">실린더(샤프B-소구경)</option><option value="실린더(소구경,플란-EB)">실린더(소구경,플란-EB)</option><option value="실린더(소구경,플란-골드)">실린더(소구경,플란-골드)</option><option value="실린더(소구경,플란-실버)">실린더(소구경,플란-실버)</option><option value="실린더(실키,유광골드)">실린더(실키,유광골드)</option><option value="실린더(엣지)">실린더(엣지)</option><option value="실린더(카누-소구경)">실린더(카누-소구경)</option><option value="실린더(크리스탈)">실린더(크리스탈)</option><option value="실린더(파이프-블랙)">실린더(파이프-블랙)</option><option value="실린더(포마-골드)">실린더(포마-골드)</option><option value="실린더(포마-흑니켈)">실린더(포마-흑니켈)</option><option value="실린더(포쉬-골드)">실린더(포쉬-골드)</option><option value="실린더(포쉬-흑니켈)">실린더(포쉬-흑니켈)</option><option value="실린더-데드락(하프)">실린더-데드락(하프)</option><option value="실린더-엣지라인(45T용)">실린더-엣지라인(45T용)</option><option value="실린더-엣지라인(하프)">실린더-엣지라인(하프)</option><option value="아크릴 손잡이">아크릴 손잡이</option><option value="안전체(손끼임방지)">안전체(손끼임방지)</option><option value="양개(샤프-모티스 + 더미)">양개(샤프-모티스 + 더미)</option><option value="에어타이트A(1000-수입)">에어타이트A(1000-수입)</option><option value="에어타이트A(832-수입)">에어타이트A(832-수입)</option><option value="오도시 마감캡(14*25)">오도시 마감캡(14*25)</option><option value="오도시(매입형-96*18)">오도시(매입형-96*18)</option><option value="오목이(SH09-브론즈)">오목이(SH09-브론즈)</option><option value="오목이(SH09-실버)">오목이(SH09-실버)</option><option value="오목이(SHN-23)엔틱그레이">오목이(SHN-23)엔틱그레이</option><option value="오목이(SHN-23)화이트">오목이(SHN-23)화이트</option><option value="오목이(SHN04-브론즈)">오목이(SHN04-브론즈)</option><option value="오목이(SHN04-블랙)">오목이(SHN04-블랙)</option><option value="오목이(SHN04-실버)">오목이(SHN04-실버)</option><option value="오목이(SHN21-그레이)">오목이(SHN21-그레이)</option><option value="오목이(SHN21-화이트)">오목이(SHN21-화이트)</option><option value="오목이(SHWD-무광골드)">오목이(SHWD-무광골드)</option><option value="오목이(SHWD-블랙/헤어라인)">오목이(SHWD-블랙/헤어라인)</option><option value="이지경첩(SUS-갑)">이지경첩(SUS-갑)</option><option value="이지경첩(도금-갑)">이지경첩(도금-갑)</option><option value="이지경첩(블랙-갑)">이지경첩(블랙-갑)</option><option value="이지경첩(유광골드-갑)">이지경첩(유광골드-갑)</option><option value="이지경첩(화이트-갑)">이지경첩(화이트-갑)</option><option value="인스퀘어(흑니켈)">인스퀘어(흑니켈)</option><option value="자석캐처">자석캐처</option><option value="제네로스윙 전용 손잡이 블랙">제네로스윙 전용 손잡이 블랙</option><option value="제네로스윙 전용 손잡이 실버">제네로스윙 전용 손잡이 실버</option><option value="조이너">조이너</option><option value="조절식스트라이크(국산)">조절식스트라이크(국산)</option><option value="차음경첩">차음경첩</option><option value="차음스트라이크">차음스트라이크</option><option value="캡핸들">캡핸들</option><option value="클래식몰딩 100걸레받이">클래식몰딩 100걸레받이</option><option value="클래식몰딩 15대칭">클래식몰딩 15대칭</option><option value="클래식몰딩 20비대칭">클래식몰딩 20비대칭</option><option value="클래식몰딩 22대칭">클래식몰딩 22대칭</option><option value="클래식몰딩 2계단 25">클래식몰딩 2계단 25</option><option value="클래식몰딩 2계단 35">클래식몰딩 2계단 35</option><option value="클래식몰딩 30비대칭">클래식몰딩 30비대칭</option><option value="클래식몰딩 31마감재">클래식몰딩 31마감재</option><option value="클래식몰딩 40대칭">클래식몰딩 40대칭</option><option value="클래식몰딩 40비대칭">클래식몰딩 40비대칭</option><option value="클래식몰딩 40평">클래식몰딩 40평</option><option value="클래식몰딩 42마감재">클래식몰딩 42마감재</option><option value="클래식몰딩 50대칭">클래식몰딩 50대칭</option><option value="클래식몰딩 50마감재">클래식몰딩 50마감재</option><option value="클래식몰딩 50비대칭">클래식몰딩 50비대칭</option><option value="클래식몰딩 55걸레받이">클래식몰딩 55걸레받이</option><option value="클래식몰딩 60비대칭">클래식몰딩 60비대칭</option><option value="클래식몰딩 60평">클래식몰딩 60평</option><option value="클래식몰딩 66허리">클래식몰딩 66허리</option><option value="클래식몰딩 70걸레받이">클래식몰딩 70걸레받이</option><option value="클래식몰딩 80걸레받이">클래식몰딩 80걸레받이</option><option value="클래식몰딩 80평">클래식몰딩 80평</option><option value="클래식몰딩 90천장">클래식몰딩 90천장</option><option value="클래식포인트템바보드">클래식포인트템바보드</option><option value="풀핸들(모던)">풀핸들(모던)</option><option value="하부인조대리석">하부인조대리석</option><option value="행거레일(32*38/2m)">행거레일(32*38/2m)</option><option value="행거레일(32*38/3m)">행거레일(32*38/3m)</option><option value="행거철물(32*38)">행거철물(32*38)</option><option value="행거하부가이드(공용-10파이)">행거하부가이드(공용-10파이)</option><option value="히든경첩_미니(블랙)">히든경첩_미니(블랙)</option><option value="히든경첩_미니(화이트)">히든경첩_미니(화이트)</option><option value="히든도어클로저(650~)">히든도어클로저(650~)</option><option value="힐링월(380)_폰티아화이트">힐링월(380)_폰티아화이트</option><option value="힐링월HG방염(380)_브론자이트">힐링월HG방염(380)_브론자이트</option><option value="힐링월HG방염(380)_살로메">힐링월HG방염(380)_살로메</option><option value="힐링월몰딩(19*10)_그레이">힐링월몰딩(19*10)_그레이</option><option value="힐링월몰딩(19*10)_그레이스톤">힐링월몰딩(19*10)_그레이스톤</option><option value="힐링월몰딩(19*10)_라반트S1">힐링월몰딩(19*10)_라반트S1</option><option value="힐링월몰딩(19*10)_브론자이트">힐링월몰딩(19*10)_브론자이트</option><option value="힐링월몰딩(19*10)_브론자이트(HG)">힐링월몰딩(19*10)_브론자이트(HG)</option><option value="힐링월몰딩(19*10)_블랙">힐링월몰딩(19*10)_블랙</option><option value="힐링월몰딩(19*10)_살로메(HG)">힐링월몰딩(19*10)_살로메(HG)</option><option value="힐링월몰딩(19*10)_솔리노V1">힐링월몰딩(19*10)_솔리노V1</option><option value="힐링월몰딩(19*10)_알제이오크">힐링월몰딩(19*10)_알제이오크</option><option value="힐링월몰딩(19*10)_카산드라V1">힐링월몰딩(19*10)_카산드라V1</option><option value="힐링월몰딩(19*10)_카스피오S1">힐링월몰딩(19*10)_카스피오S1</option><option value="힐링월몰딩(19*10)_폰티아화이트">힐링월몰딩(19*10)_폰티아화이트</option><option value="힐링월몰딩(19*19)_그레이">힐링월몰딩(19*19)_그레이</option><option value="힐링월몰딩(19*19)_그레이스톤">힐링월몰딩(19*19)_그레이스톤</option><option value="힐링월몰딩(19*19)_라반트S1">힐링월몰딩(19*19)_라반트S1</option><option value="힐링월몰딩(19*19)_브론자이트">힐링월몰딩(19*19)_브론자이트</option><option value="힐링월몰딩(19*19)_브론자이트(HG)">힐링월몰딩(19*19)_브론자이트(HG)</option><option value="힐링월몰딩(19*19)_블랙">힐링월몰딩(19*19)_블랙</option><option value="힐링월몰딩(19*19)_살로메(HG)">힐링월몰딩(19*19)_살로메(HG)</option><option value="힐링월몰딩(19*19)_솔리노V1">힐링월몰딩(19*19)_솔리노V1</option><option value="힐링월몰딩(19*19)_카산드라V1">힐링월몰딩(19*19)_카산드라V1</option><option value="힐링월몰딩(19*19)_카스피오S1">힐링월몰딩(19*19)_카스피오S1</option><option value="힐링월몰딩(19*19)_폰티아화이트">힐링월몰딩(19*19)_폰티아화이트</option><option value="힐링월방염(380)_그레이스톤">힐링월방염(380)_그레이스톤</option><option value="힐링월방염(380)_솔리노V1">힐링월방염(380)_솔리노V1</option><option value="힐링월방염(380)_알제이오크">힐링월방염(380)_알제이오크</option><option value="힐링월방염(380)_카산드라베이지">힐링월방염(380)_카산드라베이지</option><option value="힐링월방염(590)_라반트S1">힐링월방염(590)_라반트S1</option><option value="힐링월방염(590)_솔리노V1">힐링월방염(590)_솔리노V1</option><option value="힐링월방염(590)_카산드라V1">힐링월방염(590)_카산드라V1</option><option value="힐링월방염(590)_카스피오S1">힐링월방염(590)_카스피오S1</option><option value="힐링월방염(800)_솔리노V1">힐링월방염(800)_솔리노V1</option><option value="힐링월방염(800)_카산드라베이지">힐링월방염(800)_카산드라베이지</option></select>
+      <select id="adm-product-sel" onchange="admLoadProduct()"><option value="">-- 제품을 선택하세요 --</option><option value="(신)행거양방커버(34*33/2m)">(신)행거양방커버(34*33/2m)</option><option value="(신)행거양방커버(34*33/3m)">(신)행거양방커버(34*33/3m)</option></select>
 
       <!-- 기본정보 편집 -->
-      <div class="adm-sec" id="adm-meta-sec" style="display: none;">
+      <div class="adm-sec" id="adm-meta-sec" style="display: block;">
         <p class="adm-sec-hd">📝 기본 정보</p>
         <div class="adm-field">
           <label>제품명</label>
@@ -410,7 +419,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
         </div>
         <div class="adm-field">
           <label>규격/상세 정보 <span style="font-weight:400;color:#aaa">(행 추가 가능)</span></label>
-          <div class="adm-info-rows" id="adm-edit-info-rows"></div>
+          <div class="adm-info-rows" id="adm-edit-info-rows"><div class="adm-info-row"><input type="text" placeholder="항목 (예: 규격)"><input type="text" placeholder="값 (예: 10×40mm)"><button>×</button></div></div>
           <button class="adm-add-row" onclick="admAddInfoRow('adm-edit-info-rows')">＋ 행 추가</button>
         </div>
       </div>
@@ -418,7 +427,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
       <!-- 실물 이미지 -->
       <div class="adm-sec">
         <p class="adm-sec-hd">📷 실물 이미지</p>
-        <div class="adm-grid" id="adm-real-grid"><p class="adm-empty">(이미지 없음)</p></div>
+        <div class="adm-grid" id="adm-real-grid"><div class="adm-card"><img src="" alt="커버"><div class="adm-card-lbl">커버</div><div class="adm-del-ov"><span>×</span></div></div></div>
         <div class="adm-drop" id="adm-real-drop" onclick="document.getElementById('adm-real-file').click()">
           <input type="file" id="adm-real-file" accept="image/*" multiple="" onchange="admHandleFiles(this,'real')">
           ＋ 클릭 또는 드래그하여 실물 이미지 추가
@@ -455,7 +464,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
       <div class="adm-foot">
         <button class="adm-save" onclick="admSave()">💾 저장</button>
         <button class="adm-save" style="background:#28a745" onclick="admSaveAndPush()">🚀 저장 + GitHub 업로드</button>
-        <button class="adm-del-product-btn" id="adm-del-btn" style="display: none;" onclick="admDeleteProduct()">🗑 제품 삭제</button>
+        <button class="adm-del-product-btn" id="adm-del-btn" style="" onclick="admDeleteProduct()">🗑 제품 삭제</button>
         <button class="adm-close-btn" onclick="admClosePanel()">닫기</button>
       </div>
     </div>
@@ -1009,10 +1018,10 @@ function admGetCurrentHTML(){
   }catch(e){console.error('DB 직렬화 오류:',e);}
 
   // 비밀번호 반영
-  html=html.replace(/var ADM_PW='dnels1212';]*;/,'var ADM_PW=\''+ADM_PW.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+"';");
+  html=html.replace(/var ADM_PW=[^;]*;/,'var ADM_PW=\''+ADM_PW.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+"';");
 
   // 사용자 목록 반영
-  html=html.replace(/var ADM_USERS=[];]*;/,'var ADM_USERS='+JSON.stringify(ADM_USERS)+';');
+  html=html.replace(/var ADM_USERS=[^;]*;/,'var ADM_USERS='+JSON.stringify(ADM_USERS)+';');
 
   // 카테고리 반영
   html=html.replace(/var ADM_CATS=\[.*?\];/,'var ADM_CATS='+JSON.stringify(ADM_CATS)+';');
@@ -1185,7 +1194,10 @@ function admDoChangePw(){
   if(nw!==cf){err.textContent='새 비밀번호가 일치하지 않습니다.';err.style.display='block';return;}
   ADM_PW=nw;
   admCloseChangePw();
-  alert('✅ 비밀번호가 변경되었습니다.\n🚀 반드시 GitHub 업로드를 눌러야 모든 기기에 영구 저장됩니다!');
+  // 비밀번호 변경 즉시 GitHub 업로드
+  admPushToGitHub(function(){
+    alert('✅ 비밀번호가 변경되어 저장되었습니다!');
+  });
 }
 function admFilterProducts(query){
   var sel=document.getElementById('adm-product-sel');

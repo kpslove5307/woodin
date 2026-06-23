@@ -271,9 +271,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
     </div>
     <!-- 폼 -->
     <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
-      <input id="side-writer" type="text" placeholder="이름 및 대리점명"
-        style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid #e0e7f0;border-radius:10px;font-size:13px;outline:none;font-family:inherit"
-        onfocus="this.style.borderColor='#1a4fa0'" onblur="this.style.borderColor='#e0e7f0'">
+
       <textarea id="side-content" placeholder="내용을 입력하세요&#10;예) P-01 블루 컬러 추가 요청&#10;예) 실린더 규격표 상세설명 추가 요청" rows="6"
         style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid #e0e7f0;border-radius:10px;font-size:13px;resize:vertical;font-family:inherit;outline:none;line-height:1.6"
         onfocus="this.style.borderColor='#1a4fa0'" onblur="this.style.borderColor='#e0e7f0'"></textarea>
@@ -2086,12 +2084,11 @@ async function gateDoSignup(){
 
 /* ══ 사이드 패널 문의 제출 ══ */
 async function sideInquirySubmit(){
-  var writer  = (document.getElementById('side-writer').value||'').trim();
+  var writer  = (CURRENT_USER&&CURRENT_USER.name)||'사용자';
   var content = (document.getElementById('side-content').value||'').trim();
   var err     = document.getElementById('side-err');
   var okEl    = document.getElementById('side-ok');
   err.style.display='none'; okEl.style.display='none';
-  if(!writer){err.textContent='이름 및 대리점명을 입력하세요.';err.style.display='block';return;}
   if(!content){err.textContent='내용을 입력하세요.';err.style.display='block';return;}
   var cfg = getIssueConfig();
   var btn = document.querySelector('#side-panel button');

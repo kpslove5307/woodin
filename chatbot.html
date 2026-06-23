@@ -1906,7 +1906,8 @@ function respond(q){
         if(p.info)p.info.forEach(function(row){detailParts.push(row[0]);detailParts.push(row[1]);});
         if(p.descText)detailParts.push(p.descText);
         var detailTxt=detailParts.join(' ').toLowerCase();
-        var detailMatch=words.filter(function(w){return detailTxt.indexOf(w.toLowerCase())!==-1;}).length;
+        var detailTxtNospace=detailTxt.replace(/\s/g,'');
+        var detailMatch=words.filter(function(w){return detailTxt.indexOf(w.toLowerCase())!==-1||detailTxtNospace.indexOf(w.toLowerCase())!==-1;}).length;
         if(detailMatch===0)return false;
       }
       return true;

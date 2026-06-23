@@ -2473,14 +2473,20 @@ function showUserReplies(){
 async function loadMyInquiries(){
   if(!CURRENT_USER)return;
   var cfg=getIssueConfig();
-  var user=ADM_USERS.filter(function(u){
-    return u.id===CURRENT_USER.id||u.name===CURRENT_USER.name;
-  })[0];
 
-  function setLoading(containerId){
-    var el=document.getElementById(containerId);
+  // 현재 로그인 사용자의 replies 가져오기
+  var myUser=null;
+  for(var ui=0;ui<ADM_USERS.length;ui++){
+    if(ADM_USERS[ui].id===CURRENT_USER.id||ADM_USERS[ui].name===CURRENT_USER.name){
+      myUser=ADM_USERS[ui]; break;
+    }
+  }
+
+  function setLoading(cid){
+    var el=document.getElementById(cid);
     if(el)el.innerHTML='<div style="text-align:center;color:#aaa;font-size:12px;padding:16px">불러오는 중...</div>';
   }
+
   function renderInquiries(containerId, sectionId, issues){
     var container=document.getElementById(containerId);
     var section=document.getElementById(sectionId);
@@ -2502,13 +2508,18 @@ async function loadMyInquiries(){
       var dateMatch=(issue.body||'').match(/접수일시: (.+)/);
       var dateStr=dateMatch?dateMatch[1].trim():'';
 
-      // 이 이슈에 대한 관리자 답글 찾기
+      // 답글 찾기 - myUser에서 직접 참조
       var reply=null;
-      if(user&&user.replies){
-        reply=user.replies.filter(function(r){return Number(r.issueNum)===Number(issue.number);})[0]||null;
+      if(myUser&&myUser.replies){
+        for(var ri=0;ri<myUser.replies.length;ri++){
+          if(Number(myUser.replies[ri].issueNum)===Number(issue.number)){
+            reply=myUser.replies[ri]; break;
+          }
+        }
       }
 
       var card=document.createElement('div');
+      card.className='user-inq-card';
       card.style.cssText='background:#f8f9fc;border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1px solid #e8edf5';
       card.dataset.issueNum=issue.number;
       card.innerHTML=
@@ -2519,12 +2530,12 @@ async function loadMyInquiries(){
         +'<span style="font-size:11px;color:#aaa">'+dateStr+'</span>'
         +'<button onclick="userDeleteOneInquiry('+issue.number+',this)" style="margin-left:auto;padding:2px 8px;background:#fff0f0;border:1px solid #fcc;border-radius:6px;font-size:11px;cursor:pointer;color:#c33">🗑 삭제</button>'
         +'</div>'
-        +'<div style="font-size:13px;color:#333;white-space:pre-wrap;line-height:1.7;margin-bottom:'+(reply?'10px':'0')+'">'+contentText+'</div>'
+        +'<div style="font-size:13px;color:#333;white-space:pre-wrap;line-height:1.7;margin-bottom:'+(reply?'10px':'4px')+'">'+contentText+'</div>'
         +(reply
           ?'<div style="background:#fff;border-left:3px solid #1a4fa0;padding:8px 12px;border-radius:0 8px 8px 0;margin-top:6px">'
            +'<div style="font-size:11px;color:#1a4fa0;font-weight:700;margin-bottom:4px">📣 관리자 답글 <span style="font-weight:400;color:#aaa">'+reply.date+'</span></div>'
            +'<div style="font-size:12px;color:#333;white-space:pre-wrap;line-height:1.6">'+reply.text+'</div></div>'
-          :'<div style="font-size:11px;color:#aaa;margin-top:6px">⏳ 답글 대기 중</div>')
+          :'<div style="font-size:11px;color:#aaa;margin-top:2px">⏳ 답글 대기 중</div>')
         +'</div></div>';
       container.appendChild(card);
     });
@@ -2538,15 +2549,11 @@ async function loadMyInquiries(){
       headers:{'Authorization':'token '+cfg.token,'Accept':'application/vnd.github.v3+json'}
     });
     var all=await res.json();
-    // 내 이름으로 된 [문의] 이슈만 필터
     var myName=CURRENT_USER.name||CURRENT_USER.id;
     var mine=all.filter(function(i){
       if(!i.title)return false;
       var t=i.title;
-      // [문의] 또는 [삭제됨] [문의] 포함, 내 이름 포함, 단 [삭제됨]은 제외
-      return (t.indexOf('[문의]')===0||t.indexOf('[삭제됨] [문의]')===0)
-        &&t.indexOf(myName)!==-1
-        &&t.indexOf('[삭제됨]')===-1;
+      return (t.indexOf('[문의]')===0)&&t.indexOf('[삭제됨]')===-1&&t.indexOf(myName)!==-1;
     });
     renderInquiries('user-replies-box','user-replies-section',mine);
     renderInquiries('modal-replies-box','modal-replies-section',mine);
@@ -2557,7 +2564,6 @@ async function loadMyInquiries(){
     });
   }
 }
-
 
 /* ══ 문의 선택 삭제 ══ */
 function admUpdateCheckCount(){

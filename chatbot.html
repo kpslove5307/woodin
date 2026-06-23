@@ -1883,11 +1883,6 @@ function gateInit(){
       return;
     }
   } catch(e){}
-  // 미로그인이지만 사용자 목록이 비어있으면(초기상태) 바로 접근 허용
-  if(!ADM_USERS.length){
-    document.getElementById('user-gate').style.display='none';
-    return;
-  }
   document.getElementById('user-gate').style.display='flex';
 }
 

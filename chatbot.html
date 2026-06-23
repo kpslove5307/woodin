@@ -2484,10 +2484,12 @@ async function admLoadPendingUsers(){
             headers:{'Authorization':'token '+cfg.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
             body:JSON.stringify({state:'closed'})
           });
-          row.style.opacity='0.4';
           btnApprove.disabled=true;
           btnReject.disabled=true;
-          alert('"'+n+'"님을 승인했습니다. 🚀 GitHub 업로드를 눌러 저장하세요.');
+          admPushToGitHub(function(){
+            row.remove();
+            alert('"'+n+'"님 승인 완료! ✅');
+          });
         };
       })(uName, uId, uPw, issue.number);
       var btnReject = document.createElement('button');
@@ -2501,9 +2503,9 @@ async function admLoadPendingUsers(){
             headers:{'Authorization':'token '+cfg.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
             body:JSON.stringify({state:'closed'})
           });
-          row.style.opacity='0.3';
           btnApprove.disabled=true;
           btnReject.disabled=true;
+          setTimeout(function(){row.remove();}, 500);
         };
       })(uName, issue.number);
       row.appendChild(btnApprove);

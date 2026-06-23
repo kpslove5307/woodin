@@ -267,7 +267,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
     <!-- 헤더 -->
     <div style="background:linear-gradient(135deg,#1a4fa0,#1565c0);color:#fff;padding:16px 18px">
       <div style="font-size:14px;font-weight:700;margin-bottom:4px">✏️ 제품 추가 · 개선 요청</div>
-      <div id="side-inquiry-desc" style="font-size:11px;opacity:0.85;line-height:1.6">하드웨어 중 추가를 원하는 제품이나<br>개선을 바라는 점을 적어 주시면<br>관리자가 확인 후 피드백 드립니다.</div>
+      <div id="side-inquiry-desc" style="font-size:11px;opacity:0.85;line-height:1.6"></div>
     </div>
     <!-- 폼 -->
     <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
@@ -2970,6 +2970,11 @@ document.getElementById('gate-adm-pw').addEventListener('keydown',function(e){if
 ii.addEventListener('keydown',function(e){if(e.key==='Enter')handleInput(ii.value);});
 
 gateInit();
+// 문의 안내 문구 즉시 적용
+(function(){
+  var sd=document.getElementById('side-inquiry-desc');
+  if(sd&&typeof ADM_INQUIRY_TEXT!=='undefined')sd.innerHTML=ADM_INQUIRY_TEXT;
+})();
 addBot(ADM_NOTICE,ADM_CATS);
 </script>
 

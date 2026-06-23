@@ -203,7 +203,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
 
 <body>
 <!-- ══ 사용자 로그인/가입 오버레이 ══ -->
-<div id="user-gate" style="position: fixed; inset: 0px; background: rgb(240, 244, 250); z-index: 99999; display: none; align-items: center; justify-content: center; flex-direction: column;">
+<div id="user-gate" style="position: fixed; inset: 0px; background: rgb(240, 244, 250); z-index: 99999; display: flex; align-items: center; justify-content: center; flex-direction: column;">
   <div style="background:#fff;border-radius:16px;box-shadow:0 4px 32px rgba(0,0,0,0.13);padding:32px 28px;width:90%;max-width:360px">
     <div style="text-align:center;margin-bottom:20px">
       <div style="font-size:28px;margin-bottom:6px">🔐</div>
@@ -1182,7 +1182,7 @@ function admGetCurrentHTML(){
 
   // 사용자 목록 반영
   // ADM_USERS 반영 - MARKER 방식
-  var usS='/*USERS_START*/';var usE='/*USERS_END*/';
+  var usS='/*USERS_START*/[{"id":"1234","name":"테스트1234","pw":"1234"},{"id":"우딘","name":"우딘","pw":"1234","replies":[{"issueNum":24,"text":"JS 테스트 답글입니다","date":"2026. 6. 24."}]}]/*USERS_END*/';
   var usSi=html.indexOf(usS);var usEi=html.indexOf(usE);
   if(usSi!==-1&&usEi!==-1){
     html=html.substring(0,usSi)+usS+JSON.stringify(ADM_USERS)+usE+html.substring(usEi+usE.length);
@@ -3033,4 +3033,4 @@ addBot(ADM_NOTICE,ADM_CATS);
 </script>
 
 
-</body></html>
+<textarea id="test-reply-area"></textarea></body></html>

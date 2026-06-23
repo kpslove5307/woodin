@@ -2247,7 +2247,7 @@ async function admLoadInquiries(){
         +replyHtml
         +'<div style="display:flex;gap:6px;margin-top:4px">'
         +'<textarea id="'+replyId+'" placeholder="답글 입력..." rows="2" style="flex:1;padding:7px 10px;border:1px solid #ddd;border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;outline:none">'+(existReply?existReply.text:'')+'</textarea>'
-        +'<button onclick="admSaveReply('+issue.number+',' + JSON.stringify(writer) + ',' + JSON.stringify(replyId) + ',this)" style="padding:6px 12px;background:#1a4fa0;color:#fff;border:none;border-radius:8px;font-size:11px;cursor:pointer;font-weight:700;align-self:flex-end">답글 저장</button>'
+        +'<button onclick="admSaveReply('+issue.number+',\''+writer+'\',\''+replyId+'\',this)" style="padding:6px 12px;background:#1a4fa0;color:#fff;border:none;border-radius:8px;font-size:11px;cursor:pointer;font-weight:700;align-self:flex-end">답글 저장</button>'
         +'</div>';
       el.appendChild(card);
     });

@@ -2247,6 +2247,12 @@ async function admLoadPendingUsers(){
     el.innerHTML='';
     // [가입신청] 제목만 필터
     issues = issues.filter(function(i){return i.title&&i.title.indexOf('[가입신청]')===0;});
+    // 이미 승인된 아이디는 제외
+    issues = issues.filter(function(i){
+      var m=i.title.match(/\(([^)]+)\)\s*$/);
+      var id=m?m[1]:'';
+      return !ADM_USERS.some(function(u){return u.id===id;});
+    });
     if(!issues.length){el.innerHTML='<div style="padding:12px;text-align:center;color:#aaa;font-size:12px">신청 없음</div>';return;}
     issues.forEach(function(issue){
       // body에서 아이디/이름/비밀번호 파싱

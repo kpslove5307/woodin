@@ -2577,6 +2577,18 @@ async function userDeleteSelectedInquiries(containerId){
   alert('✅ '+nums.length+'개 삭제되었습니다.');
 }
 
+/* ══ 사용자 문의 숨김 (localStorage) ══ */
+function userHideInquiry(issueNum){
+  var key='woodin_hidden_inq_'+(CURRENT_USER?CURRENT_USER.id:'');
+  var hidden=JSON.parse(localStorage.getItem(key)||'[]');
+  if(hidden.indexOf(issueNum)===-1)hidden.push(issueNum);
+  localStorage.setItem(key,JSON.stringify(hidden));
+}
+function userGetHiddenInquiries(){
+  var key='woodin_hidden_inq_'+(CURRENT_USER?CURRENT_USER.id:'');
+  return JSON.parse(localStorage.getItem(key)||'[]');
+}
+
 /* ══ 관리자 답글 저장 ══ */
 function admSaveReply(issueNum, writerName, replyId, btn){
   var text = (document.getElementById(replyId).value||'').trim();
@@ -2682,8 +2694,9 @@ async function loadMyInquiries(){
     var all=await res.json();
     // 내 이름으로 된 [문의] 이슈만 필터
     var myName=CURRENT_USER.name||CURRENT_USER.id;
+    var hidden=userGetHiddenInquiries();
     var mine=all.filter(function(i){
-      return i.title&&i.title.indexOf('[문의]')===0&&i.title.indexOf(myName)!==-1;
+      return i.title&&i.title.indexOf('[문의]')===0&&i.title.indexOf(myName)!==-1&&hidden.indexOf(i.number)===-1;
     });
     renderInquiries('user-replies-box','user-replies-section',mine);
     renderInquiries('modal-replies-box','modal-replies-section',mine);

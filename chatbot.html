@@ -208,7 +208,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
       <div style="font-size:12px;color:#90a4ae;margin-top:4px">로그인 후 이용하실 수 있습니다</div>
     </div>
     <!-- 로그인 폼 -->
-    <div id="gate-login-form" style="display: none;">
+    <div id="gate-login-form" style="display: block;">
       <input id="gate-id" type="text" placeholder="아이디" autocomplete="username" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:10px;outline:none">
       <input id="gate-pw" type="password" placeholder="비밀번호" autocomplete="current-password" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:14px;outline:none">
       <div id="gate-login-err" style="display:none;color:#c33;font-size:12px;margin-bottom:10px;text-align:center"></div>
@@ -222,7 +222,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
       </div>
     </div>
     <!-- 관리자 로그인 폼 -->
-    <div id="gate-admin-form" style="display: block;">
+    <div id="gate-admin-form" style="display: none;">
       <div style="text-align:center;margin-bottom:14px;font-size:13px;color:#555;font-weight:600">⚙ 관리자 로그인</div>
       <input id="gate-adm-pw" type="password" placeholder="관리자 비밀번호" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:12px;outline:none">
       <div id="gate-adm-err" style="display: block; color: rgb(204, 51, 51); font-size: 12px; margin-bottom: 10px; text-align: center;">비밀번호가 올바르지 않습니다.</div>

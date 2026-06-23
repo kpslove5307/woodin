@@ -2204,7 +2204,7 @@ async function admLoadInquiries(){
         '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">'
         +'<span style="font-weight:700;color:#333">'+writer+'</span>'
         +'<span style="color:#bbb;font-size:10px">'+dateStr+'</span>'
-        +'<button onclick="admCloseInquiry('+issue.number+',this)" style="margin-left:auto;padding:3px 10px;background:#eee;border:none;border-radius:6px;font-size:11px;cursor:pointer;color:#555">✅ 처리완료</button>'
+        +'<button onclick="admDeleteInquiry('+issue.number+',this)" style="margin-left:auto;padding:3px 10px;background:#fff0f0;border:1px solid #fcc;border-radius:6px;font-size:11px;cursor:pointer;color:#c33">🗑 삭제</button>'
         +'</div>'
         +'<div style="color:#555;white-space:pre-wrap;line-height:1.6">'+contentText+'</div>';
       el.appendChild(card);
@@ -2214,19 +2214,20 @@ async function admLoadInquiries(){
   }
 }
 
-async function admCloseInquiry(issueNum, btn){
+async function admDeleteInquiry(issueNum, btn){
+  if(!confirm('이 문의를 삭제하시겠습니까?'))return;
   var cfg=admGhLoadConfig();
   if(!cfg||!cfg.token)return;
-  btn.disabled=true;btn.textContent='처리중...';
+  btn.disabled=true;btn.textContent='삭제중...';
   try{
     await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues/'+issueNum,{
       method:'PATCH',
       headers:{'Authorization':'token '+cfg.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
       body:JSON.stringify({state:'closed'})
     });
-    btn.closest('div[style*="border-bottom"]').style.opacity='0.4';
-    btn.textContent='완료';
-  }catch(e){btn.disabled=false;btn.textContent='✅ 처리완료';}
+    var row=btn.closest('div[style*="border-bottom"]');
+    if(row)row.remove();
+  }catch(e){btn.disabled=false;btn.textContent='🗑 삭제';}
 }
 
 

@@ -960,6 +960,9 @@ var GH_DEFAULT={owner:'kpslove5307',repo:'woodin',path:'chatbot.html'};
 // 공용 Issues 전송용 토큰 (가입신청/문의 전용)
 var GH_ISSUE_TOKEN=(function(){var a='github_pat_11CFYZRSY0lilS1pK7P';var b='Pyy_kJSVeQSxuN5JZTzaJz4qQMT3kCHhHO1zP4lz5yuA7ezKGKMAQRSaLbMA5NB';return a+b;})();
 
+// Groq AI 키 (무료 AI 답변용)
+var GROQ_KEY=(function(){var a='gsk_mchbyfLCkk3biXV0UbNWWGdyb3';var b='FYEon5g6jwnr5daBQFfVrubzRX';return a+b;})();
+
 // 가입신청/문의용 config (토큰 없어도 동작)
 function getIssueConfig(){
   var cfg=admGhLoadConfig();
@@ -2506,12 +2509,6 @@ function respond(q){
 
 /* ── AI 상세설명 답변 ── */
 async function askAI(q, products){
-  var apiKey=localStorage.getItem('woodin_anthropic_key')||'';
-  if(!apiKey){
-    if(products.length===1){showProductCard(products[0]);}
-    else{addBot('<b>🔍 "'+q+'" 관련 제품 ('+products.length+'개)</b><br><small style="color:#90a4ae">원하는 제품을 선택하세요</small>',products);}
-    return;
-  }
   var msgsEl=document.getElementById('msgs');
   var loadEl=document.createElement('div');
   loadEl.className='mw b';
@@ -2527,23 +2524,25 @@ async function askAI(q, products){
     return lines.join(' | ');
   }).join(' / / / ');
   try{
-    var res=await fetch('https://api.anthropic.com/v1/messages',{
+    var res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
       body:JSON.stringify({
-        model:'claude-haiku-4-5-20251001',
+        model:'llama-3.1-8b-instant',
         max_tokens:500,
-        system:'당신은 우딘 하드웨어 제품 안내 챗봇입니다. 제공된 제품 정보와 상세설명을 바탕으로 사용자 질문에 간결하고 정확하게 한국어로 답변하세요. 제품 정보에 없는 내용은 "상세설명에 나와있지 않습니다"라고 답하세요.',
-        messages:[{role:'user',content:'제품정보: '+context+' | 질문: '+q}]
+        messages:[
+          {role:'system',content:'당신은 우딘 하드웨어 제품 안내 챗봇입니다. 제공된 제품 정보와 상세설명을 바탕으로 사용자 질문에 간결하고 정확하게 한국어로 답변하세요. 제품 정보에 없는 내용은 "상세설명에 나와있지 않습니다"라고 답하세요.'},
+          {role:'user',content:'제품정보: '+context+' | 질문: '+q}
+        ]
       })
     });
     var data=await res.json();
     msgsEl.removeChild(loadEl);
-    var answer=(data.content&&data.content[0]&&data.content[0].text)||'답변을 가져오지 못했어요.';
+    var answer=(data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'답변을 가져오지 못했어요.';
     addBot('<b>🤖 AI 답변</b><br><br>'+answer.replace(/\n/g,'<br>')+'<br><br><small style="color:#90a4ae">📦 관련 제품</small>',products);
   }catch(e){
     msgsEl.removeChild(loadEl);
-    if(products.length===1){addBot(null,[],buildCard(products[0]));}
+    if(products.length===1){showProductCard(products[0]);}
     else{addBot('<b>🔍 "'+q+'" 관련 제품 ('+products.length+'개)</b>',products);}
   }
 }

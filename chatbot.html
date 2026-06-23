@@ -1162,6 +1162,13 @@ function admGetCurrentHTML(){
   var msgsEl=document.getElementById('msgs');
   var savedMsgs=msgsEl?msgsEl.innerHTML:'';
   if(msgsEl)msgsEl.innerHTML='';
+  // replies 박스 비우기 (동적 렌더 내용이 HTML에 박히지 않도록)
+  var repliesBoxes=['user-replies-box','modal-replies-box','adm-inquiry-list','adm-pending-users','adm-approved-users'];
+  var savedReplies={};
+  repliesBoxes.forEach(function(id){
+    var el=document.getElementById(id);
+    if(el){savedReplies[id]=el.innerHTML;el.innerHTML='';}
+  });
 
   var dt=document.doctype;
   var dtStr=dt?'<!DOCTYPE '+dt.name+'>':'';
@@ -1174,6 +1181,10 @@ function admGetCurrentHTML(){
   removed.forEach(function(el){el.classList.add('show');});
   savedImgs.forEach(function(o){o.el.src=o.src;});
   if(msgsEl)msgsEl.innerHTML=savedMsgs;
+  repliesBoxes.forEach(function(id){
+    var el=document.getElementById(id);
+    if(el&&savedReplies[id]!==undefined)el.innerHTML=savedReplies[id];
+  });
 
   // DB를 문자열 치환으로 교체 (textContent 방식 대신)
   try{

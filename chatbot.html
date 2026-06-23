@@ -2442,10 +2442,11 @@ function admSaveReply(issueNum, writerName, replyId, btn){
       if(!u.replies)u.replies=[];
       var existing=u.replies.filter(function(r){return r.issueNum===issueNum;})[0];
       if(existing){
+        existing.issueNum=Number(issueNum);
         existing.text=text;
         existing.date=new Date().toLocaleDateString('ko-KR');
       } else {
-        u.replies.push({issueNum:issueNum,text:text,date:new Date().toLocaleDateString('ko-KR')});
+        u.replies.push({issueNum:Number(issueNum),text:text,date:new Date().toLocaleDateString('ko-KR')});
       }
     }
   });
@@ -2497,7 +2498,7 @@ async function loadMyInquiries(){
       // 이 이슈에 대한 관리자 답글 찾기
       var reply=null;
       if(user&&user.replies){
-        reply=user.replies.filter(function(r){return r.issueNum===issue.number;})[0]||null;
+        reply=user.replies.filter(function(r){return r.issueNum==issue.number;})[0]||null;
       }
 
       var card=document.createElement('div');

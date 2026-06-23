@@ -307,6 +307,33 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
     <button id="adm-btn" onclick="admBtnClick()">⚙ 관리자</button>
   </div>
 
+<!-- 사용자 직접추가 모달 -->
+<div id="adm-adduser-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99998;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:14px;padding:28px 24px;width:90%;max-width:360px;box-shadow:0 4px 24px rgba(0,0,0,0.18)">
+    <div style="font-size:15px;font-weight:700;color:#333;margin-bottom:18px;text-align:center">➕ 사용자 직접 추가</div>
+    <div style="margin-bottom:10px">
+      <label style="font-size:12px;color:#666;display:block;margin-bottom:4px">이름 및 대리점명</label>
+      <input id="adduser-name" type="text" placeholder="예: 홍길동 / 우딘목재"
+        style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;outline:none">
+    </div>
+    <div style="margin-bottom:10px">
+      <label style="font-size:12px;color:#666;display:block;margin-bottom:4px">아이디</label>
+      <input id="adduser-id" type="text" placeholder="영문/숫자/한글"
+        style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;outline:none">
+    </div>
+    <div style="margin-bottom:16px">
+      <label style="font-size:12px;color:#666;display:block;margin-bottom:4px">비밀번호</label>
+      <input id="adduser-pw" type="password" placeholder="4자 이상" onkeydown="if(event.key==='Enter')admDoAddUser()"
+        style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;outline:none">
+    </div>
+    <div id="adduser-err" style="display:none;color:#c33;font-size:12px;margin-bottom:10px;text-align:center"></div>
+    <div style="display:flex;gap:8px">
+      <button onclick="admDoAddUser()" style="flex:1;padding:10px;background:#1a4fa0;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">추가</button>
+      <button onclick="admCloseAddUser()" style="flex:1;padding:10px;background:#f5f5f5;color:#555;border:none;border-radius:8px;font-size:13px;cursor:pointer">취소</button>
+    </div>
+  </div>
+</div>
+
 <!-- 사용자 비밀번호 변경 모달 -->
 <div id="user-chpw-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99998;align-items:center;justify-content:center">
   <div style="background:#fff;border-radius:14px;padding:28px 24px;width:88%;max-width:320px;box-shadow:0 4px 24px rgba(0,0,0,0.18)">
@@ -697,7 +724,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
       <div class="adm-sec" style="margin-top:12px">
         <div style="font-size:13px;font-weight:700;color:#333;margin-bottom:10px">✅ 승인된 사용자</div>
         <div id="adm-approved-users" style="max-height:360px;overflow-y:auto"><div style="display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-bottom: 1px solid rgb(240, 240, 240); font-size: 12px;"><span style="flex:1"><b>테스트1234</b> <span style="color:#888">(1234)</span></span><button style="padding: 4px 10px; background: rgb(255, 255, 255); border: 1px solid rgb(255, 204, 204); border-radius: 6px; cursor: pointer; font-size: 11px; color: rgb(204, 51, 51);">🗑 삭제</button></div><div style="display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-bottom: 1px solid rgb(240, 240, 240); font-size: 12px;"><span style="flex:1"><b>우딘</b> <span style="color:#888">(우딘)</span></span><button style="padding: 4px 10px; background: rgb(255, 255, 255); border: 1px solid rgb(255, 204, 204); border-radius: 6px; cursor: pointer; font-size: 11px; color: rgb(204, 51, 51);">🗑 삭제</button></div></div>
-        <button onclick="admAddUserManual()" style="margin-top:8px;padding:7px 16px;background:#f0f4ff;border:1px solid #c5d0e8;border-radius:8px;font-size:12px;color:#1a4fa0;cursor:pointer">➕ 직접 추가</button>
+        <button onclick="admOpenAddUser()" style="margin-top:8px;padding:7px 16px;background:#f0f4ff;border:1px solid #c5d0e8;border-radius:8px;font-size:12px;color:#1a4fa0;cursor:pointer">➕ 직접 추가</button>
       </div>
       <div style="margin-top:16px;display:flex;gap:8px">
         <button onclick="admUsersSaveAndPush()" style="flex:1;padding:10px;background:#1a4fa0;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">🚀 저장 + GitHub 업로드</button>
@@ -2532,6 +2559,38 @@ function admRenderApprovedUsers(){
     btnDel.onclick=(function(idx){return function(){if(!confirm('사용자를 삭제하시겠습니까?'))return;ADM_USERS.splice(idx,1);admRenderApprovedUsers();};})(i);
     row.appendChild(btnDel);
     el.appendChild(row);
+  });
+}
+
+/* ══ 사용자 직접 추가 모달 ══ */
+function admOpenAddUser(){
+  document.getElementById('adduser-name').value='';
+  document.getElementById('adduser-id').value='';
+  document.getElementById('adduser-pw').value='';
+  document.getElementById('adduser-err').style.display='none';
+  document.getElementById('adm-adduser-modal').style.display='flex';
+  setTimeout(function(){document.getElementById('adduser-name').focus();},100);
+}
+function admCloseAddUser(){
+  document.getElementById('adm-adduser-modal').style.display='none';
+}
+function admDoAddUser(){
+  var name=(document.getElementById('adduser-name').value||'').trim();
+  var id=(document.getElementById('adduser-id').value||'').trim();
+  var pw=(document.getElementById('adduser-pw').value||'').trim();
+  var err=document.getElementById('adduser-err');
+  err.style.display='none';
+  if(!name){err.textContent='이름을 입력하세요.';err.style.display='block';return;}
+  if(!id){err.textContent='아이디를 입력하세요.';err.style.display='block';return;}
+  if(pw.length<4){err.textContent='비밀번호는 4자 이상이어야 합니다.';err.style.display='block';return;}
+  if(ADM_USERS.some(function(u){return u.id===id;})){
+    err.textContent='"'+id+'" 아이디가 이미 존재합니다.';err.style.display='block';return;
+  }
+  ADM_USERS.push({id:id,name:name,pw:pw});
+  admRenderApprovedUsers();
+  admCloseAddUser();
+  admPushToGitHub(function(){
+    alert('✅ "'+name+'"님이 추가되었습니다!');
   });
 }
 

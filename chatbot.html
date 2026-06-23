@@ -1179,7 +1179,7 @@ function admGetCurrentHTML(){
 
   // 사용자 목록 반영
   // ADM_USERS 반영 - MARKER 방식
-  var usS='/*USERS_START*/[{"id":"1234","name":"테스트1234","pw":"1234"},{"id":"우딘","name":"우딘","pw":"1234","replies":[{"issueNum":23,"text":"아아아아아아","date":"2026. 6. 23."}]}]/*USERS_END*/';
+  var usS='/*USERS_START*/';var usE='/*USERS_END*/';
   var usSi=html.indexOf(usS);var usEi=html.indexOf(usE);
   if(usSi!==-1&&usEi!==-1){
     html=html.substring(0,usSi)+usS+JSON.stringify(ADM_USERS)+usE+html.substring(usEi+usE.length);
@@ -2451,7 +2451,7 @@ function admSaveReply(issueNum, writerName, replyId, btn){
         existing.text=text;
         existing.date=new Date().toLocaleDateString('ko-KR');
       } else {
-        u.replies.push({issueNum:issueNum,text:text,date:new Date().toLocaleDateString('ko-KR')});
+        u.replies.push({issueNum:Number(issueNum),text:text,date:new Date().toLocaleDateString('ko-KR')});
       }
     }
   });
@@ -2473,7 +2473,9 @@ function showUserReplies(){
 async function loadMyInquiries(){
   if(!CURRENT_USER)return;
   var cfg=getIssueConfig();
-  var user=ADM_USERS.filter(function(u){return u.id===CURRENT_USER.id;})[0];
+  var user=ADM_USERS.filter(function(u){
+    return u.id===CURRENT_USER.id||u.name===CURRENT_USER.name;
+  })[0];
 
   function setLoading(containerId){
     var el=document.getElementById(containerId);
@@ -2503,7 +2505,7 @@ async function loadMyInquiries(){
       // 이 이슈에 대한 관리자 답글 찾기
       var reply=null;
       if(user&&user.replies){
-        reply=user.replies.filter(function(r){return r.issueNum===issue.number;})[0]||null;
+        reply=user.replies.filter(function(r){return Number(r.issueNum)===Number(issue.number);})[0]||null;
       }
 
       var card=document.createElement('div');

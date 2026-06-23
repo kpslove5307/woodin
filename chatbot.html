@@ -2129,16 +2129,10 @@ async function sideInquirySubmit(){
 
 /* ══ 문의(제품추가·개선요청) 기능 ══════════════════════════════ */
 function inquiryOpen(){
-  // 로그인된 사용자면 이름 자동 입력
-  var writerEl = document.getElementById('inquiry-writer');
-  if(CURRENT_USER && CURRENT_USER.name) writerEl.value = CURRENT_USER.name;
   document.getElementById('inquiry-content').value = '';
   document.getElementById('inquiry-err').style.display = 'none';
   document.getElementById('inquiry-modal').style.display = 'flex';
-  setTimeout(function(){
-    if(!writerEl.value) writerEl.focus();
-    else document.getElementById('inquiry-content').focus();
-  }, 100);
+  setTimeout(function(){document.getElementById('inquiry-content').focus();}, 100);
 }
 function inquiryClose(){
   document.getElementById('inquiry-modal').style.display = 'none';

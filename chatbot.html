@@ -1857,7 +1857,15 @@ function respond(q){
     addBot('안녕하세요! 👋<br>우딘 하드웨어 챗봇입니다.',ADM_CATS);return;
   }
 
-  // ── 1. 카테고리 정확 매칭 (띄어쓰기 무시) ──
+  // ── 1. 제품명 정확 매칭 (띄어쓰기 무시) - 최우선 ──
+  var ks=Object.keys(DB);
+  for(var ki=0;ki<ks.length;ki++){
+    if(ks[ki].toLowerCase().replace(/\s/g,'')===ql){
+      showProductCard(ks[ki]);return;
+    }
+  }
+
+  // ── 2. 카테고리 정확 매칭 (띄어쓰기 무시) ──
   var matchedCat=null;
   for(var ci=0;ci<ADM_CATS.length;ci++){
     if(ADM_CATS[ci].replace(/\s/g,'')===ql){matchedCat=ADM_CATS[ci];break;}
@@ -1869,7 +1877,7 @@ function respond(q){
     return;
   }
 
-  // ── 2. 통합 스마트 검색 (제품명/카테고리/스펙/상세설명 모두, 순서·띄어쓰기 무관) ──
+  // ── 3. 통합 스마트 검색 (제품명/카테고리/스펙/상세설명 모두, 순서·띄어쓰기 무관) ──
   var tokens=tokenize(q);
   var scored=smartSearch(q);
 

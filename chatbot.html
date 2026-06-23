@@ -276,7 +276,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
         style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid #e0e7f0;border-radius:10px;font-size:13px;resize:vertical;font-family:inherit;outline:none;line-height:1.6"
         onfocus="this.style.borderColor='#1a4fa0'" onblur="this.style.borderColor='#e0e7f0'"></textarea>
       <div id="side-err" style="display:none;color:#c33;font-size:12px;text-align:center"></div>
-      <button onclick="sideInquirySubmit()"
+      <button id="side-submit-btn" onclick="sideInquirySubmit()"
         style="width:100%;padding:11px;background:#1a4fa0;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s"
         onmouseover="this.style.background='#1565c0'" onmouseout="this.style.background='#1a4fa0'">제출하기</button>
       <div id="side-ok" style="display:none;text-align:center;padding:10px;background:#f0fff4;border-radius:10px;color:#27ae60;font-size:13px;font-weight:600">
@@ -2097,8 +2097,8 @@ async function sideInquirySubmit(){
   err.style.display='none'; okEl.style.display='none';
   if(!content){err.textContent='내용을 입력하세요.';err.style.display='block';return;}
   var cfg = getIssueConfig();
-  var btn = document.querySelector('#side-panel button');
-  btn.disabled=true; btn.textContent='제출 중...';
+  var btn = document.getElementById('side-submit-btn');
+  if(btn){btn.disabled=true; btn.textContent='제출 중...';}
   try{
     var res = await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues',{
       method:'POST',
@@ -2120,7 +2120,7 @@ async function sideInquirySubmit(){
   }catch(e){
     err.textContent='네트워크 오류: '+e.message;err.style.display='block';
   }
-  btn.disabled=false; btn.textContent='제출하기';
+  if(btn){btn.disabled=false; btn.textContent='제출하기';}
 }
 
 /* ══ 문의(제품추가·개선요청) 기능 ══════════════════════════════ */

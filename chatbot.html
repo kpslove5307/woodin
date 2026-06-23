@@ -234,7 +234,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
     <!-- 가입 신청 폼 -->
     <div id="gate-signup-form" style="display:none">
       <input id="signup-name" type="text" placeholder="이름 및 대리점명 (예: 홍길동 / 우딘목재)" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:10px;outline:none">
-      <input id="signup-id" type="text" placeholder="아이디 (영문/숫자)" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:10px;outline:none">
+      <input id="signup-id" type="text" placeholder="아이디 (영문/숫자/한글)" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:10px;outline:none">
       <input id="signup-pw" type="password" placeholder="사용할 비밀번호" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:14px;outline:none">
       <div id="gate-signup-err" style="display:none;color:#c33;font-size:12px;margin-bottom:10px;text-align:center"></div>
       <button onclick="gateDoSignup()" style="width:100%;padding:11px;background:#28a745;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">가입 신청하기</button>
@@ -2061,7 +2061,7 @@ async function gateDoSignup(){
   var pw   = (document.getElementById('signup-pw').value||'').trim();
   var err  = document.getElementById('gate-signup-err');
   if(!name||!id||!pw){err.textContent='모든 항목을 입력하세요.';err.style.display='block';return;}
-  if(!/^[a-zA-Z0-9_]+$/.test(id)){err.textContent='아이디는 영문/숫자/밑줄만 사용 가능합니다.';err.style.display='block';return;}
+  if(!/^[a-zA-Z0-9_\uAC00-\uD7A3]+$/.test(id)){err.textContent='아이디는 영문/숫자/한글/밑줄만 사용 가능합니다.';err.style.display='block';return;}
   if(ADM_USERS.some(function(u){return u.id===id;})){err.textContent='이미 사용 중인 아이디입니다.';err.style.display='block';return;}
   // GitHub Issue로 신청 전송
   var cfg = getIssueConfig();

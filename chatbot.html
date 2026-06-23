@@ -197,6 +197,52 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script></head>
 
 <body>
+<!-- ══ 사용자 로그인/가입 오버레이 ══ -->
+<div id="user-gate" style="display:none;position:fixed;inset:0;background:#f0f4fa;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column">
+  <div style="background:#fff;border-radius:16px;box-shadow:0 4px 32px rgba(0,0,0,0.13);padding:32px 28px;width:90%;max-width:360px">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:28px;margin-bottom:6px">🔐</div>
+      <div style="font-size:17px;font-weight:700;color:#1a4fa0">우딘 하드웨어 챗봇</div>
+      <div style="font-size:12px;color:#90a4ae;margin-top:4px">로그인 후 이용하실 수 있습니다</div>
+    </div>
+    <!-- 로그인 폼 -->
+    <div id="gate-login-form">
+      <input id="gate-id" type="text" placeholder="아이디" autocomplete="username"
+        style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:10px;outline:none">
+      <input id="gate-pw" type="password" placeholder="비밀번호" autocomplete="current-password"
+        style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:14px;outline:none">
+      <div id="gate-login-err" style="display:none;color:#c33;font-size:12px;margin-bottom:10px;text-align:center"></div>
+      <button onclick="gateDoLogin()" style="width:100%;padding:11px;background:#1a4fa0;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">로그인</button>
+      <div style="text-align:center;margin-top:12px">
+        <span style="font-size:12px;color:#90a4ae">계정이 없으신가요? </span>
+        <button onclick="gateShowSignup()" style="background:none;border:none;color:#1a4fa0;font-size:12px;font-weight:600;cursor:pointer;text-decoration:underline">가입 신청</button>
+      </div>
+    </div>
+    <!-- 가입 신청 폼 -->
+    <div id="gate-signup-form" style="display:none">
+      <input id="signup-name" type="text" placeholder="이름 (예: 홍길동)"
+        style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:10px;outline:none">
+      <input id="signup-id" type="text" placeholder="아이디 (영문/숫자)"
+        style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:10px;outline:none">
+      <input id="signup-pw" type="password" placeholder="사용할 비밀번호"
+        style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:14px;outline:none">
+      <div id="gate-signup-err" style="display:none;color:#c33;font-size:12px;margin-bottom:10px;text-align:center"></div>
+      <button onclick="gateDoSignup()" style="width:100%;padding:11px;background:#28a745;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">가입 신청하기</button>
+      <div style="text-align:center;margin-top:12px">
+        <button onclick="gateShowLogin()" style="background:none;border:none;color:#90a4ae;font-size:12px;cursor:pointer;text-decoration:underline">← 로그인으로 돌아가기</button>
+      </div>
+    </div>
+    <!-- 대기 화면 -->
+    <div id="gate-pending-form" style="display:none;text-align:center">
+      <div style="font-size:40px;margin-bottom:12px">⏳</div>
+      <div style="font-size:15px;font-weight:700;color:#333;margin-bottom:8px">승인 대기 중</div>
+      <div id="gate-pending-msg" style="font-size:13px;color:#666;line-height:1.6;margin-bottom:16px"></div>
+      <div style="font-size:12px;color:#90a4ae">관리자 승인 후 로그인하실 수 있습니다</div>
+      <button onclick="gateShowLogin()" style="margin-top:16px;background:none;border:1px solid #ddd;border-radius:8px;padding:8px 20px;font-size:12px;color:#666;cursor:pointer">로그인 화면으로</button>
+    </div>
+  </div>
+</div>
+
 <div id="lb" style="display:none;">
   <span id="lbx" style="position:fixed;top:12px;right:16px;color:#fff;font-size:38px;cursor:pointer;line-height:1;font-weight:200;z-index:1000001;">×</span>
   <div id="lb-wrap"><img id="lbi" src="" alt="" style="transform: translate(0px, 0px) scale(1.9);"></div>
@@ -314,6 +360,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
       <button class="adm-tab" id="adm-tab-cat" onclick="admSwitchTab('cat')">🏷 카테고리</button>
       <button class="adm-tab" id="adm-tab-stock" onclick="admSwitchTab('stock')">📦 재고</button>
       <button class="adm-tab" id="adm-tab-notice" onclick="admSwitchTab('notice')">📢 안내메시지</button>
+      <button class="adm-tab" id="adm-tab-users" onclick="admSwitchTab('users')">👥 사용자</button>
     </div>
 
     <!-- 탭1: 기존 제품 편집 -->
@@ -574,6 +621,24 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
         </div>
       </div>
       <div class="adm-foot"><button class="adm-close-btn" onclick="admClosePanel()">닫기</button></div>
+    </div>
+
+    <!-- 탭6: 사용자 관리 -->
+    <div id="adm-users-view" style="display:none;padding:0 2px 16px">
+      <div class="adm-sec">
+        <div style="font-size:13px;font-weight:700;color:#333;margin-bottom:10px">📨 가입 신청 목록</div>
+        <div id="adm-pending-users" style="max-height:200px;overflow-y:auto;border:1px solid #eee;border-radius:8px;padding:4px"></div>
+        <div style="font-size:11px;color:#90a4ae;margin-top:6px">* 신청 목록은 GitHub Issues에서 가져옵니다. 새로고침 버튼을 눌러주세요.</div>
+        <button onclick="admLoadPendingUsers()" style="margin-top:8px;padding:7px 16px;background:#f0f4ff;border:1px solid #c5d0e8;border-radius:8px;font-size:12px;color:#1a4fa0;cursor:pointer">🔄 신청 목록 새로고침</button>
+      </div>
+      <div class="adm-sec" style="margin-top:12px">
+        <div style="font-size:13px;font-weight:700;color:#333;margin-bottom:10px">✅ 승인된 사용자</div>
+        <div id="adm-approved-users" style="max-height:240px;overflow-y:auto"></div>
+        <button onclick="admAddUserManual()" style="margin-top:8px;padding:7px 16px;background:#f0f4ff;border:1px solid #c5d0e8;border-radius:8px;font-size:12px;color:#1a4fa0;cursor:pointer">➕ 직접 추가</button>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:8px">
+        <button onclick="admUsersSaveAndPush()" style="flex:1;padding:10px;background:#1a4fa0;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">🚀 저장 + GitHub 업로드</button>
+      </div>
     </div>
 
   </div>
@@ -918,6 +983,9 @@ function admGetCurrentHTML(){
   // 비밀번호 반영
   html=html.replace(/var ADM_PW=[^;]*;/,'var ADM_PW=\''+ADM_PW.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+"';");
 
+  // 사용자 목록 반영
+  html=html.replace(/var ADM_USERS=[^;]*;/,'var ADM_USERS='+JSON.stringify(ADM_USERS)+';');
+
   // 카테고리 반영
   html=html.replace(/var ADM_CATS=\[.*?\];/,'var ADM_CATS='+JSON.stringify(ADM_CATS)+';');
 
@@ -1045,6 +1113,8 @@ function admAddProductAndPush(){
 
 /* ══ 관리자 모드 ══ */
 var ADM_PW='woodin2026';
+// 승인된 사용자 목록 [{id, name, pw, approved}]
+var ADM_USERS=[];
 var admPending={real:[],draw:[],desc:[],newReal:[],newDraw:[],newDesc:[]};
 var ADM_CATS=["실린더","포인트몰딩","오목이","PVC몰딩","인조대리석","리빙보드","힐링월","힐링월몰딩","모티스","하드웨어","행거","경첩","슬라이딩락","핸들"];
 
@@ -1205,14 +1275,17 @@ function admSwitchTab(tab){
   document.getElementById('adm-tab-cat').classList.toggle('on',tab==='cat');
   document.getElementById('adm-tab-stock').classList.toggle('on',tab==='stock');
   document.getElementById('adm-tab-notice').classList.toggle('on',tab==='notice');
+  document.getElementById('adm-tab-users').classList.toggle('on',tab==='users');
   document.getElementById('adm-edit-view').classList.toggle('on',tab==='edit');
   document.getElementById('adm-new-view').classList.toggle('on',tab==='new');
   document.getElementById('adm-cat-view').style.display=(tab==='cat')?'block':'none';
   document.getElementById('adm-stock-view').style.display=(tab==='stock')?'block':'none';
   document.getElementById('adm-notice-view').style.display=(tab==='notice')?'block':'none';
+  document.getElementById('adm-users-view').style.display=(tab==='users')?'block':'none';
   if(tab==='cat')admCatRender();
   if(tab==='stock'){admStockRenderList('');admStockUpdateDate();}
   if(tab==='notice'){var ed=document.getElementById('adm-notice-ed');if(ed)ed.innerHTML=ADM_NOTICE;}
+  if(tab==='users'){admRenderApprovedUsers();}
 }
 
 // ── 안내메시지 WYSIWYG ────────
@@ -1757,6 +1830,201 @@ function admDeleteProduct(){
   admOpenPanel(); // 제품 목록 새로고침
 }
 
+
+/* ══ 사용자 인증 시스템 ══════════════════════════════════════ */
+
+var CURRENT_USER = null; // 로그인된 사용자
+
+function gateInit(){
+  // 이미 로그인된 사용자 확인
+  try {
+    var saved = JSON.parse(sessionStorage.getItem('woodin_user')||'null');
+    if(saved && ADM_USERS.some(function(u){return u.id===saved.id&&u.pw===saved.pw;})){
+      CURRENT_USER = saved;
+      document.getElementById('user-gate').style.display='none';
+      return;
+    }
+  } catch(e){}
+  // 미로그인 → 게이트 표시, 챗봇 숨기기
+  document.getElementById('user-gate').style.display='flex';
+}
+
+function gateShowLogin(){
+  document.getElementById('gate-login-form').style.display='block';
+  document.getElementById('gate-signup-form').style.display='none';
+  document.getElementById('gate-pending-form').style.display='none';
+  document.getElementById('gate-login-err').style.display='none';
+}
+function gateShowSignup(){
+  document.getElementById('gate-login-form').style.display='none';
+  document.getElementById('gate-signup-form').style.display='block';
+  document.getElementById('gate-pending-form').style.display='none';
+  document.getElementById('gate-signup-err').style.display='none';
+}
+function gateShowPending(name, id){
+  document.getElementById('gate-login-form').style.display='none';
+  document.getElementById('gate-signup-form').style.display='none';
+  document.getElementById('gate-pending-form').style.display='block';
+  document.getElementById('gate-pending-msg').innerHTML =
+    '<b>'+name+'</b>님 (아이디: '+id+')<br>가입 신청이 접수되었습니다.<br>관리자 승인 후 로그인하실 수 있습니다.';
+}
+
+function gateDoLogin(){
+  var id = (document.getElementById('gate-id').value||'').trim();
+  var pw = (document.getElementById('gate-pw').value||'').trim();
+  var err = document.getElementById('gate-login-err');
+  if(!id||!pw){err.textContent='아이디와 비밀번호를 입력하세요.';err.style.display='block';return;}
+  var user = ADM_USERS.filter(function(u){return u.id===id&&u.pw===pw;})[0];
+  if(!user){err.textContent='아이디 또는 비밀번호가 올바르지 않습니다.';err.style.display='block';return;}
+  CURRENT_USER = {id:user.id, name:user.name};
+  sessionStorage.setItem('woodin_user', JSON.stringify(CURRENT_USER));
+  document.getElementById('user-gate').style.display='none';
+}
+
+async function gateDoSignup(){
+  var name = (document.getElementById('signup-name').value||'').trim();
+  var id   = (document.getElementById('signup-id').value||'').trim();
+  var pw   = (document.getElementById('signup-pw').value||'').trim();
+  var err  = document.getElementById('gate-signup-err');
+  if(!name||!id||!pw){err.textContent='모든 항목을 입력하세요.';err.style.display='block';return;}
+  if(!/^[a-zA-Z0-9_]+$/.test(id)){err.textContent='아이디는 영문/숫자/밑줄만 사용 가능합니다.';err.style.display='block';return;}
+  if(ADM_USERS.some(function(u){return u.id===id;})){err.textContent='이미 사용 중인 아이디입니다.';err.style.display='block';return;}
+  // GitHub Issue로 신청 전송
+  var cfg = admGhLoadConfig();
+  if(!cfg||!cfg.token){
+    err.textContent='시스템 오류: 관리자에게 문의하세요.';err.style.display='block';return;
+  }
+  var btn = document.querySelector('#gate-signup-form button');
+  btn.disabled=true; btn.textContent='신청 중...';
+  try{
+    var res = await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues',{
+      method:'POST',
+      headers:{'Authorization':'token '+cfg.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+      body:JSON.stringify({
+        title:'[가입신청] '+name+' ('+id+')',
+        body:'이름: '+name+'\n아이디: '+id+'\n비밀번호(해시불가): '+pw+'\n신청일시: '+new Date().toLocaleString('ko-KR'),
+        labels:['가입신청']
+      })
+    });
+    if(res.ok){
+      gateShowPending(name, id);
+    } else {
+      var j = await res.json();
+      err.textContent='전송 실패: '+(j.message||'알 수 없는 오류');err.style.display='block';
+    }
+  }catch(e){
+    err.textContent='네트워크 오류: '+e.message;err.style.display='block';
+  }
+  btn.disabled=false; btn.textContent='가입 신청하기';
+}
+
+/* ── 관리자: 가입 신청 목록 로드 ── */
+async function admLoadPendingUsers(){
+  var cfg = admGhLoadConfig();
+  if(!cfg||!cfg.token){alert('GitHub 토큰을 먼저 설정하세요.');return;}
+  var el = document.getElementById('adm-pending-users');
+  el.innerHTML = '<div style="padding:12px;text-align:center;color:#aaa;font-size:12px">불러오는 중...</div>';
+  try{
+    var res = await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues?labels=가입신청&state=open&per_page=30',{
+      headers:{'Authorization':'token '+cfg.token,'Accept':'application/vnd.github.v3+json'}
+    });
+    var issues = await res.json();
+    if(!issues.length){el.innerHTML='<div style="padding:12px;text-align:center;color:#aaa;font-size:12px">신청 없음</div>';return;}
+    el.innerHTML='';
+    issues.forEach(function(issue){
+      // body에서 아이디/이름/비밀번호 파싱
+      var lines = (issue.body||'').split('\n');
+      var info = {};
+      lines.forEach(function(l){
+        var m = l.match(/^([^:]+):\s*(.+)/);
+        if(m) info[m[1].trim()] = m[2].trim();
+      });
+      var uName = info['이름']||'?';
+      var uId   = info['아이디']||'?';
+      var uPw   = info['비밀번호(해시불가)']||'?';
+      var row = document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:12px';
+      row.innerHTML = '<span style="flex:1"><b>'+uName+'</b> <span style="color:#888">('+uId+')</span></span>';
+      var btnApprove = document.createElement('button');
+      btnApprove.textContent='✅ 승인';
+      btnApprove.style.cssText='padding:4px 10px;background:#28a745;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700';
+      btnApprove.onclick = (function(n,i,p,issueNum){
+        return function(){
+          if(ADM_USERS.some(function(u){return u.id===i;})){alert('"'+i+'" 아이디는 이미 등록됐습니다.');return;}
+          ADM_USERS.push({id:i,name:n,pw:p});
+          admRenderApprovedUsers();
+          // Issue 닫기
+          fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues/'+issueNum,{
+            method:'PATCH',
+            headers:{'Authorization':'token '+cfg.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+            body:JSON.stringify({state:'closed',labels:['가입승인']})
+          });
+          row.style.opacity='0.4';
+          btnApprove.disabled=true;
+          btnReject.disabled=true;
+          alert('"'+n+'"님을 승인했습니다. 🚀 GitHub 업로드를 눌러 저장하세요.');
+        };
+      })(uName, uId, uPw, issue.number);
+      var btnReject = document.createElement('button');
+      btnReject.textContent='❌ 거부';
+      btnReject.style.cssText='padding:4px 10px;background:#dc3545;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700';
+      btnReject.onclick = (function(n,issueNum){
+        return function(){
+          if(!confirm('"'+n+'"님의 신청을 거부하시겠습니까?'))return;
+          fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues/'+issueNum,{
+            method:'PATCH',
+            headers:{'Authorization':'token '+cfg.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+            body:JSON.stringify({state:'closed',labels:['가입거부']})
+          });
+          row.style.opacity='0.3';
+          btnApprove.disabled=true;
+          btnReject.disabled=true;
+        };
+      })(uName, issue.number);
+      row.appendChild(btnApprove);
+      row.appendChild(btnReject);
+      el.appendChild(row);
+    });
+  }catch(e){
+    el.innerHTML='<div style="padding:12px;color:#c33;font-size:12px">오류: '+e.message+'</div>';
+  }
+}
+
+function admRenderApprovedUsers(){
+  var el = document.getElementById('adm-approved-users');
+  if(!el)return;
+  if(!ADM_USERS.length){el.innerHTML='<div style="padding:12px;text-align:center;color:#aaa;font-size:12px">승인된 사용자 없음</div>';return;}
+  el.innerHTML='';
+  ADM_USERS.forEach(function(u,i){
+    var row = document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:12px';
+    row.innerHTML = '<span style="flex:1"><b>'+u.name+'</b> <span style="color:#888">('+u.id+')</span></span>';
+    var btnDel = document.createElement('button');
+    btnDel.textContent='🗑 삭제';
+    btnDel.style.cssText='padding:4px 10px;background:#fff;border:1px solid #fcc;border-radius:6px;cursor:pointer;font-size:11px;color:#c33';
+    btnDel.onclick=(function(idx){return function(){if(!confirm('사용자를 삭제하시겠습니까?'))return;ADM_USERS.splice(idx,1);admRenderApprovedUsers();};})(i);
+    row.appendChild(btnDel);
+    el.appendChild(row);
+  });
+}
+
+function admAddUserManual(){
+  var name = prompt('이름:','');
+  if(!name)return;
+  var id = prompt('아이디 (영문/숫자):','');
+  if(!id)return;
+  var pw = prompt('비밀번호:','');
+  if(!pw)return;
+  if(ADM_USERS.some(function(u){return u.id===id;})){alert('이미 존재하는 아이디입니다.');return;}
+  ADM_USERS.push({id:id,name:name,pw:pw});
+  admRenderApprovedUsers();
+  alert('추가됐습니다. 🚀 GitHub 업로드를 눌러 저장하세요.');
+}
+
+function admUsersSaveAndPush(){
+  admPushToGitHub(null);
+}
+
 function addBot(html,chips,extra,showAllCats){
   var w=document.createElement('div');w.className='mw b';
   var row=document.createElement('div');row.style.cssText='display:flex;gap:7px;align-items:flex-end';
@@ -1953,8 +2221,12 @@ async function askAI(q, products){
 }
 
 document.getElementById('sb').addEventListener('click',function(){handleInput(ii.value);});
+// 로그인 폼 Enter 키
+document.getElementById('gate-pw').addEventListener('keydown',function(e){if(e.key==='Enter')gateDoLogin();});
+document.getElementById('gate-id').addEventListener('keydown',function(e){if(e.key==='Enter')gateDoLogin();});
 ii.addEventListener('keydown',function(e){if(e.key==='Enter')handleInput(ii.value);});
 
+gateInit();
 addBot(ADM_NOTICE,ADM_CATS);
 </script>
 

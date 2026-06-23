@@ -742,7 +742,10 @@ function buildCard(key){
     if(p.descText){
       var dt=document.createElement('div');
       dt.style.cssText='white-space:pre-wrap;line-height:1.8;font-size:13px;color:#2c2c2c;padding:16px 18px;background:#fff;border-radius:0;margin:0;border:none;border-bottom:1px solid #f0f3f8;font-family:inherit';
-      dt.textContent=p.descText;
+      // URL을 클릭 가능한 링크로 변환
+      var urlReg=/(https?:\/\/[^\s\u3000\uff00-\uffef<>"]+)/g;
+      var escaped=p.descText.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      dt.innerHTML=escaped.replace(urlReg,'<a href="$1" target="_blank" rel="noopener" style="color:#1a73e8;text-decoration:underline;word-break:break-all;">$1</a>');
       panes.video.appendChild(dt);
     }
     var descSlides=(p.videos||[]).map(function(v){return{src:gi(v.f),l:v.l};}).filter(function(s){return s.src;});

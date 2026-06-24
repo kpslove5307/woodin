@@ -2915,6 +2915,42 @@ function getProductText(k){
   return normal+' '+normal.replace(/\s/g,'');
 }
 
+// 동의어 사전 - 같은 의미의 단어를 대표 토큰으로 확장
+var SYNONYMS = {
+  // 크기/규격 관련
+  '사이즈':['규격','크기','치수','사양','스펙','mm','size'],
+  '크기':['규격','사이즈','치수','사양','스펙','mm'],
+  '치수':['규격','사이즈','크기','사양','mm'],
+  '사양':['규격','스펙','사이즈','크기'],
+  '스펙':['규격','사양','사이즈','크기'],
+  // 납기 관련
+  '납기':['납기일','리드타임','배송','출고'],
+  '배송':['납기','출고','납기일'],
+  // 재고 관련
+  '재고':['stock','수량','있나','있어','있음'],
+  // 사용 관련
+  '사용가능':['사용','가능','호환','적용'],
+  '호환':['사용가능','사용','적용','가능'],
+  // 가격 관련
+  '가격':['단가','price','금액','비용'],
+  '단가':['가격','price','금액'],
+};
+
+// 동의어 확장 함수
+function expandSynonyms(tokens){
+  var expanded=tokens.slice();
+  var seen={};
+  tokens.forEach(function(t){seen[t]=1;});
+  tokens.forEach(function(t){
+    if(SYNONYMS[t]){
+      SYNONYMS[t].forEach(function(s){
+        if(!seen[s]){seen[s]=1;expanded.push(s);}
+      });
+    }
+  });
+  return expanded;
+}
+
 // 쿼리에서 검색 토큰 추출
 function tokenize(q){
   var ql=q.trim().toLowerCase();
@@ -2960,6 +2996,8 @@ function tokenize(q){
     }
   }
 
+  // 동의어 확장
+  tokens=expandSynonyms(tokens);
   return tokens;
 }
 

@@ -3033,10 +3033,14 @@ function respond(q){
     showProductCard(filtered[0]);return;
   }
   if(filtered.length<=30){
-    // AI 답변 시도 (상세설명 있는 제품 포함 + 토큰 2개 이상)
-    var hasDesc=filtered.some(function(k){return DB[k]&&DB[k].descText;});
+    // descText 있는 제품 우선 선별
+    var withDesc=filtered.filter(function(k){return DB[k]&&DB[k].descText&&DB[k].descText.trim();});
+    var withoutDesc=filtered.filter(function(k){return !DB[k]||!DB[k].descText||!DB[k].descText.trim();});
+    // descText 있는 제품 우선 + 나머지 채우기 (최대 8개)
+    var aiProducts=withDesc.concat(withoutDesc).slice(0,8);
+    var hasDesc=withDesc.length>0;
     if(tokens.length>=2&&hasDesc){
-      askAI(q,filtered.slice(0,5));return;
+      askAI(q,aiProducts,filtered);return;
     }
     addBot('<b>🔍 "'+q+'" 검색결과 ('+filtered.length+'개)</b><br><small style="color:#90a4ae">원하는 제품을 선택하세요</small>',filtered);return;
   }
@@ -3045,11 +3049,12 @@ function respond(q){
 }
 
 /* ── AI 상세설명 답변 ── */
-async function askAI(q, products){
+async function askAI(q, products, allProducts){
+  var showProducts=allProducts||products;
   var apiKey=localStorage.getItem('woodin_anthropic_key')||'';
   if(!apiKey){
-    if(products.length===1){showProductCard(products[0]);}
-    else{addBot('<b>🔍 "'+q+'" 관련 제품 ('+products.length+'개)</b><br><small style="color:#90a4ae">원하는 제품을 선택하세요</small>',products);}
+    if(showProducts.length===1){showProductCard(showProducts[0]);}
+    else{addBot('<b>🔍 "'+q+'" 관련 제품 ('+showProducts.length+'개)</b><br><small style="color:#90a4ae">원하는 제품을 선택하세요</small>',showProducts);}
     return;
   }
   var msgsEl=document.getElementById('msgs');
@@ -3060,12 +3065,20 @@ async function askAI(q, products){
   msgsEl.scrollTop=msgsEl.scrollHeight;
   var context=products.map(function(k){
     var p=DB[k];
-    var lines=['[제품: '+k+']'];
-    if(p.cat)lines.push('카테고리: '+p.cat);
-    if(p.info)p.info.forEach(function(r){lines.push(r[0]+': '+r[1]);});
-    if(p.descText)lines.push('상세설명: '+p.descText);
-    return lines.join(' | ');
-  }).join(' / / / ');
+    var parts=['[제품: '+k+']'];
+    if(p.cat)parts.push('카테고리: '+p.cat);
+    if(p.info)p.info.forEach(function(r){if(r[0]&&r[1])parts.push(r[0]+': '+r[1]);});
+    if(p.descText&&p.descText.trim())parts.push('상세설명: '+p.descText.trim());
+    return parts.join(' | ');
+  }).join('\n---\n');
+  // descText 없는 제품이면 컨텍스트 부족 안내
+  var hasAnyDesc=products.some(function(k){return DB[k]&&DB[k].descText&&DB[k].descText.trim();});
+  if(!hasAnyDesc){
+    if(showProducts.length===1){showProductCard(showProducts[0]);}
+    else{addBot('<b>🔍 "'+q+'" 관련 제품 ('+showProducts.length+'개)</b><br><small style="color:#90a4ae">원하는 제품을 선택하세요</small>',showProducts);}
+    msgsEl.removeChild(loadEl);
+    return;
+  }
   try{
     var res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
@@ -3080,25 +3093,24 @@ async function askAI(q, products){
     var data=await res.json();
     msgsEl.removeChild(loadEl);
     if(!res.ok){
-      // API 오류 - 그냥 검색결과 표시
       console.warn('AI API 오류:', data.error||data);
-      if(products.length===1){showProductCard(products[0]);}
-      else{addBot('<b>🔍 "'+q+'" 관련 제품 ('+products.length+'개)</b><br><small style="color:#90a4ae">원하는 제품을 선택하세요</small>',products);}
+      if(showProducts.length===1){showProductCard(showProducts[0]);}
+      else{addBot('<b>🔍 "'+q+'" 관련 제품 ('+showProducts.length+'개)</b><br><small style="color:#90a4ae">원하는 제품을 선택하세요</small>',showProducts);}
       return;
     }
     var answer=(data.content&&data.content[0]&&data.content[0].text)||null;
     if(!answer){
-      if(products.length===1){showProductCard(products[0]);}
-      else{addBot('<b>🔍 "'+q+'" 관련 제품 ('+products.length+'개)</b><br><small style="color:#90a4ae">원하는 제품을 선택하세요</small>',products);}
+      if(showProducts.length===1){showProductCard(showProducts[0]);}
+      else{addBot('<b>🔍 "'+q+'" 관련 제품 ('+showProducts.length+'개)</b><br><small style="color:#90a4ae">원하는 제품을 선택하세요</small>',showProducts);}
       return;
     }
     // AI 답변 텍스트 먼저 표시
     addBot('<b>🤖 AI 답변</b><br><br>'+answer.replace(/\n/g,'<br>'),null);
     // 제품 카드 표시 (단일이면 상세카드, 복수면 선택 버튼)
-    if(products.length===1){
-      showProductCard(products[0]);
+    if(showProducts.length===1){
+      showProductCard(showProducts[0]);
     } else {
-      addBot('<small style="color:#90a4ae">📦 관련 제품</small>',products);
+      addBot('<small style="color:#90a4ae">📦 관련 제품</small>',showProducts);
     }
   }catch(e){
     msgsEl.removeChild(loadEl);

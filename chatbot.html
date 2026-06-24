@@ -2928,30 +2928,52 @@ function getProductText(k){
   return normal+' '+normal.replace(/\s/g,'');
 }
 
-// 쿼리에서 검색 토큰 추출 (원본단어 + 붙여쓰기 + 숫자/문자 분리)
+// 쿼리에서 검색 토큰 추출
 function tokenize(q){
   var ql=q.trim().toLowerCase();
   var tokens=[];
+  var seen={};
+  function add(t){if(t&&t.length>0&&!seen[t]){seen[t]=1;tokens.push(t);}}
+
   // 1) 공백 기준 분리
   var bySpace=ql.split(/\s+/).filter(function(w){return w.length>0;});
   bySpace.forEach(function(w){
-    tokens.push(w);
-    // 숫자↔한글 경계 분리 (예: 45t도어 → 45t, 도어 / 45도어 → 45, 도어)
-    // 영문은 숫자와 붙어있어도 분리하지 않음 (45t는 하나의 단위로 유지)
+    add(w);
+    // 숫자↔한글 경계 분리 (45t도어 → 45t, 도어)
     var parts=w
-      .replace(/([0-9]+[a-z]*)([가-힣]+)/g,'$1 $2')  // 45t도어 → 45t 도어
-      .replace(/([가-힣]+)([0-9]+)/g,'$1 $2')          // 도어45 → 도어 45
+      .replace(/([0-9]+[a-z]*)([가-힣]+)/g,'$1 $2')
+      .replace(/([가-힣]+)([0-9]+)/g,'$1 $2')
+      .replace(/([a-z]+)([가-힣]+)/g,'$1 $2')
       .split(/\s+/).filter(function(p){return p.length>0;});
-    parts.forEach(function(p){if(p!==w)tokens.push(p);});
+    parts.forEach(function(p){if(p!==w)add(p);});
   });
-  // 2) 전체 붙여쓰기 버전 추가
+
+  // 2) 전체 붙여쓰기 버전
   var nospace=ql.replace(/\s/g,'');
-  if(nospace&&tokens.indexOf(nospace)===-1)tokens.push(nospace);
-  // 3) 숫자만 추출 (예: 45t도어사용 → 45)
-  var nums=ql.match(/[0-9]+/g)||[];
-  nums.forEach(function(n){if(tokens.indexOf(n)===-1)tokens.push(n);});
-  // 중복 제거
-  return tokens.filter(function(v,i,a){return a.indexOf(v)===i&&v.length>0;});
+  add(nospace);
+
+  // 3) 숫자 추출
+  (ql.match(/[0-9]+/g)||[]).forEach(function(n){add(n);});
+
+  // 4) 한글 n-gram (2~5글자) - 붙여쓰기 한글 검색 대응
+  // 예: "행거납기" → "행거", "납기", "거납", "행거납", "납기" 등
+  var korOnly=nospace.replace(/[^가-힣]/g,'');
+  if(korOnly.length>=2&&korOnly.length<=10){
+    // 2글자 단위
+    for(var i=0;i<korOnly.length-1;i++){
+      add(korOnly.substring(i,i+2));
+    }
+    // 3글자 단위
+    for(var i=0;i<korOnly.length-2;i++){
+      add(korOnly.substring(i,i+3));
+    }
+    // 4글자 단위
+    for(var i=0;i<korOnly.length-3;i++){
+      add(korOnly.substring(i,i+4));
+    }
+  }
+
+  return tokens;
 }
 
 // 토큰별 독립 매칭 점수 계산 (순서 무관, 띄어쓰기 무관)

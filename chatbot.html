@@ -1279,19 +1279,37 @@ async function admPushToGitHub(onSuccess){
       }
     }
 
-    // ── 2) HTML 직렬화: I를 임시로 placeholder로 바꿔서 저장 ──────
-    msg.textContent='HTML 파일 인코딩 중...';
-    var savedI={};
-    for(var k in I){
-      if(I[k]&&I[k]!=='__IMG_PLACEHOLDER__'&&I[k].startsWith('data:')){
-        savedI[k]=I[k];
-        I[k]='__IMG_PLACEHOLDER__';
-      }
-    }
-    var html=admGetCurrentHTML();
-    // 업로드 성공 후 I를 복원하지 않음 → 다음 업로드 시 중복 방지
-    // for(var k in savedI){I[k]=savedI[k];}
+    // ── 2) GitHub에서 최신 파일 받아서 데이터만 교체 ──────────────
+    msg.textContent='최신 파일 가져오는 중...';
+    var latestRes=await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/contents/'+cfg.path,{
+      headers:{'Authorization':'token '+cfg.token,'Accept':'application/vnd.github.v3+json'}
+    });
+    var latestD=await latestRes.json();
+    var html=decodeURIComponent(escape(atob(latestD.content.replace(/\n/g,''))));
 
+    // ADM_USERS 교체
+    var usS='/*USER'+'S_START*/';var usE='/*USER'+'S_END*/';
+    var si=html.indexOf(usS),ei=html.indexOf(usE);
+    if(si!==-1&&ei!==-1)html=html.substring(0,si)+usS+JSON.stringify(ADM_USERS)+usE+html.substring(ei+usE.length);
+
+    // ADM_CATS 교체
+    html=html.replace(/var ADM_CATS=\[.*?\];/,'var ADM_CATS='+JSON.stringify(ADM_CATS)+';');
+
+    // ADM_NOTICE 교체
+    var ntS='/*NOTI'+'CE_START*/';var ntE='/*NOTI'+'CE_END*/';
+    var ni=html.indexOf(ntS),ne=html.indexOf(ntE);
+    if(ni!==-1&&ne!==-1)html=html.substring(0,ni)+ntS+ADM_NOTICE+ntE+html.substring(ne+ntE.length);
+
+    // ADM_PW 교체
+    html=html.replace(/var ADM_PW='[^']*';/,"var ADM_PW='"+ADM_PW+"';");
+
+    // I (이미지) placeholder 반영
+    for(var k in I){
+      if(I[k]&&I[k]!=='__IMG_PLACEHOLDER__'&&I[k].startsWith('data:'))I[k]='__IMG_PLACEHOLDER__';
+    }
+    html=html.replace(/var I=\{[\s\S]*?\};/,'var I='+JSON.stringify(I)+';');
+
+    msg.textContent='HTML 파일 인코딩 중...';
     var htmlB64=btoa(unescape(encodeURIComponent(html)));
     msg.textContent='HTML 업로드 중...';
     await ghPutFile(cfg, cfg.path, htmlB64, '챗봇 업데이트 ('+now+')');

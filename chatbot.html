@@ -2392,7 +2392,7 @@ async function admLoadInquiries(){
       card.appendChild(chk);
 
       // 내용 영역
-      var replyHtml=existReply?'<div style="background:#f0f7ff;border-left:3px solid #1a4fa0;padding:8px 10px;border-radius:0 6px 6px 0;margin-bottom:8px;font-size:11px"><span style="color:#1a4fa0;font-weight:700">📣 관리자 답글</span><br><span style="color:#333;white-space:pre-wrap">'+existReply.text+'</span></div>':'';
+      var replyHtml=existReply?'<div style="margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8ecf4;font-size:12px"><span style="color:#1a4fa0;font-weight:600">📣 관리자 답글</span>&nbsp;&nbsp;<span style="color:#333;white-space:pre-wrap">'+existReply.text+'</span></div>':'';'
       var body=document.createElement('div');
       body.style.cssText='flex:1;min-width:0';
       body.innerHTML=

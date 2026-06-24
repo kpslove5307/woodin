@@ -2242,6 +2242,8 @@ function gateDoAdminLogin(){
   // 관리자 로그인 성공 → IS_ADMIN 설정 후 게이트 닫고 패널 열기
   IS_ADMIN=true;
   document.getElementById('user-gate').style.display='none';
+  var admBtn=document.getElementById('adm-btn');
+  if(admBtn) admBtn.style.display='';
   admOpenPanel();
 }
 function gateShowPending(name, id){

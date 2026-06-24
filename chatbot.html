@@ -1326,6 +1326,7 @@ async function admPushToGitHub(onSuccess){
 
     overlay.classList.remove('show');
     var pageUrl='https://'+cfg.owner+'.github.io/'+cfg.repo+'/'+cfg.path;
+    _usersCache=null;_usersCacheTime=0;
     if(onSuccess)onSuccess();
     var imgMsg=newImgs.length>0?'\n✅ 새 이미지 '+newImgs.length+'개 (images/ 폴더)':'\n(새 이미지 없음)';
     alert('🚀 GitHub 업로드 성공!\n\n✅ chatbot.html'+imgMsg+'\n\nGitHub Pages URL:\n'+pageUrl+'\n\n※ Pages 반영까지 1~2분 소요됩니다.');
@@ -2141,6 +2142,9 @@ function removeCookie(name){
 /* ══ 사용자 인증 시스템 ══════════════════════════════════════ */
 
 var CURRENT_USER = null; // 로그인된 사용자
+var _usersCache = null; // ADM_USERS 캐시
+var _usersCacheTime = 0; // 캐시 시간
+var _CACHE_TTL = 5 * 60 * 1000; // 5분
 
 function gateInit(){
   // 이미 로그인된 사용자 확인
@@ -2547,24 +2551,32 @@ async function loadMyInquiries(){
   if(!CURRENT_USER)return;
   var cfg=getIssueConfig();
 
-  // 최신 ADM_USERS를 GitHub에서 직접 받아오기 (캐시 우회)
+  // 최신 ADM_USERS를 GitHub에서 받아오기 (5분 캐시)
   var myUser=null;
   try{
-    var ghCfg=admGhLoadConfig();
-    if(ghCfg&&ghCfg.token){
-      var rawRes=await fetch('https://api.github.com/repos/'+ghCfg.owner+'/'+ghCfg.repo+'/contents/'+ghCfg.path,{
-        headers:{'Authorization':'token '+ghCfg.token,'Accept':'application/vnd.github.v3+json'}
-      });
-      var rawD=await rawRes.json();
-      var rawHtml=decodeURIComponent(escape(atob(rawD.content.replace(/\n/g,''))));
-      var us=rawHtml.indexOf('/*USERS_START*/');
-      var ue=rawHtml.indexOf('/*USERS_END*/');
-      if(us!==-1&&ue!==-1){
-        var freshUsers=JSON.parse(rawHtml.substring(us+15,ue));
-        // 전역 ADM_USERS도 갱신
-        ADM_USERS.length=0;
-        freshUsers.forEach(function(u){ADM_USERS.push(u);});
+    var now=Date.now();
+    var needFetch=!_usersCache||((now-_usersCacheTime)>_CACHE_TTL);
+    if(needFetch){
+      var ghCfg=admGhLoadConfig();
+      if(ghCfg&&ghCfg.token){
+        var rawRes=await fetch('https://api.github.com/repos/'+ghCfg.owner+'/'+ghCfg.repo+'/contents/'+ghCfg.path,{
+          headers:{'Authorization':'token '+ghCfg.token,'Accept':'application/vnd.github.v3+json'}
+        });
+        var rawD=await rawRes.json();
+        var rawHtml=decodeURIComponent(escape(atob(rawD.content.replace(/\n/g,''))));
+        var us=rawHtml.indexOf('/*USERS_START*/');
+        var ue=rawHtml.indexOf('/*USERS_END*/');
+        if(us!==-1&&ue!==-1){
+          var freshUsers=JSON.parse(rawHtml.substring(us+15,ue));
+          _usersCache=freshUsers;
+          _usersCacheTime=now;
+        }
       }
+    }
+    // 캐시에서 ADM_USERS 갱신
+    if(_usersCache){
+      ADM_USERS.length=0;
+      _usersCache.forEach(function(u){ADM_USERS.push(u);});
     }
   }catch(e){console.warn('ADM_USERS 갱신 실패, 로컬값 사용:',e);}
 
@@ -3127,21 +3139,25 @@ async function mobileInqLoadList(){
   var box=document.getElementById('mob-inq-list-content');
   box.innerHTML='<div style="text-align:center;color:#bbb;font-size:13px;padding:30px 0">불러오는 중...</div>';
   try{
-    // 최신 ADM_USERS에서 내 replies 가져오기
+    // 최신 ADM_USERS에서 내 replies 가져오기 (5분 캐시)
     var ghCfg=admGhLoadConfig();
     var myUser=null;
-    if(ghCfg&&ghCfg.token){
-      var rawRes=await fetch('https://api.github.com/repos/'+ghCfg.owner+'/'+ghCfg.repo+'/contents/'+ghCfg.path,{
-        headers:{'Authorization':'token '+ghCfg.token,'Accept':'application/vnd.github.v3+json'}
-      });
-      var rawD=await rawRes.json();
-      var rawHtml=decodeURIComponent(escape(atob(rawD.content.replace(/\n/g,''))));
-      var us=rawHtml.indexOf('/*USERS_START*/'),ue=rawHtml.indexOf('/*USERS_END*/');
-      if(us!==-1&&ue!==-1){
-        var freshUsers=JSON.parse(rawHtml.substring(us+15,ue));
-        myUser=freshUsers.filter(function(u){return u.id===CURRENT_USER.id;})[0];
+    var now2=Date.now();
+    if(!_usersCache||(now2-_usersCacheTime)>_CACHE_TTL){
+      if(ghCfg&&ghCfg.token){
+        var rawRes=await fetch('https://api.github.com/repos/'+ghCfg.owner+'/'+ghCfg.repo+'/contents/'+ghCfg.path,{
+          headers:{'Authorization':'token '+ghCfg.token,'Accept':'application/vnd.github.v3+json'}
+        });
+        var rawD=await rawRes.json();
+        var rawHtml=decodeURIComponent(escape(atob(rawD.content.replace(/\n/g,''))));
+        var us=rawHtml.indexOf('/*USERS_START*/'),ue=rawHtml.indexOf('/*USERS_END*/');
+        if(us!==-1&&ue!==-1){
+          _usersCache=JSON.parse(rawHtml.substring(us+15,ue));
+          _usersCacheTime=now2;
+        }
       }
     }
+    if(_usersCache) myUser=_usersCache.filter(function(u){return u.id===CURRENT_USER.id;})[0]||null;
     // Issues 가져오기
     var cfg=getIssueConfig();
     var res=await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues?state=open&per_page=50',{

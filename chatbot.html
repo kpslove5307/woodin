@@ -981,7 +981,7 @@ function buildCard(key){
   var card=document.createElement('div');card.className='pcard';
   var tbr=document.createElement('div');tbr.className='tbr';
   var _vipIds=['강원선','강영수','강지혜','강승연'];
-  var canSeeInner=CURRENT_USER&&(CURRENT_USER.id.indexOf('우딘')!==-1||_vipIds.indexOf(CURRENT_USER.id)!==-1||CURRENT_USER.id==='admin');
+  var canSeeInner=CURRENT_USER&&(CURRENT_USER.id.endsWith('우딘')||_vipIds.indexOf(CURRENT_USER.id)!==-1||CURRENT_USER.id==='admin');
   var tabDefs=[{id:'img',l:'🖼 이미지'},{id:'draw',l:'📐 도면'},{id:'video',l:'📋 상세설명'}];
   if(canSeeInner)tabDefs.push({id:'inner',l:'🔒 내부정보'});
   var panes={img:document.createElement('div'),draw:document.createElement('div'),video:document.createElement('div'),inner:document.createElement('div')};
@@ -1043,7 +1043,7 @@ function buildCard(key){
   // 재고 표시 (우딘 포함 아이디 + 특정 VIP 아이디에만 표시)
   var _vipIds2=['강원선','강영수','강지혜','강승연'];
   var canSeeStock = CURRENT_USER && (
-    CURRENT_USER.id.indexOf('우딘')!==-1 ||
+    CURRENT_USER.id.endsWith('우딘') ||
     _vipIds2.indexOf(CURRENT_USER.id)!==-1 ||
     IS_ADMIN
   );

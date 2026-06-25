@@ -1243,7 +1243,7 @@ function admGetCurrentHTML(){
   html=html.replace("u.id===saved.id&&u.pw===saved.pw","u.id===saved.id");
 
   // 카테고리 반영
-  html=html.replace(/var ADM_CATS=\[.*?\];/,'var ADM_CATS='+JSON.stringify(ADM_CATS)+';');
+  html=html.replace(/var ADM_CATS=["실린더","포인트몰딩","오목이","PVC몰딩","인조대리석","리빙보드","힐링월","힐링월몰딩","모티스","하드웨어","행거","경첩","슬라이딩락","핸들"];/,'var ADM_CATS='+JSON.stringify(ADM_CATS)+';');
 
   // 문의 안내 문구 반영
   var iqS='/*INQUIRY_START*/';var iqE='/*INQUIRY_END*/';
@@ -1329,7 +1329,7 @@ async function admPushToGitHub(onSuccess){
     if(si!==-1&&ei!==-1)html=html.substring(0,si)+usS+JSON.stringify(ADM_USERS)+usE+html.substring(ei+usE.length);
 
     // ADM_CATS 교체
-    html=html.replace(/var ADM_CATS=\[.*?\];/,'var ADM_CATS='+JSON.stringify(ADM_CATS)+';');
+    html=html.replace(/var ADM_CATS=["실린더","포인트몰딩","오목이","PVC몰딩","인조대리석","리빙보드","힐링월","힐링월몰딩","모티스","하드웨어","행거","경첩","슬라이딩락","핸들"];/,'var ADM_CATS='+JSON.stringify(ADM_CATS)+';');
 
     // ADM_NOTICE 교체
     var ntS='/*NOTI'+'CE_START*/';var ntE='/*NOTI'+'CE_END*/';

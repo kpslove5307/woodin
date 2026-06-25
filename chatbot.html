@@ -456,10 +456,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
 <!-- 관리자 패널 -->
 <div id="adm-panel" class="">
   <div id="adm-inner">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-      <h2 style="margin:0">🛠 관리자 패널</h2>
-      <button onclick="admClosePanel()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888;line-height:1;padding:2px 6px" title="닫기">✕</button>
-    </div>
+    <h2>🛠 관리자 패널</h2>
 
     <!-- GitHub 연동 상태 바 -->
     <div id="adm-gh-bar">
@@ -795,12 +792,6 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
       </div>
 
     </div>
-    
-      <div class="adm-foot">
-        <button class="adm-save-btn" onclick="admSaveLocal()">💾 저장</button>
-        <button class="adm-push-btn" onclick="admPushToGitHub()">🚀 저장 + GitHub 업로드</button>
-        <button class="adm-close-btn" onclick="admClosePanel()">닫기</button>
-      </div>
     </div>
 
   </div>
@@ -1551,8 +1542,8 @@ function admOpenPanel(){
   ['real','draw','desc','newReal','newDraw','newDesc'].forEach(function(t){
     admSetupDrop('adm-'+admDropId(t)+'-drop',t);
   });
-  document.getElementById('adm-meta-sec').style.display='none';
-  document.getElementById('adm-del-btn').style.display='none';
+  var _e_adm_meta_sec=document.getElementById('adm-meta-sec');if(_e_adm_meta_sec)_e_adm_meta_sec.style.display='none';
+  var _e_adm_del_btn=document.getElementById('adm-del-btn');if(_e_adm_del_btn)_e_adm_del_btn.style.display='none';
   admSwitchTab('edit');
   admGhUpdateStatus();
   // 재고 드롭존 드래그 초기화

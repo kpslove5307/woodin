@@ -1268,6 +1268,27 @@ function admGetCurrentHTML(){
     }
   })();
 
+  // ── 필수 요소 보존 (저장해도 날아가지 않도록) ──
+
+  // 1. adm-foot (저장/업로드/닫기 버튼) 없으면 추가
+  if(html.indexOf('<div class="adm-foot">')<0){
+    var innerCloseIdx=html.lastIndexOf('</div>\n    </div>\n\n  </div>');
+    if(innerCloseIdx>0){
+      var footHtml='\n      <div class="adm-foot">\n        <button class="adm-save-btn" onclick="admSaveLocal()">💾 저장</button>\n        <button class="adm-push-btn" onclick="admSaveAndPush()">💾 저장 + GitHub 업로드</button>\n        <button class="adm-close-btn" onclick="admClosePanel()">닫기</button>\n      </div>';
+      html=html.substring(0,innerCloseIdx)+footHtml+html.substring(innerCloseIdx);
+    }
+  }
+
+  // 2. 상단 저장+업로드 버튼 없으면 추가
+  var topSaveBtn='<button onclick="admSaveAndPush()"';
+  if(html.indexOf(topSaveBtn)<0){
+    var htmlUploadBtn='onclick="admPushToGitHub(null)"';
+    var btnEnd=html.indexOf('</button>',html.indexOf(htmlUploadBtn))+9;
+    if(btnEnd>8){
+      html=html.substring(0,btnEnd)+'\n      <button onclick="admSaveAndPush()" style="padding:5px 12px;background:#1a3a5c;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;">💾 저장 + GitHub 업로드</button>'+html.substring(btnEnd);
+    }
+  }
+
   return html;
 }
 
@@ -1558,18 +1579,6 @@ function admOpenPanel(){
       e.preventDefault();stockDrop.style.borderColor='#bbb';stockDrop.style.background='#fafafa';
       var f=e.dataTransfer.files[0];if(f)admStockHandleFile(f);
     });
-  }
-  // X 닫기 버튼 동적 생성 (저장해도 사라지지 않도록)
-  var inner=document.getElementById('adm-inner');
-  if(inner&&!inner.querySelector('.adm-x-close')){
-    var xBtn=document.createElement('button');
-    xBtn.className='adm-x-close';
-    xBtn.innerHTML='✕';
-    xBtn.title='닫기';
-    xBtn.style.cssText='position:absolute;top:16px;right:20px;background:none;border:none;font-size:22px;cursor:pointer;color:#999;line-height:1;z-index:1';
-    xBtn.onclick=admClosePanel;
-    inner.style.position='relative';
-    inner.insertBefore(xBtn,inner.firstChild);
   }
   document.getElementById('adm-panel').classList.add('show');
 }

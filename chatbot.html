@@ -531,9 +531,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
 
       <!-- 내부정보 (영업팀/수주팀 전용) -->
       <div class="adm-sec" style="border-color:#f5c6c6;background:#fff8f8">
-        <p class="adm-sec-hd" style="color:#c0392b">🔒 내부정보 <span style="font-weight:400;color:#aaa;font-size:11px">(영업팀·수주팀 아이디만 열람 가능)</span></p>
-        <div class="adm-field">
-          <textarea id="adm-inner-text" placeholder="내부 전용 정보를 입력하세요
+        <p class="adm-sec-hd" style="color:#c0392b">🔒 내부정보 <span style="font-weight:400;color:#aaa;font-size:11px">(아이디에 '우딘' 포함 또는 강원선·강영수·강지혜·강승연만 열람 가능)</span></p> placeholder="내부 전용 정보를 입력하세요
 예) 단가, 마진율, 납기 협의 내용, 거래처 메모 등" style="width:100%;min-height:90px;padding:8px 10px;border:1px solid #f5c6c6;border-radius:7px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box;line-height:1.6;background:#fff8f8"></textarea>
         </div>
       </div>
@@ -601,7 +599,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
 
       <!-- 내부정보 (영업팀/수주팀 전용) -->
       <div class="adm-sec" style="border-color:#f5c6c6;background:#fff8f8">
-        <p class="adm-sec-hd" style="color:#c0392b">🔒 내부정보 <span style="font-weight:400;color:#aaa;font-size:11px">(영업팀·수주팀 아이디만 열람 가능)</span></p>
+        <p class="adm-sec-hd" style="color:#c0392b">🔒 내부정보 <span style="font-weight:400;color:#aaa;font-size:11px">(아이디에 '우딘' 포함 또는 강원선·강영수·강지혜·강승연만 열람 가능)</span></p>
         <div class="adm-field">
           <textarea id="adm-new-inner-text" placeholder="내부 전용 정보를 입력하세요
 예) 단가, 마진율, 납기 협의 내용, 거래처 메모 등" style="width:100%;min-height:90px;padding:8px 10px;border:1px solid #f5c6c6;border-radius:7px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box;line-height:1.6;background:#fff8f8"></textarea>
@@ -982,7 +980,8 @@ function buildCard(key){
   var p=DB[key];if(!p)return null;
   var card=document.createElement('div');card.className='pcard';
   var tbr=document.createElement('div');tbr.className='tbr';
-  var canSeeInner=CURRENT_USER&&(CURRENT_USER.id.indexOf('수주팀')!==-1||CURRENT_USER.id.indexOf('영업팀')!==-1||CURRENT_USER.id==='admin');
+  var _vipIds=['강원선','강영수','강지혜','강승연'];
+  var canSeeInner=CURRENT_USER&&(CURRENT_USER.id.indexOf('우딘')!==-1||_vipIds.indexOf(CURRENT_USER.id)!==-1||CURRENT_USER.id==='admin');
   var tabDefs=[{id:'img',l:'🖼 이미지'},{id:'draw',l:'📐 도면'},{id:'video',l:'📋 상세설명'}];
   if(canSeeInner)tabDefs.push({id:'inner',l:'🔒 내부정보'});
   var panes={img:document.createElement('div'),draw:document.createElement('div'),video:document.createElement('div'),inner:document.createElement('div')};
@@ -1041,10 +1040,11 @@ function buildCard(key){
   var pb=document.createElement('div');pb.className='pb';
   var pt=document.createElement('div');pt.className='pt';pt.textContent=key;
   var bc=document.createElement('span');bc.className='bc';bc.textContent=p.cat;pt.appendChild(bc);pb.appendChild(pt);
-  // 재고 표시 (수주팀/영업팀 아이디에만 표시)
+  // 재고 표시 (우딘 포함 아이디 + 특정 VIP 아이디에만 표시)
+  var _vipIds2=['강원선','강영수','강지혜','강승연'];
   var canSeeStock = CURRENT_USER && (
-    CURRENT_USER.id.indexOf('수주팀')!==-1 ||
-    CURRENT_USER.id.indexOf('영업팀')!==-1 ||
+    CURRENT_USER.id.indexOf('우딘')!==-1 ||
+    _vipIds2.indexOf(CURRENT_USER.id)!==-1 ||
     IS_ADMIN
   );
   if(canSeeStock&&p.stock!==undefined&&p.stock!==null&&p.stock!==''){

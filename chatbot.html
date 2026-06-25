@@ -456,7 +456,10 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
 <!-- 관리자 패널 -->
 <div id="adm-panel" class="">
   <div id="adm-inner">
-    <h2>🛠 관리자 패널</h2>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+      <h2 style="margin:0">🛠 관리자 패널</h2>
+      <button onclick="admClosePanel()" style="background:none;border:none;font-size:24px;line-height:1;cursor:pointer;color:#999;padding:0 4px" title="닫기">✕</button>
+    </div>
 
     <!-- GitHub 연동 상태 바 -->
     <div id="adm-gh-bar">
@@ -792,12 +795,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
       </div>
 
     </div>
-    
-      <div class="adm-foot">
-        <button class="adm-save-btn" onclick="admSaveLocal()">💾 저장</button>
-        <button class="adm-push-btn" onclick="admPushToGitHub()">🚀 저장 + GitHub 업로드</button>
-        <button class="adm-close-btn" onclick="admClosePanel()">닫기</button>
-      </div></div>
+    </div>
 
   </div>
   
@@ -1260,14 +1258,6 @@ function admGetCurrentHTML(){
     }
   }
 
-  // adm-foot 보존 - 없으면 추가
-  (function(){
-    var footHtml='\n      <div class="adm-foot">\n        <button class="adm-save-btn" onclick="admSaveLocal()">💾 저장</button>\n        <button class="adm-push-btn" onclick="admPushToGitHub()">🚀 저장 + GitHub 업로드</button>\n        <button class="adm-close-btn" onclick="admClosePanel()">닫기</button>\n      </div>';
-    var innerEnd=html.lastIndexOf('</div>\n    </div>\n\n  </div>');
-    if(innerEnd>0&&html.indexOf('<div class="adm-foot">')<0){
-      html=html.substring(0,innerEnd)+footHtml+html.substring(innerEnd);
-    }
-  })();
   // adm-foot 중복 방지
   (function(){
     var ft='<div class="adm-foot">';

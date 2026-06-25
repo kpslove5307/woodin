@@ -792,7 +792,12 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
       </div>
 
     </div>
-    </div>
+    
+      <div class="adm-foot">
+        <button class="adm-save-btn" onclick="admSaveLocal()">💾 저장</button>
+        <button class="adm-push-btn" onclick="admSaveAndPush()">🚀 저장 + GitHub 업로드</button>
+        <button class="adm-close-btn" onclick="admClosePanel()">닫기</button>
+      </div></div>
 
   </div>
   
@@ -1221,7 +1226,7 @@ function admGetCurrentHTML(){
   html=html.replace("u.id===saved.id&&u.pw===saved.pw","u.id===saved.id");
 
   // 카테고리 반영
-  html=html.replace(/var ADM_CATS=["실린더","포인트몰딩","오목이","PVC몰딩","인조대리석","리빙보드","힐링월","힐링월몰딩","모티스","하드웨어","행거","경첩","슬라이딩락","핸들"];/,'var ADM_CATS='+JSON.stringify(ADM_CATS)+';');
+  html=html.replace(/var ADM_CATS=\[[^\]]*\];/,'var ADM_CATS='+JSON.stringify(ADM_CATS)+';');
 
   // 문의 안내 문구 반영
   var iqS='/*INQUIRY_START*/';var iqE='/*INQUIRY_END*/';
@@ -1361,10 +1366,18 @@ async function admPushToGitHub(onSuccess){
     // ADM_NOTICE 교체
     var ntS='/*NOTI'+'CE_START*/';var ntE='/*NOTI'+'CE_END*/';
     var ni=html.indexOf(ntS),ne=html.indexOf(ntE);
-    if(ni!==-1&&ne!==-1)html=html.substring(0,ni)+ntS+ADM_NOTICE+ntE+html.substring(ne+ntE.length);
+    if(ni!==-1&&ne!==-1)html=html.substring(0,ni)+ntS+'`'+ADM_NOTICE.replace(/`/g,'\\`')+'`'+ntE+html.substring(ne+ntE.length);
 
     // ADM_PW 교체
     html=html.replace(/var ADM_PW='[^']*';/,"var ADM_PW='dnels1122';");
+
+    // DB 교체
+    var dbS='/*DB_'+'START*/';var dbE='/*DB_'+'END*/';
+    var dsi=html.indexOf(dbS),dei=html.indexOf(dbE);
+    if(dsi!==-1&&dei!==-1){
+      var dbJson=JSON.stringify(DB);
+      html=html.substring(0,dsi)+dbS+'\n'+dbJson.slice(1,-1)+'\n'+dbE+html.substring(dei+dbE.length);
+    }
 
     // I (이미지) placeholder 반영
     for(var k in I){

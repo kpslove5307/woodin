@@ -199,6 +199,8 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
 .adm-spinner{width:44px;height:44px;border:4px solid #e0e0e0;border-top-color:var(--p);border-radius:50%;animation:adm-spin .8s linear infinite}
 @keyframes adm-spin{to{transform:rotate(360deg)}}
 @media(max-width:480px){
+  body{padding:0;gap:0;}
+  #app{border-radius:0;height:100dvh;height:100vh;}
   #hdr{padding:10px 12px;gap:8px;}
   #hdr h1{font-size:12px;}
   #hdr p{font-size:9.5px;}

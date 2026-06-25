@@ -1543,7 +1543,7 @@ function admOpenPanel(){
     admSetupDrop('adm-'+admDropId(t)+'-drop',t);
   });
   document.getElementById('adm-meta-sec').style.display='none';
-  document.getElementById('adm-del-btn').style.display='none';
+  var delBtn=document.getElementById('adm-del-btn');if(delBtn)delBtn.style.display='none';
   admSwitchTab('edit');
   admGhUpdateStatus();
   // 재고 드롭존 드래그 초기화

@@ -1215,16 +1215,6 @@ async function admPushToGitHub(onSuccess){
       }
     }
 
-    // DB 교체
-    var dbS='/*DB_'+'START*/';var dbE='/*DB_'+'END*/';
-    var dsi=html.indexOf(dbS),dei=html.indexOf(dbE);
-    if(dsi!==-1&&dei!==-1){
-      try{
-        var dbJson=JSON.stringify(DB);
-        html=html.substring(0,dsi)+dbS+'\n'+dbJson.slice(1,-1)+'\n'+dbE+html.substring(dei+dbE.length);
-      }catch(e){console.error('DB 교체 오류:',e);}
-    }
-
     // ADM_USERS 교체
     var usS='/*USER'+'S_START*/';var usE='/*USER'+'S_END*/';
     var si=html.indexOf(usS),ei=html.indexOf(usE);
@@ -2062,6 +2052,7 @@ function setCookie(name, value, days){
   var expires='';
   if(days){var d=new Date();d.setTime(d.getTime()+(days*24*60*60*1000));expires='; expires='+d.toUTCString();}
   document.cookie=name+'='+encodeURIComponent(value)+expires+'; path=/; SameSite=Lax';
+  try{localStorage.setItem(name, value);}catch(e){}
 }
 function getCookie(name){
   var n=name+'=';
@@ -2070,6 +2061,7 @@ function getCookie(name){
     var c=ca[i].trim();
     if(c.indexOf(n)===0)return decodeURIComponent(c.substring(n.length));
   }
+  try{var ls=localStorage.getItem(name);if(ls)return ls;}catch(e){}
   return null;
 }
 function removeCookie(name){

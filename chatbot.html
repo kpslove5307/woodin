@@ -2197,9 +2197,9 @@ function gateShowUserInfo(){
     nm.textContent = CURRENT_USER.name || CURRENT_USER.id;
     el.style.display='flex';
   }
-  // 일반 사용자는 관리자 버튼 숨기기
+  // 관리자만 관리자 버튼 표시
   var admBtn=document.getElementById('adm-btn');
-  if(admBtn) admBtn.style.display='none';
+  if(admBtn) admBtn.style.display=IS_ADMIN?'':'none';
   // 사이드 패널 이름 자동입력
   var sw = document.getElementById('side-writer');
   if(sw && CURRENT_USER && CURRENT_USER.name) sw.value = CURRENT_USER.name;
@@ -2269,14 +2269,11 @@ function gateDoAdminLogin(){
   var pw = document.getElementById('gate-adm-pw').value;
   var err = document.getElementById('gate-adm-err');
   if(pw !== ADM_PW){err.textContent='비밀번호가 올바르지 않습니다.';err.style.display='block';return;}
-  // 관리자 로그인 성공 → IS_ADMIN 설정 + 쿠키 저장 후 게이트 닫고 패널 열기
+  // 관리자 로그인 성공 → IS_ADMIN 설정 후 게이트 닫고 패널 열기
   IS_ADMIN=true;
-  CURRENT_USER={id:'admin',name:'관리자'};
-  setCookie('woodin_user', JSON.stringify(CURRENT_USER), 7);
   document.getElementById('user-gate').style.display='none';
   var admBtn=document.getElementById('adm-btn');
   if(admBtn) admBtn.style.display='';
-  gateShowUserInfo();
   admOpenPanel();
 }
 function gateShowPending(name, id){

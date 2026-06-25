@@ -1542,8 +1542,8 @@ function admOpenPanel(){
   ['real','draw','desc','newReal','newDraw','newDesc'].forEach(function(t){
     admSetupDrop('adm-'+admDropId(t)+'-drop',t);
   });
-  var _e_adm_meta_sec=document.getElementById('adm-meta-sec');if(_e_adm_meta_sec)_e_adm_meta_sec.style.display='none';
-  var _e_adm_del_btn=document.getElementById('adm-del-btn');if(_e_adm_del_btn)_e_adm_del_btn.style.display='none';
+  document.getElementById('adm-meta-sec').style.display='none';
+  var _delBtn=document.getElementById('adm-del-btn');if(_delBtn)_delBtn.style.display='none';
   admSwitchTab('edit');
   admGhUpdateStatus();
   // 재고 드롭존 드래그 초기화

@@ -1559,15 +1559,14 @@ function admClosePanel(){
   document.getElementById('adm-panel').classList.remove('show');
 }
 function admSwitchTab(tab){
-  document.getElementById('adm-tab-edit').classList.toggle('on',tab==='edit');
-  document.getElementById('adm-tab-new').classList.toggle('on',tab==='new');
-  document.getElementById('adm-tab-cat').classList.toggle('on',tab==='cat');
-  document.getElementById('adm-tab-stock').classList.toggle('on',tab==='stock');
-  document.getElementById('adm-tab-notice').classList.toggle('on',tab==='notice');
-  document.getElementById('adm-tab-users').classList.toggle('on',tab==='users');
-  document.getElementById('adm-tab-inquiry').classList.toggle('on',tab==='inquiry');
-  document.getElementById('adm-edit-view').classList.toggle('on',tab==='edit');
-  document.getElementById('adm-new-view').classList.toggle('on',tab==='new');
+  ['edit','new','cat','stock','notice','users','inquiry'].forEach(function(t){
+    var btn=document.getElementById('adm-tab-'+t);
+    if(btn) btn.classList[t===tab?'add':'remove']('on');
+  });
+  var ev=document.getElementById('adm-edit-view');
+  if(ev) ev.classList[tab==='edit'?'add':'remove']('on');
+  var nv=document.getElementById('adm-new-view');
+  if(nv) nv.classList[tab==='new'?'add':'remove']('on');
   document.getElementById('adm-cat-view').style.display=(tab==='cat')?'block':'none';
   document.getElementById('adm-stock-view').style.display=(tab==='stock')?'block':'none';
   document.getElementById('adm-notice-view').style.display=(tab==='notice')?'block':'none';

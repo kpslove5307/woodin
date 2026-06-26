@@ -1270,10 +1270,21 @@ function admSaveAndPush(){
     (p.videos||[]).forEach(function(o){allFiles.push(o.f);});
   }
   var newImgs=Object.keys(I).filter(function(k){return I[k]&&I[k]!=='__IMG_PLACEHOLDER__'&&I[k].startsWith('data:');});
-
-
   admPushToGitHub(null);
-}/* ══ 관리자 모드 ══ */
+}
+
+/* 추가 + GitHub 업로드 (새 제품 탭) */
+function admAddProductAndPush(){
+  var name=(document.getElementById('adm-new-name').value||'').trim();
+  if(!name){alert('제품명을 입력하세요.');return;}
+  if(DB[name]){alert('"'+name+'" 제품이 이미 존재합니다.');return;}
+  var cat=document.getElementById('adm-new-cat').value;
+  if(!cat||cat==='__new__'){alert('카테고리를 선택하세요.');return;}
+  admAddProductLocal();
+  admPushToGitHub(null);
+}
+
+/* ══ 관리자 모드 ══ */
 var IS_ADMIN = false; // 관리자 로그인 여부
 
 function admBtnClick(){
@@ -1357,7 +1368,18 @@ function admFilterDelProducts(query){
       sel.appendChild(o);
     }
   });
-}function admPopulateCats(){
+}
+function admDeleteSelectedProduct(){
+  var pname=document.getElementById('adm-del-product-sel').value;
+  if(!pname){alert('삭제할 제품을 선택하세요.');return;}
+  if(!confirm('"'+pname+'" 제품을 삭제하시겠습니까?\n삭제 후 GitHub 업로드해야 영구 적용됩니다.'))return;
+  delete DB[pname];
+  admFilterDelProducts(document.getElementById('adm-del-search').value);
+  admFilterProducts(document.getElementById('adm-product-search').value||'');
+  alert('"'+pname+'" 제품이 삭제되었습니다.\n🚀 HTML만 GitHub 업로드 버튼을 눌러 저장하세요.');
+}
+
+function admPopulateCats(){
   // DB에서 카테고리 동적 수집 + 하드코딩 목록 합치기
   var cats=ADM_CATS.slice();
   Object.values(DB).forEach(function(p){if(p.cat&&cats.indexOf(p.cat)<0)cats.push(p.cat);});
@@ -1656,7 +1678,13 @@ function admCatAdd(){
   inp.value='';
   admCatRender();
   admPopulateCats();
-}// ── 재고 관리 ──────────────────────────────────────────
+}
+function admCatSaveAndPush(){
+  admPopulateCats();
+  admPushToGitHub(null);
+}
+
+// ── 재고 관리 ──────────────────────────────────────────
 var _stockRows=[];  // 파싱된 엑셀 데이터 [{name, qty}]
 
 function admStockUpdateDate(){
@@ -2005,7 +2033,20 @@ function admAddProduct(){
   if(!cat||cat==='__new__'){alert('카테고리를 선택하세요.');return;}
   admAddProductLocal();
   alert('✅ "'+name+'" 제품이 추가되었습니다!\n챗봇에서 바로 검색할 수 있습니다.');
-}/* ══ 쿠키 헬퍼 (localStorage 대체) ══ */
+}
+
+/* 제품 삭제 */
+function admDeleteProduct(){
+  var pname=document.getElementById('adm-product-sel').value;
+  if(!pname)return;
+  if(!confirm('"'+pname+'" 제품을 삭제하시겠습니까?\n이 작업은 현재 세션에만 적용됩니다.'))return;
+  delete DB[pname];
+  alert('"'+pname+'" 제품이 삭제되었습니다.');
+  admOpenPanel(); // 제품 목록 새로고침
+}
+
+
+/* ══ 쿠키 헬퍼 (localStorage 대체) ══ */
 function setCookie(name, value, days){
   var expires='';
   if(days){var d=new Date();d.setTime(d.getTime()+(days*24*60*60*1000));expires='; expires='+d.toUTCString();}
@@ -2748,7 +2789,22 @@ function admDoAddUser(){
   admPushToGitHub(function(){
     alert('✅ "'+name+'"님이 추가되었습니다!');
   });
-}function admUsersSaveAndPush(){
+}
+
+function admAddUserManual(){
+  var name = prompt('이름:','');
+  if(!name)return;
+  var id = prompt('아이디 (영문/숫자):','');
+  if(!id)return;
+  var pw = prompt('비밀번호:','');
+  if(!pw)return;
+  if(ADM_USERS.some(function(u){return u.id===id;})){alert('이미 존재하는 아이디입니다.');return;}
+  ADM_USERS.push({id:id,name:name,pw:pw});
+  admRenderApprovedUsers();
+  alert('추가됐습니다. 🚀 GitHub 업로드를 눌러 저장하세요.');
+}
+
+function admUsersSaveAndPush(){
   admPushToGitHub(null);
 }
 

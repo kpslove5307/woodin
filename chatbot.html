@@ -1228,7 +1228,7 @@ async function admPushToGitHub(onSuccess){
     // ADM_NOTICE 교체
     var ntS='/*NOTI'+'CE_START*/';var ntE='/*NOTI'+'CE_END*/';
     var ni=html.indexOf(ntS),ne=html.indexOf(ntE);
-    if(ni!==-1&&ne!==-1)html=html.substring(0,ni)+ntS+ADM_NOTICE+ntE+html.substring(ne+ntE.length);
+    if(ni!==-1&&ne!==-1)html=html.substring(0,ni)+ntS+'`'+ADM_NOTICE+'`'+ntE+html.substring(ne+ntE.length);
 
     // ADM_PW 교체
     html=html.replace(/var ADM_PW='[^']*';/,"var ADM_PW='dnels1122';");

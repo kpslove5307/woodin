@@ -1313,7 +1313,7 @@ function admCloseLogin(){
 }
 function admCheckPw(){
   var v=document.getElementById('adm-pw-input').value;
-  if(v===ADM_PW){IS_ADMIN=true;admCloseLogin();admOpenPanel();}
+  if(v===ADM_PW){IS_ADMIN=true;if(!CURRENT_USER)CURRENT_USER={id:'admin',name:'관리자'};setCookie('woodin_user',JSON.stringify({id:'admin',name:'관리자'}),7);admCloseLogin();admOpenPanel();}
   else{
     document.getElementById('adm-err').style.display='block';
     document.getElementById('adm-pw-input').value='';
@@ -2181,9 +2181,12 @@ function gateDoAdminLogin(){
   if(pw !== ADM_PW){err.textContent='비밀번호가 올바르지 않습니다.';err.style.display='block';return;}
   // 관리자 로그인 성공 → IS_ADMIN 설정 후 게이트 닫고 패널 열기
   IS_ADMIN=true;
+  if(!CURRENT_USER)CURRENT_USER={id:'admin',name:'관리자'};
+  setCookie('woodin_user',JSON.stringify({id:'admin',name:'관리자'}),7);
   document.getElementById('user-gate').style.display='none';
   var admBtn=document.getElementById('adm-btn');
   if(admBtn) admBtn.style.display='';
+  gateShowUserInfo();
   admOpenPanel();
 }
 function gateShowPending(name, id){

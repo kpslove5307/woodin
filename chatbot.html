@@ -2975,14 +2975,32 @@ function scoreProduct(k, tokens){
   return score;
 }
 
+// 토큰 중 의미있는 것들이 모두 매칭되는지 확인 (장문 검색용)
+function allKeyTokensMatch(k, tokens){
+  var txt=getProductText(k);
+  // 2글자 미만 토큰, n-gram 파생 토큰은 필수 매칭 제외 (보조 토큰)
+  // 공백분리 원본 토큰만 필수로 체크
+  var keyTokens=tokens.filter(function(t){return t.length>=2;});
+  // 중복 의미 토큰 줄이기: 매칭되는 것과 안되는 것 분류
+  var matched=keyTokens.filter(function(t){return txt.indexOf(t)!==-1;});
+  // 전체 핵심 토큰의 70% 이상 매칭되어야 함
+  return matched.length >= Math.ceil(keyTokens.length * 0.7);
+}
+
 // 통합 스마트 검색
 function smartSearch(q){
   var tokens=tokenize(q);
   if(!tokens.length)return[];
+  // 원본 공백 분리 토큰 (의미 단어)
+  var spaceTokens=q.trim().toLowerCase().split(/\s+/).filter(function(w){return w.length>=2;});
+  var isLongQuery=spaceTokens.length>=2; // 2단어 이상 = 장문 검색
   var scored=[];
   Object.keys(DB).forEach(function(k){
     var s=scoreProduct(k,tokens);
-    if(s>0)scored.push({k:k,score:s});
+    if(s<=0)return;
+    // 장문 검색이면 핵심 토큰 70% 이상 매칭 필수
+    if(isLongQuery&&!allKeyTokensMatch(k,tokens))return;
+    scored.push({k:k,score:s});
   });
   scored.sort(function(a,b){return b.score-a.score||a.k.localeCompare(b.k,'ko');});
   // 최고점이 2위보다 2배 이상 높으면 단독 1위로 확정

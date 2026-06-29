@@ -1264,7 +1264,7 @@ async function admPushToGitHub(onSuccess){
 function admSaveAndPush(){
   var pname=document.getElementById('adm-product-sel').value;
   if(!pname){alert('제품을 선택하세요.');return;}
-  if(!admSaveLocal()){alert('저장 실패.');return;}
+  if(!admSaveLocal(true)){alert('저장 실패.');return;}
   // 저장 후 DB 확인
   var p=DB[pname];
   var allFiles=[];
@@ -1955,7 +1955,7 @@ function admShowToast(msg, color){
 }
 
 /* 저장 (기존 제품 편집) */
-function admSaveLocal(){
+function admSaveLocal(silent){
   var pname=document.getElementById('adm-product-sel').value;
   if(!pname)return false;
   var p=DB[pname];if(!p)return false;
@@ -2002,14 +2002,14 @@ function admSaveLocal(){
   p.descText=(descTextEl?descTextEl.value.trim():'');
   var innerTextEl=document.getElementById('adm-inner-text');
   p.innerText=(innerTextEl?innerTextEl.value.trim():'');
-  admShowToast('✅ \"'+pname+'\" 세션에 저장됨! (GitHub 업로드 전)');
+  if(!silent) admShowToast('✅ "'+pname+'" 세션에 저장됨! (GitHub 업로드 전)');
   return true;
 }
 function admSave(){
   var pname=document.getElementById('adm-product-sel').value;
   if(!pname){alert('제품을 선택하세요.');return;}
-  if(!admSaveLocal()){alert('제품을 찾을 수 없습니다.');return;}
-  alert('✅ 저장되었습니다!\n영구 저장은 GitHub 업로드 버튼을 눌러주세요.');
+  if(!admSaveLocal(true)){alert('제품을 찾을 수 없습니다.');return;}
+  admShowToast('✅ "'+pname+'" 세션에 저장됨! (GitHub 업로드 전)');
 }
 
 /* 새 제품 추가 */

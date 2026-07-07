@@ -11,9 +11,9 @@
 body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:16px;gap:16px}
 #side-panel{width:390px;flex-shrink:0;display:none;flex-direction:column;gap:0;align-self:flex-start;margin-top:0}
 @media(min-width:1100px){#side-panel{display:flex}
-#notice-popup-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9600;align-items:center;justify-content:center;padding:20px}
+#notice-popup-modal{display:none;position:fixed;inset:0;background:transparent;z-index:9600;align-items:center;justify-content:center;padding:20px;pointer-events:none}
 #notice-popup-modal.show{display:flex}
-.npm-box{background:#fff;border-radius:18px;max-width:600px;width:100%;padding:34px 32px 26px;box-shadow:0 20px 60px rgba(0,0,0,.35);max-height:85vh;display:flex;flex-direction:column}
+.npm-box{background:#fff;border-radius:18px;max-width:600px;width:100%;padding:34px 32px 26px;box-shadow:0 8px 40px rgba(0,0,0,.25);max-height:85vh;display:flex;flex-direction:column;pointer-events:auto;border:1px solid rgba(0,0,0,.08)}
 .npm-title{font-size:22px;font-weight:800;color:var(--p);margin-bottom:16px;display:flex;align-items:center;gap:8px;flex-shrink:0}
 #notice-popup-content{font-size:16px;line-height:1.8;white-space:pre-wrap;margin-bottom:26px;overflow-y:auto;flex:1;min-height:0}
 .npm-btns{display:flex;gap:10px;flex-shrink:0}
@@ -21,8 +21,8 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
 .npm-btn-today{background:#f0f2f5;color:#666}
 .npm-btn-close{background:var(--p);color:#fff;font-weight:700}
 @media(min-width:1600px){
-  #notice-popup-modal.show{background:transparent;justify-content:flex-start;pointer-events:none}
-  .npm-box{pointer-events:auto;width:340px;max-width:340px;height:82vh;max-height:82vh;margin-left:28px}
+  #notice-popup-modal.show{justify-content:flex-start}
+  .npm-box{width:340px;max-width:340px;height:82vh;max-height:82vh;margin-left:28px}
 }}
 #app{width:100%;max-width:860px;background:var(--w);border-radius:22px;box-shadow:0 8px 40px rgba(26,79,160,.15);display:flex;flex-direction:column;height:98vh;overflow:hidden}
 #hdr{background:linear-gradient(135deg,var(--p),var(--pd));color:#fff;padding:13px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0;flex-wrap:wrap}

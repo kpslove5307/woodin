@@ -13,9 +13,11 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
 @media(min-width:1100px){#side-panel{display:flex}
 #notice-popup-modal{display:none;position:fixed;inset:0;background:transparent;z-index:9600;align-items:center;justify-content:center;padding:20px;pointer-events:none}
 #notice-popup-modal.show{display:flex}
-.npm-box{background:#fff;border-radius:18px;max-width:600px;width:100%;padding:34px 32px 26px;box-shadow:0 8px 40px rgba(0,0,0,.25);max-height:85vh;display:flex;flex-direction:column;pointer-events:auto;border:1px solid rgba(0,0,0,.08)}
-.npm-title{font-size:22px;font-weight:800;color:var(--p);margin-bottom:16px;display:flex;align-items:center;gap:8px;flex-shrink:0}
-#notice-popup-content{font-size:16px;line-height:1.8;white-space:pre-wrap;margin-bottom:26px;overflow-y:auto;flex:1;min-height:0}
+.npm-box{border-radius:18px;max-width:600px;width:100%;padding:34px 32px 26px;max-height:85vh;display:flex;flex-direction:column;pointer-events:auto}
+.npm-title{margin-bottom:18px;display:flex;align-items:center;flex-shrink:0}
+.npm-title-text{font-size:22px;font-weight:800;color:var(--p);background:rgba(255,255,255,.9);padding:6px 14px;border-radius:8px;box-decoration-break:clone;-webkit-box-decoration-break:clone;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+#notice-popup-content{margin-bottom:26px;overflow-y:auto;flex:1;min-height:0}
+#notice-popup-text{font-size:16px;line-height:2.2;white-space:pre-wrap;background:rgba(255,255,255,.88);padding:3px 10px;border-radius:5px;box-decoration-break:clone;-webkit-box-decoration-break:clone;box-shadow:0 1px 6px rgba(0,0,0,.08)}
 .npm-btns{display:flex;gap:10px;flex-shrink:0}
 .npm-btns button{flex:1;padding:13px;border:none;border-radius:10px;font-size:14px;cursor:pointer}
 .npm-btn-today{background:#f0f2f5;color:#666}
@@ -1665,7 +1667,7 @@ function popupNoticeShow(){
   }
   var modal=document.getElementById('notice-popup-modal');
   if(!modal||!item)return;
-  var box=document.getElementById('notice-popup-content');
+  var box=document.getElementById('notice-popup-text');
   if(box){box.textContent=item.content;box.style.color=item.color;}
   modal.dataset.currentType=item.type;
   modal.classList.add('show');
@@ -3698,8 +3700,8 @@ async function mobileInqSubmit(){
 <!-- 공지 팝업 모달 -->
 <div id="notice-popup-modal">
   <div class="npm-box">
-    <div class="npm-title">📣 공지사항</div>
-    <div id="notice-popup-content"></div>
+    <div class="npm-title"><span class="npm-title-text">📣 공지사항</span></div>
+    <div id="notice-popup-content"><span id="notice-popup-text"></span></div>
     <div class="npm-btns">
       <button class="npm-btn-today" onclick="popupNoticeCloseToday()">오늘 하루 보지 않기</button>
       <button class="npm-btn-close" onclick="popupNoticeClose()">닫기</button>

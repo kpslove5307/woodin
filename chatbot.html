@@ -13,18 +13,27 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
 @media(min-width:1100px){#side-panel{display:flex}
 #notice-popup-modal{display:none;position:fixed;inset:0;background:transparent;z-index:9600;align-items:center;justify-content:center;padding:20px;pointer-events:none}
 #notice-popup-modal.show{display:flex}
-.npm-box{border-radius:18px;max-width:600px;width:100%;padding:34px 32px 26px;max-height:85vh;display:flex;flex-direction:column;pointer-events:auto}
-.npm-title{margin-bottom:18px;display:flex;align-items:center;flex-shrink:0}
-.npm-title-text{font-size:22px;font-weight:800;color:var(--p);background:rgba(255,255,255,.9);padding:6px 14px;border-radius:8px;box-decoration-break:clone;-webkit-box-decoration-break:clone;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.npm-box{background:#fff;border-radius:18px;max-width:600px;width:100%;padding:34px 32px 26px;max-height:85vh;display:flex;flex-direction:column;pointer-events:auto;box-shadow:0 8px 40px rgba(0,0,0,.25);border:1px solid rgba(0,0,0,.08)}
+.npm-title{margin-bottom:16px;display:flex;align-items:center;flex-shrink:0}
+.npm-title-text{font-size:22px;font-weight:800;color:var(--p)}
 #notice-popup-content{margin-bottom:26px;overflow-y:auto;flex:1;min-height:0}
-#notice-popup-text{font-size:16px;line-height:2.2;white-space:pre-wrap;background:rgba(255,255,255,.88);padding:3px 10px;border-radius:5px;box-decoration-break:clone;-webkit-box-decoration-break:clone;box-shadow:0 1px 6px rgba(0,0,0,.08)}
+#notice-popup-text{font-size:16px;line-height:1.8;white-space:pre-wrap}
 .npm-btns{display:flex;gap:10px;flex-shrink:0}
 .npm-btns button{flex:1;padding:13px;border:none;border-radius:10px;font-size:14px;cursor:pointer}
 .npm-btn-today{background:#f0f2f5;color:#666}
 .npm-btn-close{background:var(--p);color:#fff;font-weight:700}
-@media(min-width:1600px){
-  #notice-popup-modal.show{justify-content:flex-start}
-  .npm-box{width:340px;max-width:340px;height:82vh;max-height:82vh;margin-left:28px}
+/* 사이드바(최대 390px) + gap(16) + 챗봇창(최대 860px) + body 패딩(32) = 1298px이 화면 중앙에 오기 때문에,
+   그 바깥쪽 여백 폭을 직접 계산해서 공지팝업을 배치 - 사이드바와 겹치지 않도록 */
+@media(min-width:1850px){
+  .npm-box{
+    position:fixed;
+    left:20px;
+    top:9vh;
+    width:clamp(240px, calc(50vw - 685px), 340px);
+    max-width:none;
+    height:82vh;
+    max-height:82vh;
+  }
 }}
 #app{width:100%;max-width:860px;background:var(--w);border-radius:22px;box-shadow:0 8px 40px rgba(26,79,160,.15);display:flex;flex-direction:column;height:98vh;overflow:hidden}
 #hdr{background:linear-gradient(135deg,var(--p),var(--pd));color:#fff;padding:13px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0;flex-wrap:wrap}

@@ -2257,10 +2257,11 @@ function admAddProduct(){
 function admDeleteProduct(){
   var pname=document.getElementById('adm-product-sel').value;
   if(!pname)return;
-  if(!confirm('"'+pname+'" 제품을 삭제하시겠습니까?\n이 작업은 현재 세션에만 적용됩니다.'))return;
+  if(!confirm('"'+pname+'"\n제품을 삭제하고 GitHub에 즉시 반영합니다.\n계속하시겠습니까?'))return;
   delete DB[pname];
-  alert('"'+pname+'" 제품이 삭제되었습니다.');
-  admOpenPanel(); // 제품 목록 새로고침
+  admOpenPanel(); // 제품 목록 새로고침 (삭제로 인해 드롭다운이 초기화되므로, 아래 업로드는 선택 상태와 무관하게 바로 진행)
+  admShowToast('🗑 "'+pname+'" 삭제됨 - GitHub 업로드 중...');
+  admPushToGitHub(null);
 }
 
 

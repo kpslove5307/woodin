@@ -511,6 +511,7 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
       <button class="adm-tab" id="adm-tab-popup" onclick="admSwitchTab('popup')">📣 공지팝업</button>
       <button class="adm-tab" id="adm-tab-users" onclick="admSwitchTab('users')">👥 사용자</button>
       <button class="adm-tab on" id="adm-tab-inquiry" onclick="admSwitchTab('inquiry')">📋 문의</button>
+      <button class="adm-tab" id="adm-tab-faq" onclick="admSwitchTab('faq')">💬 질문답변</button>
     </div>
 
     <!-- 탭1: 기존 제품 편집 -->
@@ -807,6 +808,22 @@ body{background:var(--bg);min-height:100vh;display:flex;justify-content:center;a
         <div id="adm-inquiry-list" style="max-height:740px;overflow-y:auto;border:1px solid #eee;border-radius:8px;padding:4px;font-size:13.5px"><div data-issue-num="34" style="padding: 12px 14px; border-bottom: 1px solid rgb(240, 240, 240); font-size: 12px; display: flex; gap: 10px; align-items: flex-start;"><input type="checkbox" class="inq-check" data-num="34" style="margin-top: 4px; cursor: pointer; width: 16px; height: 16px; flex-shrink: 0;"><div style="flex: 1 1 0%; min-width: 0px;"><div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span style="font-weight:700;color:#333">영업팀아이유</span><span style="color:#bbb;font-size:10px">2026. 6. 24. 오후 1:17:50</span><button onclick="admDeleteInquiry(34,this)" style="margin-left:auto;padding:3px 10px;background:#fff0f0;border:1px solid #fcc;border-radius:6px;font-size:11px;cursor:pointer;color:#c33">🗑 삭제</button></div><div style="color:#555;white-space:pre-wrap;line-height:1.6;margin-bottom:8px">ㅇㅇㅇㅇㅇ</div><div style="display:flex;gap:6px;margin-top:4px"><textarea id="reply-34" placeholder="답글 입력..." rows="2" style="flex:1;padding:7px 10px;border:1px solid #ddd;border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;outline:none"></textarea><button onclick="admSaveReply(34,'영업팀아이유','reply-34',this)" style="padding:6px 12px;background:#1a4fa0;color:#fff;border:none;border-radius:8px;font-size:11px;cursor:pointer;font-weight:700;align-self:flex-end" disabled="">저장중...</button></div></div></div><div data-issue-num="33" style="padding: 12px 14px; border-bottom: 1px solid rgb(240, 240, 240); font-size: 12px; display: flex; gap: 10px; align-items: flex-start;"><input type="checkbox" class="inq-check" data-num="33" style="margin-top: 4px; cursor: pointer; width: 16px; height: 16px; flex-shrink: 0;"><div style="flex: 1 1 0%; min-width: 0px;"><div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span style="font-weight:700;color:#333">영업팀아이유</span><span style="color:#bbb;font-size:10px">2026. 6. 24. 오후 1:14:01</span><button onclick="admDeleteInquiry(33,this)" style="margin-left:auto;padding:3px 10px;background:#fff0f0;border:1px solid #fcc;border-radius:6px;font-size:11px;cursor:pointer;color:#c33">🗑 삭제</button></div><div style="color:#555;white-space:pre-wrap;line-height:1.6;margin-bottom:8px">방가방가</div><div style="margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8ecf4;font-size:12px"><span style="color:#1a4fa0;font-weight:600">📣 관리자 답글</span>&nbsp;&nbsp;<span style="color:#333;white-space:pre-wrap">ㅋㅋㅋㅋㅋ</span></div><div style="display:flex;gap:6px;margin-top:4px"><textarea id="reply-33" placeholder="답글 입력..." rows="2" style="flex:1;padding:7px 10px;border:1px solid #ddd;border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;outline:none">ㅋㅋㅋㅋㅋ</textarea><button onclick="admSaveReply(33,'영업팀아이유','reply-33',this)" style="padding:6px 12px;background:#1a4fa0;color:#fff;border:none;border-radius:8px;font-size:11px;cursor:pointer;font-weight:700;align-self:flex-end">답글 저장</button></div></div></div><div data-issue-num="32" style="padding: 12px 14px; border-bottom: 1px solid rgb(240, 240, 240); font-size: 12px; display: flex; gap: 10px; align-items: flex-start;"><input type="checkbox" class="inq-check" data-num="32" style="margin-top: 4px; cursor: pointer; width: 16px; height: 16px; flex-shrink: 0;"><div style="flex: 1 1 0%; min-width: 0px;"><div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span style="font-weight:700;color:#333">영업팀아이유</span><span style="color:#bbb;font-size:10px">2026. 6. 24. 오후 1:05:44</span><button onclick="admDeleteInquiry(32,this)" style="margin-left:auto;padding:3px 10px;background:#fff0f0;border:1px solid #fcc;border-radius:6px;font-size:11px;cursor:pointer;color:#c33">🗑 삭제</button></div><div style="color:#555;white-space:pre-wrap;line-height:1.6;margin-bottom:8px">안녕하세요</div><div style="margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8ecf4;font-size:12px"><span style="color:#1a4fa0;font-weight:600">📣 관리자 답글</span>&nbsp;&nbsp;<span style="color:#333;white-space:pre-wrap">안녕</span></div><div style="display:flex;gap:6px;margin-top:4px"><textarea id="reply-32" placeholder="답글 입력..." rows="2" style="flex:1;padding:7px 10px;border:1px solid #ddd;border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;outline:none">안녕</textarea><button onclick="admSaveReply(32,'영업팀아이유','reply-32',this)" style="padding:6px 12px;background:#1a4fa0;color:#fff;border:none;border-radius:8px;font-size:11px;cursor:pointer;font-weight:700;align-self:flex-end">답글 저장</button></div></div></div><div data-issue-num="31" style="padding: 12px 14px; border-bottom: 1px solid rgb(240, 240, 240); font-size: 12px; display: flex; gap: 10px; align-items: flex-start;"><input type="checkbox" class="inq-check" data-num="31" style="margin-top: 4px; cursor: pointer; width: 16px; height: 16px; flex-shrink: 0;"><div style="flex: 1 1 0%; min-width: 0px;"><div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span style="font-weight:700;color:#333">영업팀아이유</span><span style="color:#bbb;font-size:10px">2026. 6. 24. 오전 8:29:29</span><button onclick="admDeleteInquiry(31,this)" style="margin-left:auto;padding:3px 10px;background:#fff0f0;border:1px solid #fcc;border-radius:6px;font-size:11px;cursor:pointer;color:#c33">🗑 삭제</button></div><div style="color:#555;white-space:pre-wrap;line-height:1.6;margin-bottom:8px">찬우잘생겼어</div><div style="margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8ecf4;font-size:12px"><span style="color:#1a4fa0;font-weight:600">📣 관리자 답글</span>&nbsp;&nbsp;<span style="color:#333;white-space:pre-wrap">나도알아</span></div><div style="display:flex;gap:6px;margin-top:4px"><textarea id="reply-31" placeholder="답글 입력..." rows="2" style="flex:1;padding:7px 10px;border:1px solid #ddd;border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;outline:none">나도알아</textarea><button onclick="admSaveReply(31,'영업팀아이유','reply-31',this)" style="padding:6px 12px;background:#1a4fa0;color:#fff;border:none;border-radius:8px;font-size:11px;cursor:pointer;font-weight:700;align-self:flex-end">답글 저장</button></div></div></div></div>
       </div>
 
+    </div>
+
+    <div id="adm-faq-view" style="display: none; padding: 0px 2px 16px;">
+      <div class="adm-sec">
+        <p class="adm-sec-hd">💬 질문답변 추가·수정 <span style="font-weight:400;color:#aaa;font-size:12px">비슷한 문장으로 검색하면 이 답변이 뜹니다</span></p>
+        <input type="text" id="adm-faq-q" placeholder="예: 인조대리석 납기 얼마나 걸려요?" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:8px">
+        <textarea id="adm-faq-a" placeholder="답변 내용을 입력하세요" rows="3" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;margin-bottom:8px"></textarea>
+        <div style="display:flex;gap:6px">
+          <button onclick="admFaqSave()" style="flex:1;padding:10px;background:var(--p);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">저장</button>
+          <button onclick="admFaqCancelEdit()" id="adm-faq-cancel-btn" style="display:none;padding:10px 16px;background:#f0f0f0;border:none;border-radius:8px;font-size:13px;cursor:pointer">취소</button>
+        </div>
+      </div>
+      <div class="adm-sec">
+        <p class="adm-sec-hd">📋 등록된 질문답변 <span id="adm-faq-count" style="font-weight:400;color:#aaa;font-size:12px"></span></p>
+        <div id="adm-faq-list" style="max-height:600px;overflow-y:auto"></div>
+      </div>
     </div>
     
       <div class="adm-foot">
@@ -1261,6 +1278,11 @@ async function admPushToGitHub(onSuccess){
     var csi=html.indexOf(csS),cse=html.indexOf(csE);
     if(csi!==-1&&cse!==-1)html=html.substring(0,csi)+csS+JSON.stringify(ADM_CATS)+csE+html.substring(cse+csE.length);
 
+    // ADM_FAQ 교체 (마커 방식)
+    var fqS='/*FAQ'+'_START*/';var fqE='/*FAQ'+'_END*/';
+    var fqi=html.indexOf(fqS),fqe=html.indexOf(fqE);
+    if(fqi!==-1&&fqe!==-1)html=html.substring(0,fqi)+fqS+JSON.stringify(ADM_FAQ)+fqE+html.substring(fqe+fqE.length);
+
     // ADM_NOTICE 교체
     var ntS='/*NOTI'+'CE_START*/';var ntE='/*NOTI'+'CE_END*/';
     var ni=html.indexOf(ntS),ne=html.indexOf(ntE);
@@ -1374,6 +1396,7 @@ var ADM_PW='dnels1122';
 var ADM_USERS=/*USERS_START*/[{"id":"강원선","name":"강원선","pw":"1234"},{"id":"강승연","name":"강승연","pw":"1234"},{"id":"강지혜","name":"강지혜","pw":"1234"},{"id":"강영수","name":"강영수","pw":"12324"},{"id":"권범민우딘","name":"권범민","pw":"1234"},{"id":"박준하우딘","name":"박준하","pw":"1234"},{"id":"양우경우딘","name":"양우경","pw":"1234"},{"id":"김동현우딘","name":"김동현","pw":"1234"},{"id":"이동연우딘","name":"이동연","pw":"1234"},{"id":"이시원우딘","name":"이시원","pw":"1234"},{"id":"방재원우딘","name":"방재원","pw":"1234"},{"id":"이남준우딘","name":"이남준","pw":"1234","replies":[{"issueNum":39,"text":"나도암","date":"2026. 6. 29."}]},{"id":"정지영우딘","name":"정지영","pw":"1234"},{"id":"이걸우딘","name":"이걸","pw":"1234"},{"id":"고정기우딘","name":"고정기","pw":"1234"},{"id":"최윤실우딘","name":"최윤실","pw":"1234"},{"id":"양승준우딘","name":"양승준","pw":"1234"},{"id":"장미희우딘","name":"장미희","pw":"1234","replies":[{"issueNum":45,"text":"예쁜장미희","date":"2026. 7. 9."}]},{"id":"최동수우딘","name":"최동수","pw":"1234"},{"id":"김완섭우딘","name":"김완섭","pw":"1234"},{"id":"이희동우딘","name":"이희동","pw":"1234"},{"id":"이가진우딘","name":"이가진","pw":"1234"},{"id":"진효직우딘","name":"진효직","pw":"1234"},{"id":"송인성우딘","name":"송인성","pw":"1234"},{"id":"노재환우딘","name":"노재환","pw":"1234"},{"id":"김준우딘","name":"김준","pw":"1234"},{"id":"김영남우딘","name":"김영남","pw":"1234"},{"id":"이경민우딘","name":"이경민","pw":"1234"},{"id":"양일호우딘","name":"양일호","pw":"1234"},{"id":"강승훈우딘","name":"강승훈","pw":"1234"},{"id":"김우빈우딘","name":"김우빈","pw":"1234"},{"id":"박진수우딘","name":"박진수","pw":"1234"},{"id":"김환우딘","name":"김환","pw":"1234"},{"id":"이순민우딘","name":"이순민","pw":"1234"},{"id":"이동훈우딘","name":"이동훈","pw":"1234"},{"id":"황보동규우딘","name":"황보동규","pw":"1234"},{"id":"김현우우딘","name":"김현우","pw":"1234"},{"id":"이재훈우딘","name":"이재훈","pw":"1234"},{"id":"김종철우딘","name":"김종철","pw":"1234"},{"id":"이영상우딘","name":"이영상","pw":"1234"},{"id":"김도훈우딘","name":"김도훈","pw":"1234"},{"id":"김상중우딘","name":"김상중","pw":"1234"},{"id":"이병남우딘","name":"이병남","pw":"1234"},{"id":"전대성우딘","name":"전대성","pw":"1234"},{"id":"장양희우딘","name":"장양희","pw":"1234"},{"id":"김현기우딘","name":"김현기","pw":"1234"},{"id":"김영웅우딘","name":"김영웅","pw":"1234"},{"id":"배대건우딘","name":"배대건","pw":"1234"},{"id":"탁성민우딘","name":"탁성민","pw":"1234"},{"id":"이정현우딘","name":"이정현","pw":"1234"},{"id":"이진원우딘","name":"이진원","pw":"1234"},{"id":"한준택우딘","name":"한준택","pw":"1234"},{"id":"류동윤우딘","name":"류동윤","pw":"1234"},{"id":"염태동우딘","name":"염태동","pw":"1234"},{"id":"서보영우딘","name":"서보영","pw":"1234"},{"id":"이준호우딘","name":"이준호","pw":"1234"},{"id":"김찬우우딘","name":"김찬우","pw":"3509","replies":[{"issueNum":40,"text":"알겠습니다. 일주일 안으로 상세도면 제작하여 업로드 하겠습니다","date":"2026. 6. 30."}]}]/*USERS_END*/;
 var admPending={real:[],draw:[],desc:[],newReal:[],newDraw:[],newDesc:[],changed:{real:false,draw:false,desc:false}};
 var ADM_CATS=/*CATS_START*/["실린더","포인트몰딩","오목이","PVC몰딩","인조대리석","리빙보드","힐링월","힐링월몰딩","모티스","하드웨어","행거","경첩","슬라이딩락","핸들","클래식몰딩","세라민타일","흡음보드"]/*CATS_END*/;
+var ADM_FAQ=/*FAQ_START*/[]/*FAQ_END*/;
 
 function admOpenLogin(){
   document.getElementById('adm-pw-input').value='';
@@ -1522,9 +1545,69 @@ function admClosePanel(){
   document.getElementById('adm-panel').classList.remove('show');
 }
 var admCurrentTab='edit';
+
+// ── 질문답변(FAQ) 관리자 CRUD ──────────────────────────
+var admFaqEditIndex=null;
+function admFaqRender(){
+  var list=document.getElementById('adm-faq-list');
+  var countEl=document.getElementById('adm-faq-count');
+  if(countEl)countEl.textContent='('+ADM_FAQ.length+'개)';
+  if(!list)return;
+  list.innerHTML='';
+  if(!ADM_FAQ.length){
+    list.innerHTML='<div style="text-align:center;color:#bbb;font-size:12px;padding:16px">등록된 질문답변이 없습니다</div>';
+    return;
+  }
+  ADM_FAQ.forEach(function(item,i){
+    var card=document.createElement('div');
+    card.style.cssText='background:#f8f9fc;border-radius:10px;padding:10px 12px;margin-bottom:8px;border:1px solid #e8edf5';
+    var qEsc=item.q.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+    var aEsc=item.a.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+    card.innerHTML=
+      '<div style="font-weight:700;color:#333;font-size:13px;margin-bottom:4px">Q. '+qEsc+'</div>'
+      +'<div style="color:#666;font-size:12.5px;white-space:pre-wrap;line-height:1.5;margin-bottom:8px">A. '+aEsc+'</div>'
+      +'<div style="display:flex;gap:6px">'
+      +'<button onclick="admFaqStartEdit('+i+')" style="padding:4px 10px;background:#fff;border:1px solid #ccc;border-radius:6px;font-size:11px;cursor:pointer">✏️ 수정</button>'
+      +'<button onclick="admFaqDelete('+i+')" style="padding:4px 10px;background:#fff0f0;border:1px solid #fcc;border-radius:6px;font-size:11px;cursor:pointer;color:#c33">🗑 삭제</button>'
+      +'</div>';
+    list.appendChild(card);
+  });
+}
+function admFaqSave(){
+  var q=(document.getElementById('adm-faq-q').value||'').trim();
+  var a=(document.getElementById('adm-faq-a').value||'').trim();
+  if(!q||!a){alert('질문과 답변을 모두 입력하세요.');return;}
+  if(admFaqEditIndex!==null){
+    ADM_FAQ[admFaqEditIndex].q=q;
+    ADM_FAQ[admFaqEditIndex].a=a;
+  } else {
+    ADM_FAQ.push({id:Date.now(),q:q,a:a});
+  }
+  admFaqCancelEdit();
+  admFaqRender();
+}
+function admFaqStartEdit(i){
+  admFaqEditIndex=i;
+  document.getElementById('adm-faq-q').value=ADM_FAQ[i].q;
+  document.getElementById('adm-faq-a').value=ADM_FAQ[i].a;
+  document.getElementById('adm-faq-cancel-btn').style.display='inline-block';
+  document.getElementById('adm-faq-q').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function admFaqCancelEdit(){
+  admFaqEditIndex=null;
+  document.getElementById('adm-faq-q').value='';
+  document.getElementById('adm-faq-a').value='';
+  document.getElementById('adm-faq-cancel-btn').style.display='none';
+}
+function admFaqDelete(i){
+  if(!confirm('이 질문답변을 삭제하시겠습니까?'))return;
+  ADM_FAQ.splice(i,1);
+  admFaqRender();
+}
+
 function admSwitchTab(tab){
   admCurrentTab=tab;
-  ['edit','new','cat','notice','popup','users','inquiry'].forEach(function(t){
+  ['edit','new','cat','notice','popup','users','inquiry','faq'].forEach(function(t){
     var btn=document.getElementById('adm-tab-'+t);
     if(btn) btn.classList[t===tab?'add':'remove']('on');
   });
@@ -1537,7 +1620,9 @@ function admSwitchTab(tab){
   document.getElementById('adm-popup-view').style.display=(tab==='popup')?'block':'none';
   document.getElementById('adm-users-view').style.display=(tab==='users')?'block':'none';
   document.getElementById('adm-inquiry-view').style.display=(tab==='inquiry')?'block':'none';
+  document.getElementById('adm-faq-view').style.display=(tab==='faq')?'block':'none';
   if(tab==='cat')admCatRender();
+  if(tab==='faq')admFaqRender();
   if(tab==='notice'){
     var ed=document.getElementById('adm-notice-ed');if(ed)ed.innerHTML=ADM_NOTICE;
     var ied=document.getElementById('adm-inquiry-ed');if(ied)ied.innerHTML=ADM_INQUIRY_TEXT;
@@ -3187,6 +3272,33 @@ function findCategoryResidual(q){
   return null;
 }
 
+// ── 질문답변(FAQ) 매칭: 저장된 질문과 사용자 문장의 토큰 겹침을 길이가중치로 비교 ──
+function scoreFaqMatch(q, faqQ){
+  var qTokens=tokenize(q), faqTokens=tokenize(faqQ);
+  if(!qTokens.length||!faqTokens.length)return 0;
+  var qSet={};qTokens.forEach(function(t){qSet[t]=1;});
+  var faqSet={};faqTokens.forEach(function(t){faqSet[t]=1;});
+  function weightedCoverage(fromTokens, targetSet){
+    var total=0,hit=0,seen={};
+    fromTokens.forEach(function(t){
+      if(seen[t])return;seen[t]=1;
+      var w=t.length;total+=w;
+      if(targetSet[t])hit+=w;
+    });
+    return total>0?hit/total:0;
+  }
+  return (weightedCoverage(faqTokens,qSet)+weightedCoverage(qTokens,faqSet))/2;
+}
+function findFaqMatch(q){
+  if(!ADM_FAQ||!ADM_FAQ.length)return null;
+  var best=null,bestScore=0;
+  ADM_FAQ.forEach(function(item){
+    var s=scoreFaqMatch(q,item.q);
+    if(s>bestScore){bestScore=s;best=item;}
+  });
+  return (best&&bestScore>=0.6)?best:null;
+}
+
 // 통합 스마트 검색
 function smartSearch(q){
   var tokens=tokenize(q);
@@ -3239,6 +3351,13 @@ function respond(q){
     var catProducts=Object.keys(DB).filter(function(k){return DB[k].cat===matchedCat;});
     if(catProducts.length>0){addBot('<b>📂 '+matchedCat+'</b> ('+catProducts.length+'개 제품)',catProducts);}
     else{addBot('<b>📂 '+matchedCat+'</b> — 등록된 제품이 없습니다.',ADM_CATS);}
+    return;
+  }
+
+  // ── 2.5 질문답변(FAQ) 매칭 ──
+  var faqHit=findFaqMatch(q);
+  if(faqHit){
+    addBot('<b>💬 답변</b><br>'+faqHit.a.replace(/</g,'&lt;').replace(/\n/g,'<br>'));
     return;
   }
 

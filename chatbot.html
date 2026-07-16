@@ -1102,14 +1102,26 @@ function addUser(t){
 /* ══ GitHub 연동 ══ */
 var GH_STORAGE_KEY='woodin_gh_config';
 var GH_DEFAULT={owner:'kpslove5307',repo:'felicity',path:'chatbot.html'};
-// 공용 Issues 전송용 토큰 (가입신청/문의 전용)
-var GH_ISSUE_TOKEN=(function(){var a='github_pat_11CFYZRSY0lilS1pK7P';var b='Pyy_kJSVeQSxuN5JZTzaJz4qQMT3kCHhHO1zP4lz5yuA7ezKGKMAQRSaLbMA5NB';return a+b;})();
+// 가입신청/문의용: 개인 토큰 있으면 GitHub 직접 호출, 없으면 서버 프록시(Cloudflare Worker) 경유
+// (실제 GitHub 토큰은 프록시 서버에만 있고 이 파일에는 없음)
+var ISSUE_PROXY_BASE='https://felicity.kpslove5307.workers.dev/gh';
+var ISSUE_PROXY_KEY='89f0a22eb87c3304053f821b932b7f9ca04a71d1db657e75';
 
-// 가입신청/문의용 config (토큰 없어도 동작)
+// 가입신청/문의용 config (개인 토큰 없어도 프록시로 동작)
 function getIssueConfig(){
   var cfg=admGhLoadConfig();
-  if(cfg&&cfg.token)return cfg;
-  return {owner:GH_DEFAULT.owner,repo:GH_DEFAULT.repo,token:GH_ISSUE_TOKEN};
+  if(cfg&&cfg.token){
+    return {
+      owner:cfg.owner, repo:cfg.repo,
+      baseUrl:'https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo,
+      authHeaders:{'Authorization':'token '+cfg.token}
+    };
+  }
+  return {
+    owner:GH_DEFAULT.owner, repo:GH_DEFAULT.repo,
+    baseUrl:ISSUE_PROXY_BASE,
+    authHeaders:{'X-App-Key':ISSUE_PROXY_KEY}
+  };
 }
 
 function admGhLoadConfig(){
@@ -2247,9 +2259,9 @@ async function gateDoSignup(){
   var btn = document.querySelector('#gate-signup-form button');
   btn.disabled=true; btn.textContent='신청 중...';
   try{
-    var res = await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues',{
+    var res = await fetch(cfg.baseUrl+'/issues',{
       method:'POST',
-      headers:{'Authorization':'token '+cfg.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+      headers:{...cfg.authHeaders,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
       body:JSON.stringify({
         title:'[가입신청] '+name+' ('+id+')',
         body:'이름: '+name+'\n아이디: '+id+'\n비밀번호(해시불가): '+pw+'\n신청일시: '+new Date().toLocaleString('ko-KR'),
@@ -2279,9 +2291,9 @@ async function sideInquirySubmit(){
   var btn = document.querySelector('#side-panel button');
   btn.disabled=true; btn.textContent='제출 중...';
   try{
-    var res = await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues',{
+    var res = await fetch(cfg.baseUrl+'/issues',{
       method:'POST',
-      headers:{'Authorization':'token '+cfg.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+      headers:{...cfg.authHeaders,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
       body:JSON.stringify({
         title:'[문의] '+writer,
         body:'작성자: '+writer+'\n\n'+content+'\n\n접수일시: '+new Date().toLocaleString('ko-KR')
@@ -2323,9 +2335,9 @@ async function inquirySubmit(){
   var btn = document.getElementById('inquiry-submit-btn');
   if(btn){btn.disabled=true; btn.textContent='제출 중...';}
   try{
-    var res = await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues',{
+    var res = await fetch(cfg.baseUrl+'/issues',{
       method:'POST',
-      headers:{'Authorization':'token '+cfg.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+      headers:{...cfg.authHeaders,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
       body:JSON.stringify({
         title:'[문의] '+writer,
         body:'작성자: '+writer+'\n\n'+content+'\n\n접수일시: '+new Date().toLocaleString('ko-KR')
@@ -2460,14 +2472,14 @@ async function userDeleteOneInquiry(issueNum, btn){
   var cfg=getIssueConfig();
   try{
     // Issue 제목에 [삭제됨] 추가
-    var r1=await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues/'+issueNum,{
-      headers:{'Authorization':'token '+cfg.token,'Accept':'application/vnd.github.v3+json'}
+    var r1=await fetch(cfg.baseUrl+'/issues/'+issueNum,{
+      headers:{...cfg.authHeaders,'Accept':'application/vnd.github.v3+json'}
     });
     var iss=await r1.json();
     if(iss.title&&iss.title.indexOf('[삭제됨]')===-1){
-      await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues/'+issueNum,{
+      await fetch(cfg.baseUrl+'/issues/'+issueNum,{
         method:'PATCH',
-        headers:{'Authorization':'token '+cfg.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+        headers:{...cfg.authHeaders,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
         body:JSON.stringify({title:'[삭제됨] '+iss.title})
       });
     }
@@ -2487,14 +2499,14 @@ async function userDeleteSelectedInquiries(containerId){
   checked.forEach(function(cb){cards.push({num:parseInt(cb.dataset.num),card:cb.closest('.user-inq-card')});});
   for(var i=0;i<cards.length;i++){
     try{
-      var r1=await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues/'+cards[i].num,{
-        headers:{'Authorization':'token '+cfg.token,'Accept':'application/vnd.github.v3+json'}
+      var r1=await fetch(cfg.baseUrl+'/issues/'+cards[i].num,{
+        headers:{...cfg.authHeaders,'Accept':'application/vnd.github.v3+json'}
       });
       var iss=await r1.json();
       if(iss.title&&iss.title.indexOf('[삭제됨]')===-1){
-        await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues/'+cards[i].num,{
+        await fetch(cfg.baseUrl+'/issues/'+cards[i].num,{
           method:'PATCH',
-          headers:{'Authorization':'token '+cfg.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+          headers:{...cfg.authHeaders,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
           body:JSON.stringify({title:'[삭제됨] '+iss.title})
         });
       }
@@ -2578,7 +2590,7 @@ var admSideShownCount=0;
 
 async function admLoadAllInquiriesCompact(isFirst){
   var cfg=getIssueConfig();
-  if(!cfg||!cfg.token)return;
+  if(!cfg)return;
   if(isFirst){
     admSidePage=1;
     admSideShownCount=0;
@@ -2592,8 +2604,8 @@ async function admLoadAllInquiriesCompact(isFirst){
     });
   }
   try{
-    var res=await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues?state=open&per_page=100&page='+admSidePage,{
-      headers:{'Authorization':'token '+cfg.token,'Accept':'application/vnd.github.v3+json'}
+    var res=await fetch(cfg.baseUrl+'/issues?state=open&per_page=100&page='+admSidePage,{
+      headers:{...cfg.authHeaders,'Accept':'application/vnd.github.v3+json'}
     });
     var rawIssues=await res.json();
     if(!Array.isArray(rawIssues))throw new Error('응답 오류');
@@ -2745,8 +2757,8 @@ async function loadMyInquiries(){
   setLoading('modal-replies-box');
 
   try{
-    var res=await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues?state=open&per_page=50',{
-      headers:{'Authorization':'token '+cfg.token,'Accept':'application/vnd.github.v3+json'}
+    var res=await fetch(cfg.baseUrl+'/issues?state=open&per_page=50',{
+      headers:{...cfg.authHeaders,'Accept':'application/vnd.github.v3+json'}
     });
     var all=await res.json();
     var myName=CURRENT_USER.name||CURRENT_USER.id;
@@ -3425,8 +3437,8 @@ async function mobileInqLoadList(){
     if(_usersCache) myUser=_usersCache.filter(function(u){return u.id===CURRENT_USER.id;})[0]||null;
     // Issues 가져오기
     var cfg=getIssueConfig();
-    var res=await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues?state=open&per_page=100',{
-      headers:{'Authorization':'token '+cfg.token,'Accept':'application/vnd.github.v3+json'}
+    var res=await fetch(cfg.baseUrl+'/issues?state=open&per_page=100',{
+      headers:{...cfg.authHeaders,'Accept':'application/vnd.github.v3+json'}
     });
     var issues=await res.json();
     var myIssues=IS_ADMIN
@@ -3473,14 +3485,14 @@ async function mobileInqSubmit(){
   var text=(document.getElementById('mobile-inq-text').value||'').trim();
   if(!text){alert('내용을 입력해주세요.');return;}
   var cfg=getIssueConfig();
-  if(!cfg||!cfg.token){alert('설정이 필요합니다.');return;}
+  if(!cfg){alert('설정이 필요합니다.');return;}
   var btn=document.querySelector('#mob-panel-write button');
   btn.disabled=true;btn.textContent='제출 중...';
   try{
     var body='작성자: '+CURRENT_USER.name+'\n\n'+text+'\n\n접수일시: '+new Date().toLocaleString('ko-KR');
-    var res=await fetch('https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/issues',{
+    var res=await fetch(cfg.baseUrl+'/issues',{
       method:'POST',
-      headers:{'Authorization':'token '+cfg.token,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+      headers:{...cfg.authHeaders,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
       body:JSON.stringify({title:'[문의] '+CURRENT_USER.name,body:body})
     });
     if(!res.ok)throw new Error('제출 실패');

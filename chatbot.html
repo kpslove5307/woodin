@@ -903,7 +903,7 @@ function gi(f){
   // 새로 업로드한 이미지(base64)는 바로 반환
   if(I[f]&&I[f]!=='__IMG_PLACEHOLDER__')return I[f];
   // 파일명 전체 인코딩 (한글, 공백 등 모두 처리)
-  var OWNER='kpslove5307', REPO='woodin', BRANCH='main';
+  var OWNER='kpslove5307', REPO='felicity', BRANCH='main';
   return 'https://raw.githubusercontent.com/'+OWNER+'/'+REPO+'/'+BRANCH+'/images/'+encodeURIComponent(f);
 }
 
@@ -1101,7 +1101,7 @@ function addUser(t){
 
 /* ══ GitHub 연동 ══ */
 var GH_STORAGE_KEY='woodin_gh_config';
-var GH_DEFAULT={owner:'kpslove5307',repo:'woodin',path:'chatbot.html'};
+var GH_DEFAULT={owner:'kpslove5307',repo:'felicity',path:'chatbot.html'};
 // 공용 Issues 전송용 토큰 (가입신청/문의 전용)
 var GH_ISSUE_TOKEN=(function(){var a='github_pat_11CFYZRSY0lilS1pK7P';var b='Pyy_kJSVeQSxuN5JZTzaJz4qQMT3kCHhHO1zP4lz5yuA7ezKGKMAQRSaLbMA5NB';return a+b;})();
 
